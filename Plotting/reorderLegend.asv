@@ -1,0 +1,7 @@
+function [ ] = reorderLegend( varargin )
+%REORDERLEGEND Reorder legend items in active plot
+%   Usages:
+%    reorderLegend(2, 3, 1);
+%
+end
+
