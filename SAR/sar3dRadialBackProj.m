@@ -1,4 +1,4 @@
-function [ Img, varargout ] = sar3dRadial( S, x, y, z, f, varargin )
+function [ Img, varargout ] = sar3dRadialBackProj( S, x, y, z, f, varargin )
 %SAR3DRADIAL Generate polarized images from radial sar data
 %   S -> Raw Data
 %   x -> x coordinates

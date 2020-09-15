@@ -1,4 +1,4 @@
-function varargout = plotError(x, y, varargin)
+function varargout = plotErrorAuto(x, y, varargin)
 
 yS = squeeze(y);
 xS = squeeze(x);

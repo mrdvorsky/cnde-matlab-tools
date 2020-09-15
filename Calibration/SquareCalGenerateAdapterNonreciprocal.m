@@ -1,14 +1,14 @@
-function [ ] = SquareCalGenerateAdapter( filename, varargin )
+function [ ] = SquareCalGenerateAdapterNonreciprocal( filename, varargin )
 
 
 %% Inputs
-filenames = ["s", "s1", "s2", "s3", "load"];
+filenames = ["s", "s1", "s2", "s3", "load", "thru"];
 filePaths = compose(strcat(filename, "/%s.s2p"), filenames);
 
 calFileOut = strcat(filename, "/calData");
 
 % Shorts are 30.75, 60.0, and 129.5 mils respectively
-shortLengths(1, 1, :, 1) = [0, 30.3, 60, 130, 0] .* 0.0254;
+shortLengths(1, 1, :, 1) = [0, 30.3, 60, 130, 0, 0] .* 0.0254;
 
 wg_a = 7.112;
 c = 299.79;
@@ -16,7 +16,7 @@ c = 299.79;
 g1Guess = exp(1j .* deg2rad(20));
 g2Guess = exp(1j .* deg2rad(-20));
 
-calIndices = [1, 2:5];
+calIndices = [1, 2:4, 5:6];
 
 %% Manage Inputs
 if nargin == 1
@@ -48,7 +48,7 @@ Tlin = zeros(2, 2, 4, length(F));
 g1 = zeros(length(F), 1);
 g2 = zeros(length(F), 1);
 for ff = 1:length(F)
-    [Tlin(:, :, :, ff), Tcirc(:, :, :, ff), g1(ff), g2(ff)] = SquareCalGetErrorParams(...
+    [Tlin(:, :, :, ff), Tcirc(:, :, :, ff), g1(ff), g2(ff)] = SquareCalGetErrorParamsNonreciprocal(...
         Sm(:, :, calIndices, ff), d(1, 1, calIndices, ff), g1Guess, g2Guess, -1j);
     g1Guess = g1(ff);
     g2Guess = g2(ff);

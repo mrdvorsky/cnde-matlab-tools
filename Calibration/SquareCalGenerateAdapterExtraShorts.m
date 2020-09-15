@@ -1,29 +1,28 @@
-function [ ] = SquareCalGenerateAdapter( filename, varargin )
+function [ ] = SquareCalGenerateAdapterExtraShorts( filename, varargin )
 
 
 %% Inputs
-filenames = ["s", "s1", "s2", "s3", "load"];
+filenames = ["s", "s1", "s2", "s3", "s4", "s5", "load"];
 filePaths = compose(strcat(filename, "/%s.s2p"), filenames);
 
 calFileOut = strcat(filename, "/calData");
 
 % Shorts are 30.75, 60.0, and 129.5 mils respectively
-shortLengths(1, 1, :, 1) = [0, 30.3, 60, 130, 0] .* 0.0254;
+shortLengths(1, 1, :, 1) = [0, 30.3, 60, 130, 118, 236, 0] .* 0.0254;
 
 wg_a = 7.112;
 c = 299.79;
 
-g1Guess = exp(1j .* deg2rad(20));
-g2Guess = exp(1j .* deg2rad(-20));
+g1Guess = exp(1j .* deg2rad(-20));
+g2Guess = exp(1j .* deg2rad(20));
 
-calIndices = [1, 2:5];
+calIndices = [1, 2:4, 7];
 
 %% Manage Inputs
 if nargin == 1
     plotIndices = [];
 else
-%     plotIndices = [1:4];
-    plotIndices = [2];
+    plotIndices = [1:6];
 end
 
 %% Read Data

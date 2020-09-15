@@ -1,4 +1,4 @@
-function [ Tlin, Tcirc, g1, g2 ] = SquareCalGetErrorParams( Sm, d, g1Guess, g2Guess, t15Guess )
+function [ Tlin, Tcirc, g1, g2, Srecip ] = SquareCalGetErrorParamsNonreciprocal( Sm, d, g1Guess, g2Guess, t15Guess )
 %SQUARECALGETERRORPARAMS Calibrate square waveguide
 %   Calculate calibration parameters for a 2-port square waveguide. The
 %   inputs S and Sm are the actual and measured S-parameters of the square
@@ -86,6 +86,9 @@ k = [1, -1] * sqrt(V(1, 2) ./ V(2, 1));
 [~, kInd] = min(abs(k*Q(2, 1) - t15Guess));
 
 T4 = Q * [k(kInd), 0; 0, 1];
+
+%% Calculate Reciprocal Standard Parameters
+Srecip = T4\C4*T4;
 
 %% Calculate T2,T3,T4
 T3 = C3*T4;
