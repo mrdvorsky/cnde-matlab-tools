@@ -22,7 +22,8 @@ calIndices = [1, 2:5];
 if nargin == 1
     plotIndices = [];
 else
-    plotIndices = [1:4];
+%     plotIndices = [1:4];
+    plotIndices = [2];
 end
 
 %% Read Data
