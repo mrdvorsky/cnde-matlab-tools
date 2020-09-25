@@ -8,7 +8,7 @@ filePaths = compose(strcat(filename, "/%s.s2p"), filenames);
 calFileOut = strcat(filename, "/calData");
 
 % Shorts are 30.75, 60.0, and 129.5 mils respectively
-shortLengths(1, 1, :, 1) = [0, 30.0, 60.2, 129.6, 0, 0] .* 0.0254;
+shortLengths(1, 1, :, 1) = [0, 30.3, 60, 130, 0] .* 0.0254;
 
 wg_a = 7.112;
 c = 299.79;
