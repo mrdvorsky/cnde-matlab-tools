@@ -23,8 +23,11 @@ assert(all(newOrder(:) > 0) && length(newOrder(:)) == length(unique(newOrder(:))
     "Input must be made up of unique positive integers.");
 
 ax = gca;
+prevLegendStrings = get(legend(), "String");
 plotHandles = flip(ax.Children);
 ax.Children = flip(plotHandles(newOrder));
+legend(prevLegendStrings(newOrder));
+
 
 end
 
