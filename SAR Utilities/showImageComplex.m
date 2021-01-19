@@ -6,7 +6,13 @@ function [ varargout ] = showImageComplex( x, y, Img, varargin )
 %% Parse Inputs
 p = inputParser;
 addParameter(p, "PhaseMultiplier", 1);
+addParameter(p, "NormalizeFactor", 1);
 parse(p, varargin{:});
+
+%% Normalize
+if p.Results.NormalizeFactor > 0
+    Img = Img ./ max(abs(Img(:))) .* p.Results.NormalizeFactor;
+end
 
 %% Plot
 [varargout{1:nargout}] = imagesc(squeeze(x), squeeze(y), ...
