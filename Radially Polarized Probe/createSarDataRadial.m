@@ -23,8 +23,8 @@ k3(1, 1, :) = 2 .* pi .* f ./ c;
 S = zeros(length(x), length(y), length(f));
 for ii = 1:length(x0)
     [phi, theta, R] = cart2sph(-x1 + x0(ii), -y2 + y0(ii), -abs(z0(ii)));
-    polDot = cos(a0(ii) - phi) .* cos(e0(ii)) .* cos(theta) ...
-        + sin(e0(ii)) .* sin(theta);
+    polDot = cos(a0(ii) - phi) .* cos(e0(ii)) .* cos(theta + pi/2) ...
+        + sin(e0(ii)) .* sin(theta + pi/2);
     
     Stmp = exp(-2j .* R .* k3);
     Stmp = Stmp .* (p0(ii) .* polDot.^2 + np0(ii));
