@@ -26,7 +26,7 @@ try
         strcat(fileName, calAppend)), ".s2p"));
     calData = cal.Parameters(shortChannel(1), shortChannel(2), :);
 catch
-    error("File '%s.s2p' does not exist.", fullfile(fileDirectory, fileName));
+    error("File '%s.s2p' does not exist or has the wrong format.", fullfile(fileDirectory, fileName));
 end
 
 %% Calibrate

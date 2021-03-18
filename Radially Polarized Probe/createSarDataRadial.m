@@ -28,7 +28,7 @@ for ii = 1:length(x0)
     
     Stmp = exp(-2j .* R .* k3);
     Stmp = Stmp .* (p0(ii) .* polDot.^2 + np0(ii));
-    Stmp = Stmp .* radialProbePattern(pi/2 + theta, thetaBw);
+    Stmp = Stmp .* antennaPatternRadialPolarization(pi/2 + theta, thetaBw, "NormalizeOutputPower", 1).^2;
     Stmp = Stmp ./ R.^2;
     
     S = S + Stmp;
