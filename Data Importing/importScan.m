@@ -1,32 +1,28 @@
-function [X, Y, Z, F, Data, Header, ErrorMessage] = importScan(Filepath)
+function [X, Y, Z, F, Data, Header] = importScan(Filepath)
 
 X = [];
 Y = [];
 Z = [];
 F = [];
 Data = [];
-ErrorMessage = '';
 
 File = fopen(Filepath);
 
 if File == -1
-    ErrorMessage = 'File not found.';
-    return;
+    error("File not found.");
 end
 
 %% Get Version Info
 scanFileCode = fread(File, 1, 'double');
 if scanFileCode ~= 63474328
-    ErrorMessage = '*.scan file type not recognized.';
     fclose(File);
-    return;
+    error("*.scan file type not recognized.");
 end
 
 scanFileVersion = fread(File, 1, 'double');
 if scanFileVersion ~= 1
-    ErrorMessage = '*.scan file version is not supported.';
     fclose(File);
-    return;
+    error("*.scan file version is not supported.");
 end
 
 %% Get Header Data
@@ -107,9 +103,8 @@ elseif numDims == 1
     axisOrder = [axisOrder; 2; 3];
     numSteps = [numSteps; 1; 1];
 else
-    ErrorMessage = strcat('Import failed, number of dimensions in ', ...
-        '*.scan file must be between 1 and 3.');
-    return;
+    error(strcat("Import failed, number of dimensions in ", ...
+        "*.scan file must be between 1 and 3."));
 end
 
 Data = reshape(Data, numF, numChannels, []);
