@@ -13,8 +13,8 @@ shortLengths(1, 1, :, 1) = [0, 30.3, 60, 130, 0, 0] .* 0.0254;
 wg_a = 7.112;
 c = 299.79;
 
-g1Guess = exp(1j .* deg2rad(-20));
-g2Guess = exp(1j .* deg2rad(20));
+g1Guess = exp(1j .* deg2rad(20));
+g2Guess = exp(1j .* deg2rad(-20));
 
 calIndices = [1, 2:4, 5:6];
 
