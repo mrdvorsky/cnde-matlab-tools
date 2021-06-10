@@ -1,6 +1,25 @@
 function [ nodes, weights ] = clenshawCurtis( orderN, a, b, w )
-%CLENSHAWCURTIS Summary of this function goes here
-%   Detailed explanation goes here
+%CLENSHAWCURTIS Generate integration weights and nodes for closed interval
+%   This function generates the weights and nodes required to compute a
+%   definite integral over a closed interval. The weights and nodes are
+%   defined using the Clenshaw-Curtis Quadrature rules.
+%   
+%   The function outputs "nodes" and "weights" can be used to approximate
+%   the definite integral of a function f(x)dx over the interval [a,b] by
+%   computing I = sum(weights .* f(nodes)). This should give approximately
+%   the same result as I = integral(f, a, b), with a higher value of
+%   orderN resulting in a better approximation. The parameter orderN is
+%   the number of points at which to evaluate f(x). If f(x) is a polynomial
+%   with degree less than or equal to orderN, the result will be exact.
+%   The inputs "a" and "b" must be real, finite values.
+%
+%   A weighting function "w" can be optionally supplied such that the
+%   integral I = sum(weights .* f(nodes)) corresponds to the integral of
+%   f(x)w(x)dx over the closed interval [a,b]. In this case, the value I
+%   will be exact f(x) is a polynomial with degree less than orderN,
+%   regardless of w(x). The input "w" should be a function handle that
+%   accepts a scalar input and returns a scalar output. The default value
+%   of "w" is effectively w(x) = 1.
 
 %% Check Input
 if nargin < 3
