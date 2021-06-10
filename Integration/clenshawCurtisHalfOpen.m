@@ -1,6 +1,26 @@
 function [ nodes, weights ] = clenshawCurtisHalfOpen( orderN, L, w )
-%CLENSHAWCURTIS Summary of this function goes here
-%   Detailed explanation goes here
+%CLENSHAWCURTIS Generate integration weights and nodes for half-open interval
+%   This function generates the weights and nodes required to compute a
+%   definite integral over a half-open interval. The weights and nodes are
+%   defined using the Clenshaw-Curtis Quadrature rules.
+%   
+%   The function outputs "nodes" and "weights" can be used to approximate
+%   the definite integral of a function f(x)dx over the interval [0,inf)
+%   by computing I = sum(weights .* f(nodes)). This should give
+%   approximately the same result as I = integral(f, 0, inf), with a higher
+%   value of orderN resulting in a better approximation. The parameter
+%   orderN is the number of points at which to evaluate f(x).
+%
+%   The parameter L is a scaling factor such that the integral computed is
+%   actually I = L*integral(f(L*x), 0, inf). Changing the value of L can
+%   change the convergence speed, and should be chosen based on the
+%   function being integrated. The default value of L is 1.
+%
+%   A weighting function "w" can be optionally supplied such that the
+%   integral I = sum(weights .* f(nodes)) corresponds to the integral of
+%   f(x)w(x)dx over theinterval [0,inf). The input "w" should be a function
+%   handle that accepts a scalar input and returns a scalar output. The
+%   default value of "w" is effectively w(x) = 1.
 
 %% Check Input
 if nargin < 2
@@ -38,10 +58,6 @@ theta(:, 1) = (1:N) * (pi/N);
 nodes(:, 1) = L * cot(0.5*theta).^2;
 
 weights = (2*L) * weights(2:end) ./ (1 - cos(theta)).^2;
-
-%% Change Interval
-% weights = 0.5*(b - a) .* weights;
-% nodes = 0.5*(b - a) .* nodes + 0.5*(a + b);
 
 end
 
