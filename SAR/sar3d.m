@@ -1,12 +1,17 @@
-function [ Image ] = sar3d( S, x, y, z, f, zx, zy )
+function [ Image ] = sar3d( S, x, y, z, f, zx, zy, er, thk )
 %SAR3D Formulate Plane Wave SAR image from raw data
-%   S -> Raw Data
-%   x -> x coordinates
-%   y -> y coordinates
-%   z -> Desired z coordinates
-%   f -> Freqeuncy coordinates
-%   zx -> (Optional) Zero pad amount x (percent)
-%   zy -> (Optional) Zero pad amount y (percent)
+%   S -> Raw measurement data at each location and frequency. Should be of
+%        size length(x) by length(y) by length(f)
+%   x -> Vector of x coordinates (mm)
+%   y -> Vector of y coordinates (mm)
+%   z -> Vector of desired z coordinates (mm)
+%   f -> Vector of freqeuncy coordinates (GHz)
+%   zx -> (Optional) Zero pad amount x (percent). Default value is 0.
+%   zy -> (Optional) Zero pad amount y (percent). Default value is zy.
+%   er -> (Optional) Array of permittivities (real part only) for each
+%         layer. Default value is [1];
+%   thk -> (Optional) Array of thicknesses  for each layer. Default value
+%         is [inf]. The last layer thickness is ignored.
 
 %% Calculate k
 if nargin == 5
