@@ -13,14 +13,19 @@ function [ Image ] = sar3d( S, x, y, z, f, zx, zy, er, thk )
 %   thk -> (Optional) Array of thicknesses  for each layer. Default value
 %         is [inf]. The last layer thickness is ignored.
 
-%% Calculate k
-if nargin == 5
-    zx = 0;
-    zy = 0;
-elseif nargin == 6
-    zy = zx;
+arguments
+    x (:, 1) double;
+    y (:, 1) double;
+    z (:, 1) double;
+    f (:, 1) double;
+    S (:, :, :) double;
+    zx (1, 1) double = 0;
+    zy (1, 1) double = zx;
+    er (:, 1) double = [1];
+    thk (:, 1) double = [inf];
 end
 
+%% Calculate k
 zx = 2 * round((zx ./ 100) .* length(x));
 zy = 2 * round((zy ./ 100) .* length(y));
 
