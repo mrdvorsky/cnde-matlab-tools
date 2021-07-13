@@ -45,6 +45,10 @@ for iz = 1:length(z)
 end
 
 Image = ifft2(ImageSpectrum);
-Image = Image(1:length(x), 1:length(y), :);
+
+%% Crop Output
+outSizeCropped = outSize;
+outSizeCropped(1:2) = [length(x), length(y)];
+Image = reshape(Image(1:length(x), 1:length(y), :), outSizeCropped);
 
 end
