@@ -1,35 +1,43 @@
-function [ Image ] = sar3d( S, x, y, z, f, zx, zy, er, thk )
+function [Image] = sar3d(S, x, y, z, f, options)
 %SAR3D Formulate Plane Wave SAR image from raw data
+%   Usage:
+%       Img = sar3d(S, x, y, z, f);
+%       Img = sar3d(S, x, y, z, f, ZeroPadPercent=25);
+%       Img = sar3d(S, x, y, z, f, ZeroPadPercentX=25, ZeroPadPercentY=0);
+%       Img = sar3d(S, x, y, z, f, er=[2, 3], thk=[10, inf]); % Not implemented
+%
 %   S -> Raw measurement data at each location and frequency. Should be of
 %        size length(x) by length(y) by length(f)
 %   x -> Vector of x coordinates (mm)
 %   y -> Vector of y coordinates (mm)
 %   z -> Vector of desired z coordinates (mm)
 %   f -> Vector of freqeuncy coordinates (GHz)
-%   zx -> (Optional) Zero pad amount x (percent). Default value is 0.
-%   zy -> (Optional) Zero pad amount y (percent). Default value is zy.
-%   er -> (Optional) Array of permittivities (real part only) for each
-%         layer. Default value is [1];
-%   thk -> (Optional) Array of thicknesses  for each layer. Default value
-%         is [inf]. The last layer thickness is ignored.
 
+%% Check Inputs
 arguments
+    S double;
     x (:, 1) double;
     y (:, 1) double;
     z (:, 1) double;
     f (:, 1) double;
-    S (:, :, :) double;
-    zx (1, 1) double = 0;
-    zy (1, 1) double = zx;
-    er (:, 1) double = [1];
-    thk (:, 1) double = [inf];
+    options.ZeroPadPercent (1, 1) double = 0;
+    options.ZeroPadPercentX (1, 1) double = -1;
+    options.ZeroPadPercentY (1, 1) double = -1;
+end
+
+if options.ZeroPadPercentX < 0
+    options.ZeroPadPercentX = options.ZeroPadPercent;
+end
+
+if options.ZeroPadPercentY < 0
+    options.ZeroPadPercentY = options.ZeroPadPercent;
 end
 
 %% Calculate k
-zx = 2 * round((zx ./ 100) .* length(x));
-zy = 2 * round((zy ./ 100) .* length(y));
+zx = 2 * round((options.ZeroPadPercentX ./ 100) .* length(x));
+zy = 2 * round((options.ZeroPadPercentY ./ 100) .* length(y));
 
-c = 299.7924499512;
+c = 299.792458;
 k(1, 1, :) = 2*pi*f/c;
 
 dx = x(2) - x(1);
@@ -55,6 +63,10 @@ for iz = 1:length(z)
 end
 
 Image = ifft2(ImageSpectrum);
-Image = Image(1:length(x), 1:length(y), :);
+
+%% Crop Output
+outSizeCropped = outSize;
+outSizeCropped(1:2) = [length(x), length(y)];
+Image = reshape(Image(1:length(x), 1:length(y), :), outSizeCropped);
 
 end
