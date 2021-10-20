@@ -1,21 +1,55 @@
-function [X, Y, Z, F, Data, Header] = importScan(filenameIn)
+function [varargout] = importScan(filenameIn, options)
 %IMPORTSCAN Import a ".scan" file created by the amntl scanner program.
 % This function imports and parses a ".scan" file.
 %
 % Example Usage:
-%   [X, Y, Z, F, Data, Header] = importScan(filename);
+%   [x, y, f, Data, Header] = importScan(filename);
+%   [x, y, z, f, Data, Header] = importScan(filename);
 %
 % Inputs:
 %   filenameIn - Path to the file. If the file has no extension, ".scan"
 %       will be automatically appended.
+%   NumOutputDimensions (optional) - The number of output dimensions to
+%       use. This should be equal to the number of dimensions specified in
+%       the output parameters.
 % Output:
-%   X, Y, Z, ... - Vectors containing the coordinates of each scan point.
+%   x, y, z, ... - Vectors containing the coordinates of each scan point.
 %       If the scan is uniform, each vector will contain a unique, sorted,
 %       and uniformly increasing list of coordinates for the corresponding
 %       dimension. Otherwise, each vector will contain one element for each
-%       scan point.
+%       scan point. The number of coordinate vectors is variable and should
+%       be at equal to or higher than the index of the highest nonzero
+%       dimension used in the scan.
+%   Data - If the data is uniform, Data(i1, i2, ..., ff, cc) will be equal
+%       to the measurement made at coordinate (x(i0), y(i1), ...) when
+%       using a frequency of f(ff) and using channel cc. The size of Data
+%       depends on the number of output parameters specified. For example,
+%       calling as [x, y, f, Data, Header] = importScan(...) will result in
+%       Data being (numX by numY by numF by numChannels).
+%       If the data is nonuniform, Data will be (numPoints by numF by
+%       numChannels), and Data(ii, ff, cc) will be the measurement made at
+%       coordinate (x(ii), y(ii), ...).
 %
 % Author: Matt Dvorsky
+
+arguments
+    filenameIn {mustBeText};
+    options.NumOutputDimensions(1, 1) = -1;
+end
+
+%% Check Inputs
+if options.NumOutputDimensions < 0
+    options.NumOutputDimensions = nargout - 3;
+end
+
+if options.NumOutputDimensions ~= nargout - 3
+    outputParameterString = strcat(join(compose("axis%d, ", ...
+        1:options.NumOutputDimensions), ""), "Data, Header");
+    warning(strcat("Number of output dimensions is not consistent with ", ...
+        "the number of output parameters. The format of the function call ", ...
+        "should be [%s] = importScan(filename, NumOutputDimensions=%d);"), ...
+        outputParameterString, options.NumOutputDimensions);
+end
 
 %% Open File
 % Add ".scan" extension if filenameIn has no extension.
@@ -48,18 +82,18 @@ if scanFileVersion ~= 1
 end
 
 %% Read Remaining Header Data From ".scan" File
-Header.header = (string(fread(fileHandle, ...
-    fread(fileHandle, 1, "double"), "double=>char").'));
-Header.description = (string(fread(fileHandle, ...
-    fread(fileHandle, 1, "double"), "double=>char").'));
-Header.deviceName = (string(fread(fileHandle, ...
-    fread(fileHandle, 1, "double"), "double=>char").'));
+Header.header = string(fread(fileHandle, ...
+    fread(fileHandle, 1, "double"), "double=>char").');
+Header.description = string(fread(fileHandle, ...
+    fread(fileHandle, 1, "double"), "double=>char").');
+Header.deviceName = string(fread(fileHandle, ...
+    fread(fileHandle, 1, "double"), "double=>char").');
 
 isUniform = fread(fileHandle, 1, "double");
 Header.isUniform = isUniform;
 numDims = fread(fileHandle, 1, "double");
 axisOrder = 1 + fread(fileHandle, numDims, "double");
-numSteps = fread(fileHandle, numDims, "double");
+dimSize = fread(fileHandle, numDims, "double");
 numChannels = fread(fileHandle, 1, "double");
 
 Header.channelNames = strings(numChannels, 1);
@@ -79,9 +113,9 @@ if isUniform
     % Then, the absolute coordinates are specified in the same way. The
     % absolute coordinates are currently ignored.
     for ii = 1:numDims  % Get relative location vector
-        axisCoordinates(ii) = {fread(fileHandle, numSteps(ii), "double")};
+        axisCoordinates(ii) = {fread(fileHandle, dimSize(ii), "double")};
     end
-    fread(fileHandle, sum(numSteps), "double"); % Discard absolute location
+    fread(fileHandle, sum(dimSize), "double"); % Discard absolute location
 else
     % In the nonuniform case, numSteps(1) will contain the total number of
     % scan points. The file will contain numSteps(1) data points for each
@@ -89,13 +123,13 @@ else
     % point grid. Then, the absolute coordinates are specified in the same
     % way. The absolute coordinates are currently ignored.
     for ii = 1:numDims  % Get relative location
-        axisCoordinates(ii) = {fread(fileHandle, numSteps(1), "double")};
+        axisCoordinates(ii) = {fread(fileHandle, dimSize(1), "double")};
     end
-    fread(fileHandle, numSteps(1) .* 3, "double"); % Discard absolute location
+    fread(fileHandle, dimSize(1) .* 3, "double"); % Discard absolute location
 end
 
 % Next, the file contains the vector of frequencies in GHz
-F = fread(fileHandle, numF, "double"); % Read frequency vector
+f = fread(fileHandle, numF, "double"); % Read frequency vector
 
 % If end of file was reached, header is missing data.
 if feof(fileHandle)
@@ -104,7 +138,7 @@ if feof(fileHandle)
 end
 
 %% Read Scan Measurement Data
-numDataPoints = numF .* numChannels .* prod(numSteps);
+numDataPoints = numF .* numChannels .* prod(dimSize);
 
 % Read data from file.
 numDataPointsToRead = numDataPoints * (1 + isComplex);
@@ -139,53 +173,72 @@ end
 % Done with reading data from file.
 fclose(fileHandle);
 
-%% Reorganize data into proper format
-if numDims == 3
-    X = axisCoordinates{1};
-    Y = axisCoordinates{2};
-    Z = axisCoordinates{3};
-elseif numDims == 2
-    X = axisCoordinates{1};
-    Y = axisCoordinates{2};
-    if isUniform
-        Z = 0;
+%% Check File Dimensions and Requested Output Dimensions
+if options.NumOutputDimensions < numDims
+    if all(dimSize(options.NumOutputDimensions + 1:end) == 1)
+        % In this case
     else
-        Z = zeros(length(X), 1);
+        error(strcat("Requested number of output dimensions (%d) is ", ...
+            "less than the number of dimensions in the scan file (%d)."), ...
+            options.NumOutputDimensions, numDims);
     end
-    axisOrder = [axisOrder; 3];
-    numSteps = [numSteps; 1];
-elseif numDims == 1
-    X = axisCoordinates{1};
-    if isUniform
-        Z = 0;
-        Y = Z;
-    else
-        Z = zeros(length(X), 1);
-        Y = Z;
-    end
-    axisOrder = [axisOrder; 2; 3];
-    numSteps = [numSteps; 1; 1];
-else
-    error(strcat("Import failed, number of dimensions in ", ...
-        "*.scan file must be between 1 and 3."));
 end
 
-Data = reshape(Data, numF, numChannels, []);
+if options.NumOutputDimensions > numDims
+    warning(strcat("Requested number of output dimensions (%d) is greater ", ...
+        "than the number of dimensions in the scan file (%d). ", ...
+        "Extra dimensions with a size of 1 will be added to the output."), ...
+        options.NumOutputDimensions, numDims);
+end
 
+%% Set Output Coordinates and Frequencies
+varargout = cell(options.NumOutputDimensions + 3, 1);
+
+% Set output coordinate vectors to values parsed from scan file.
+for ii = 1:numDims
+    varargout{ii} = axisCoordinates{ii};
+end
+
+% Set remaining requested output coordinate vectors to 0.
+for ii = (numDims + 1):options.NumOutputDimensions
+    if isUniform
+        varargout{ii} = 0;
+    else
+        varargout{ii} = zeros(prod(dimSize), 1);
+    end
+end
+
+%% Reorganize Data
+% Set output axis order based on number of requested channels.
+% Add additional indices to axis order if needed, and add 1's to the output
+% dimensions sizes.
+outputAxisOrder = [axisOrder; ((numDims + 1):options.NumOutputDimensions).'];
+outputDimSize = [dimSize; 1 + 0*((numDims + 1):options.NumOutputDimensions).'];
+
+Data = reshape(Data, numF, numChannels, []);
 if isUniform
-    for ii = 1:(numDims - 1) % Flip every other row, column, etc.
+    % Flip every other row, column, etc., to account for raster scan.
+    for ii = 1:(numDims - 1)
         Data = reshape(Data, numF, numChannels, ...
-            prod(numSteps(axisOrder(1:ii-1))), ...
-            numSteps(axisOrder(ii)), []);
+            prod(outputDimSize(outputAxisOrder(1:ii-1))), ...
+            outputDimSize(outputAxisOrder(ii)), []);
         Data(:, :, :, :, 2:2:end) = flip(Data(:, :, :, :, 2:2:end), 4);
     end
     
-    Data = reshape(Data, [numF; numChannels; numSteps(axisOrder)].');
-    Data = permute(Data, [3, 4, 5, 1, 2]);
-    Data = ipermute(Data, [axisOrder; 4; 5].');
-    Data = permute(Data, [1, 2, 3, 4, 5]); % (X, Y, Z, F, Channel)
+    Data = reshape(Data, [numF; numChannels; ...
+        outputDimSize(outputAxisOrder)].');
+    
+    % Permute so dimensions are (a1, a2, ... , f, Channel)
+    Data = ipermute(Data, [length(outputAxisOrder) + [1; 2]; ...
+        outputAxisOrder].');
 else
-    Data = permute(Data, [3, 1, 2]); % (Location, F, Channel)
+    % Permute so dimensions are (Scan Location, f, Channel)
+    Data = permute(Data, [3, 1, 2]);
 end
+
+%% Set Remaining Outputs
+varargout{options.NumOutputDimensions + 1} = f;
+varargout{options.NumOutputDimensions + 2} = Data;
+varargout{options.NumOutputDimensions + 3} = Header;
 
 end
