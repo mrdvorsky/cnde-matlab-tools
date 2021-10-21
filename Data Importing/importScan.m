@@ -20,6 +20,7 @@ function [varargout] = importScan(filenameIn, options)
 %       scan point. The number of coordinate vectors is variable and should
 %       be at equal to or higher than the index of the highest nonzero
 %       dimension used in the scan.
+%   f - Vector of frequencies.
 %   Data - If the data is uniform, Data(i1, i2, ..., ff, cc) will be equal
 %       to the measurement made at coordinate (x(i0), y(i1), ...) when
 %       using a frequency of f(ff) and using channel cc. The size of Data
@@ -29,6 +30,16 @@ function [varargout] = importScan(filenameIn, options)
 %       If the data is nonuniform, Data will be (numPoints by numF by
 %       numChannels), and Data(ii, ff, cc) will be the measurement made at
 %       coordinate (x(ii), y(ii), ...).
+%   Header - Structure containing the following fields:
+%       .header - String containing user, date, and time information.
+%       .description - String describing the scan.
+%       .deviceName - String describing the measurement device used.
+%       .channelNames - Array of strings giving the name of each channel.
+%       .namedArguments - Struct containing name value pairs of arguments
+%           contained in the scan description. Any text of the form
+%           {name = value} or {name : value} will be captured. The name
+%           parameters will be lowercase and have all spaces replaced with
+%           underscores. The value parameters will be strings.
 %
 % Author: Matt Dvorsky
 
@@ -81,7 +92,7 @@ if scanFileVersion ~= 1
     error("*.scan file version is not supported.");
 end
 
-%% Read Remaining Header Data From ".scan" File
+%% Read Header Data From Scan File
 Header.header = string(fread(fileHandle, ...
     fread(fileHandle, 1, "double"), "double=>char").');
 Header.description = string(fread(fileHandle, ...
@@ -92,7 +103,7 @@ Header.deviceName = string(fread(fileHandle, ...
 isUniform = fread(fileHandle, 1, "double");
 Header.isUniform = isUniform;
 numDims = fread(fileHandle, 1, "double");
-axisOrder = 1 + fread(fileHandle, numDims, "double");
+dimOrder = 1 + fread(fileHandle, numDims, "double");
 dimSize = fread(fileHandle, numDims, "double");
 numChannels = fread(fileHandle, 1, "double");
 
@@ -102,6 +113,7 @@ for ii = 1:numChannels
         fileHandle, fread(fileHandle, 1, "double"), "double=>char").'));
 end
 
+%% Read Scan Coordinates and Frequencies
 numF = fread(fileHandle, 1, "double");
 isComplex = fread(fileHandle, 1, "double");
 
@@ -112,20 +124,20 @@ if isUniform
     % dimension, specifying the relative coordinates of each uniform grid.
     % Then, the absolute coordinates are specified in the same way. The
     % absolute coordinates are currently ignored.
-    for ii = 1:numDims  % Get relative location vector
+    for ii = 1:numDims  % Get relative location vector.
         axisCoordinates(ii) = {fread(fileHandle, dimSize(ii), "double")};
     end
-    fread(fileHandle, sum(dimSize), "double"); % Discard absolute location
+    fread(fileHandle, sum(dimSize), "double"); % Discard absolute location.
 else
     % In the nonuniform case, numSteps(1) will contain the total number of
     % scan points. The file will contain numSteps(1) data points for each
     % dimension, specifying the relative coordinates of each every scan
     % point grid. Then, the absolute coordinates are specified in the same
     % way. The absolute coordinates are currently ignored.
-    for ii = 1:numDims  % Get relative location
+    for ii = 1:numDims  % Get relative location.
         axisCoordinates(ii) = {fread(fileHandle, dimSize(1), "double")};
     end
-    fread(fileHandle, dimSize(1) .* 3, "double"); % Discard absolute location
+    fread(fileHandle, dimSize(1) .* numDims, "double"); % Discard absolute location.
 end
 
 % Next, the file contains the vector of frequencies in GHz
@@ -176,18 +188,23 @@ fclose(fileHandle);
 %% Check File Dimensions and Requested Output Dimensions
 if options.NumOutputDimensions < numDims
     if all(dimSize(options.NumOutputDimensions + 1:end) == 1)
-        % In this case
+        % In this case, the number of dimensions of Data can be reduced,
+        % since the extra dimensions are singleton. We can fix this by
+        % removing these elements in dimOrder and dimSize.
+        numDims = options.NumOutputDimensions;
+        dimOrder(dimOrder > options.NumOutputDimensions) = [];
+        dimSize = dimSize(1:options.NumOutputDimensions);
     else
         error(strcat("Requested number of output dimensions (%d) is ", ...
             "less than the number of dimensions in the scan file (%d)."), ...
-            options.NumOutputDimensions, numDims);
+            options.NumOutputDimensions, find(dimSize > 1, 1, "last"));
     end
 end
 
 if options.NumOutputDimensions > numDims
     warning(strcat("Requested number of output dimensions (%d) is greater ", ...
         "than the number of dimensions in the scan file (%d). ", ...
-        "Extra dimensions with a size of 1 will be added to the output."), ...
+        "Extra singleton dimensions will be added to the output."), ...
         options.NumOutputDimensions, numDims);
 end
 
@@ -212,7 +229,7 @@ end
 % Set output axis order based on number of requested channels.
 % Add additional indices to axis order if needed, and add 1's to the output
 % dimensions sizes.
-outputAxisOrder = [axisOrder; ((numDims + 1):options.NumOutputDimensions).'];
+outputDimOrder = [dimOrder; ((numDims + 1):options.NumOutputDimensions).'];
 outputDimSize = [dimSize; 1 + 0*((numDims + 1):options.NumOutputDimensions).'];
 
 Data = reshape(Data, numF, numChannels, []);
@@ -220,21 +237,44 @@ if isUniform
     % Flip every other row, column, etc., to account for raster scan.
     for ii = 1:(numDims - 1)
         Data = reshape(Data, numF, numChannels, ...
-            prod(outputDimSize(outputAxisOrder(1:ii-1))), ...
-            outputDimSize(outputAxisOrder(ii)), []);
+            prod(outputDimSize(outputDimOrder(1:ii-1))), ...
+            outputDimSize(outputDimOrder(ii)), []);
         Data(:, :, :, :, 2:2:end) = flip(Data(:, :, :, :, 2:2:end), 4);
     end
     
     Data = reshape(Data, [numF; numChannels; ...
-        outputDimSize(outputAxisOrder)].');
+        outputDimSize(outputDimOrder)].');
     
     % Permute so dimensions are (a1, a2, ... , f, Channel)
-    Data = ipermute(Data, [length(outputAxisOrder) + [1; 2]; ...
-        outputAxisOrder].');
+    Data = ipermute(Data, [length(outputDimOrder) + [1; 2]; ...
+        outputDimOrder]);
 else
     % Permute so dimensions are (Scan Location, f, Channel)
     Data = permute(Data, [3, 1, 2]);
 end
+
+%% Parse Scan Header Description Named Arguments
+% Parse Header.description for all named value pairs.
+% The following regex string matches {name = val} or {name : val}, and
+% captures (name) and (val), removing any surrounding whitespace.
+regexpSearchString = "{\s*(.+?)\s*[=:]\s*(.+?)\s*}";
+
+% Search for all name value pairs
+nameValuePairs = regexp(Header.description, regexpSearchString, "tokens");
+
+% Add pairs to struct, removing spaces and capitalization from all names.
+fields = struct();
+for ii = 1:length(nameValuePairs)
+    try
+        fields.(strrep(lower(nameValuePairs{ii}(1)), " ", "_")) = ...
+            nameValuePairs{ii}(2);
+    catch
+        warning(strcat("Unable to assign field name '%s' and its ", ...
+            "corresponding value '%s' to the nameArguments struct."), ...
+            nameValuePairs{ii}(1), nameValuePairs{ii}(2));
+    end
+end
+Header.namedArguments = fields;
 
 %% Set Remaining Outputs
 varargout{options.NumOutputDimensions + 1} = f;
