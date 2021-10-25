@@ -24,10 +24,8 @@ function [varargout] = showImage(x, y, ImgIn, options, imagescOptions)
 %   y - vector of coordinates of ImgIn (first dimension).
 %   ImgIn - Array containing image. Should have at most 2 non-singleton
 %       dimensions. Can be complex if DisplayFormat is specified.
-%
 % Outputs:
 %   Passed through from "imagesc". See imagesc documentation for details.
-%
 % Named Options:
 %   DisplayFormat ("None") - For a complex-valued image, this argument
 %       specifies which component to show. Options are "None", "Magnitude",
@@ -38,6 +36,8 @@ function [varargout] = showImage(x, y, ImgIn, options, imagescOptions)
 %   PhaseMultiplier (1) - If DisplayFormat="MagPhase", this scale factor is
 %       applied to the phase before displaying.
 %   ColorbarLabel - If specified, use as the colorbar label string.
+%
+% Author: Matt Dvorsky
 
 arguments
     x(:, 1) double;

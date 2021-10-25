@@ -11,7 +11,7 @@ function [nodes, weights] = gaussLegendre(orderN, a, b)
 % orderN resulting in a better approximation. The parameter orderN is
 % the number of points at which to evaluate f(x).
 %
-% If f(x) is a polynomial with degree less than to 2*orderN, the result
+% If f(x) is a polynomial with degree less than 2*orderN, the result
 % will be exact.
 %
 % Use of these quadrature rules will never result in evalation of the
@@ -41,9 +41,9 @@ function [nodes, weights] = gaussLegendre(orderN, a, b)
 % Author: Matt Dvorsky
 
 arguments
-    orderN(1, 1) {mustBeInteger} = 10;
-    a(1, 1) {mustBeNumeric} = -1;
-    b(1, 1) {mustBeNumeric} = -1;
+    orderN(1, 1) {mustBeInteger, mustBeFinite} = 10;
+    a(1, 1) {mustBeNumeric, mustBeFinite} = -1;
+    b(1, 1) {mustBeNumeric, mustBeFinite} = 1;
 end
 
 %% Calculate Nodes

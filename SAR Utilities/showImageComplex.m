@@ -9,6 +9,8 @@ function [varargout] = showImageComplex(x, y, Img, varargin)
 %   h = showImageComplex(x, y, Img);
 %   showImageComplex(x, y, Img, NormalizeFactor=1.5);
 %   showImageComplex(x, y, Img, PhaseMultiplier=0.5);
+%
+% Author: Matt Dvorsky
 
 [varargout{1:nargout}] = showImage(x, y, Img, varargin{:}, DisplayFormat="MagPhase");
 
