@@ -44,7 +44,7 @@ function [varargout] = importScan(filenameIn, options)
 % Author: Matt Dvorsky
 
 arguments
-    filenameIn {mustBeText};
+    filenameIn {mustBeTextScalar};
     options.NumOutputDimensions(1, 1) = -1;
 end
 

@@ -35,7 +35,9 @@ function [varargout] = showImage(x, y, ImgIn, options, imagescOptions)
 %       this scaling factor is applied post-normalization.
 %   PhaseMultiplier (1) - If DisplayFormat="MagPhase", this scale factor is
 %       applied to the phase before displaying.
+%   ShowColorbar (true) - Whether or not to display colorbar.
 %   ColorbarLabel - If specified, use as the colorbar label string.
+%   Axes - If specified, use as current axes.
 %
 % Author: Matt Dvorsky
 
@@ -43,12 +45,14 @@ arguments
     x(:, 1) double;
     y(:, 1) double;
     ImgIn(:, :) double;
-    options.DisplayFormat {mustBeMember(options.DisplayFormat, ...
+    options.DisplayFormat {mustBeTextScalar, mustBeMember(options.DisplayFormat, ...
         ["None", "Magnitude", "dB", "Phase", "Real", "Imag", "MagPhase"])} = "None";
     options.Normalize(1, 1) {mustBeNumericOrLogical} = false;
     options.NormalizeFactor(1, 1) {mustBeNumeric} = 1;
     options.PhaseMultiplier(1, 1) {mustBeNumeric} = 1;
+    options.ShowColorbar(1, 1) {mustBeNumericOrLogical} = true;
     options.ColorbarLabel(1, 1) {mustBeTextScalar};
+    options.Axes(1, 1) {mustBeA(options.Axes, "Axes")};
     
     imagescOptions.AlphaData;
     imagescOptions.AlphaDataMapping;
@@ -65,7 +69,7 @@ switch options.DisplayFormat
         if ~isreal(ImgIn)
             error(strcat("Input image must be real-valued. If complex, ", ...
                 "specify the complex display format you would like to use ", ...
-                "by specifying the ComplexFormat named argument."));
+                "by specifying the DisplayFormat named argument."));
         end
         Img = ImgIn;
         colorbarLabel = "";
@@ -90,25 +94,33 @@ switch options.DisplayFormat
 end
 
 %% Show Image
+if ~isfield(options, "Axes")
+    options.Axes = gca;
+end
+
 if options.DisplayFormat == "MagPhase"
-    [varargout{1:nargout}] = imagesc(x, y, ...
+    [varargout{1:nargout}] = imagesc(options.Axes, x, y, ...
         squeeze(options.PhaseMultiplier .* rad2deg(angle(Img))).', ...
         imagescOptions, AlphaData=squeeze(abs(Img)).');
-    set(gca, "Color", "k");
-    colormap hsv;
+    set(options.Axes, "Color", "k");
+    colormap(options.Axes, "hsv");
 else
-    [varargout{1:nargout}] = imagesc(x, y, squeeze(Img).', imagescOptions);
+    [varargout{1:nargout}] = imagesc(options.Axes, x, y, squeeze(Img).', ...
+        imagescOptions);
 end
-axis image;
-axis xy;
+
+axis(options.Axes, "image");
+axis(options.Axes, "xy");
 
 %% Colorbar
-if isfield(options, "ColorbarLabel")
-    colorbarLabel = options.ColorbarLabel;
+if options.ShowColorbar
+    if isfield(options, "ColorbarLabel")
+        colorbarLabel = options.ColorbarLabel;
+    end
+    
+    colorbarHandle = colorbar(options.Axes);
+    colorbarHandle.Label.String = colorbarLabel;
 end
-
-colorbarHandle = colorbar;
-colorbarHandle.Label.String = colorbarLabel;
 
 end
 

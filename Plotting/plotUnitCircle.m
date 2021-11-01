@@ -16,6 +16,8 @@ function [] = plotUnitCircle()
 h1.HandleVisibility = "off";
 h2.HandleVisibility = "off";
 h3.HandleVisibility = "off";
+xlim([-1.1, 1.1]);
+ylim([-1.1, 1.1]);
 
 end
 
