@@ -65,7 +65,7 @@ switch options.DisplayFormat
         if ~isreal(ImgIn)
             error(strcat("Input image must be real-valued. If complex, ", ...
                 "specify the complex display format you would like to use ", ...
-                "by specifying the ComplexFormat named argument."));
+                "by specifying the DisplayFormat named argument."));
         end
         Img = ImgIn;
         colorbarLabel = "";
