@@ -1,27 +1,18 @@
-function [ varargout ] = showImageComplex( x, y, Img, varargin )
-%SHOWIMAGE Shows an xy complex-valued image using color for phase
+function [varargout] = showImageComplex(x, y, Img, varargin)
+%SHOWIMAGECOMPLEX Shows an xy complex-valued image using color for phase.
+% This function is simply a wrapper around showImage, but with the
+% DisplayFormat defaulted to "MagPhase". See documentation of showImage for
+% more details.
+%
+% Example Usage:
+%   showImageComplex(x, y, Img);
+%   h = showImageComplex(x, y, Img);
+%   showImageComplex(x, y, Img, NormalizeFactor=1.5);
+%   showImageComplex(x, y, Img, PhaseMultiplier=0.5);
+%
+% Author: Matt Dvorsky
 
-% Img = Img ./ max(abs(Img(:)));
-
-%% Parse Inputs
-p = inputParser;
-addParameter(p, "PhaseMultiplier", 1);
-addParameter(p, "NormalizeFactor", 1);
-parse(p, varargin{:});
-
-%% Normalize
-if p.Results.NormalizeFactor > 0
-    Img = Img ./ max(abs(Img(:))) .* p.Results.NormalizeFactor;
-end
-
-%% Plot
-[varargout{1:nargout}] = imagesc(squeeze(x), squeeze(y), ...
-    squeeze(p.Results.PhaseMultiplier .* rad2deg(angle(Img))).', ...
-    "AlphaData", squeeze(abs(Img)).');
-set(gca, "Color", "k");
-colormap hsv;
-axis image;
-axis xy;
+[varargout{1:nargout}] = showImage(x, y, Img, varargin{:}, DisplayFormat="MagPhase");
 
 end
 
