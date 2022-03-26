@@ -21,9 +21,10 @@ function [S] = createSarData3d(x, y, f, x0, y0, z0, a0, options)
 %   x - Vector of sample x-coordinates.
 %   y - Vector of sample y-coordinates.
 %   f - Vector of sample frequency coordinates.
-%   x0 - Vector of point target x-coordinates.
-%   y0 - Vector of point target y-coordinates. Must be same length as x0.
-%   z0 - Vector of point target z-coordinates. Must be same length as x0.
+%   x0 - Vector of point target x-coordinates. Inputs x0, y0, z0, and a0
+%       must have compatible sizes.
+%   y0 - Vector of point target y-coordinates.
+%   z0 - Vector of point target z-coordinates.
 %   a0 (optional) - Vector of point target reflectivities. Must be same
 %       length as x0. Defaults to ones(size(x0));
 % Outputs:
@@ -41,19 +42,27 @@ function [S] = createSarData3d(x, y, f, x0, y0, z0, a0, options)
 % Author: Matt Dvorsky
 
 arguments
-    x(:, 1, 1);
-    y(1, :, 1);
-    f(1, 1, :);
-    x0(:, 1);
-    y0(:, 1);
-    z0(:, 1);
+    x(:, 1, 1) {mustBeReal};
+    y(1, :, 1) {mustBeReal};
+    f(1, 1, :) {mustBePositive};
+    x0(:, 1) {mustBeReal};
+    y0(:, 1) {mustBeReal};
+    z0(:, 1) {mustBeReal};
     a0(:, 1) = ones(size(x0));
-    options.UseRangeForAmplitude = true;
-    options.SpeedOfLight(1, 1) = 299.792458;
-    options.ThetaBeamwidthX(1, 1) = inf;
-    options.ThetaBeamwidthY(1, 1) = inf;
-    options.Er(:, 1) = 1;
-    options.Thk(:, 1) = inf;
+    options.UseRangeForAmplitude {mustBeNumericOrLogical} = true;
+    options.SpeedOfLight(1, 1) {mustBePositive} = 299.792458;
+    options.ThetaBeamwidthX(1, 1) {mustBePositive} = inf;
+    options.ThetaBeamwidthY(1, 1) {mustBePositive} = inf;
+    options.Er(:, 1) {mustBeGreaterThanOrEqual(options.Er, 1)} = 1;
+    options.Thk(:, 1) {mustBePositive} = inf;
+end
+
+%% Check for Size Mismatch
+try
+    [x0, y0, z0, a0] = bsx(x0, y0, z0, a0);
+catch
+    error(strcat("Non-singleton dimensions of x0, y0, z0, and a0", ...
+        " (4th through 7th arguments) must match each other."));
 end
 
 %% Create SAR Data
@@ -70,18 +79,17 @@ for ii = 1:length(z0)
         S_ii = S_ii ./ R.^2;
     end
     
-    if isfinite(options.thetaBeamwidthX)
+    if isfinite(options.ThetaBeamwidthX)
         S_ii = S_ii .* antennaPatternGaussian(atan2(abs(x - x0(ii)), abs(z0(ii))), ...
-            options.thetaBeamwidthX);
+            options.ThetaBeamwidthX);
     end
     
-    if isfinite(options.thetaBeamwidthY)
+    if isfinite(options.ThetaBeamwidthY)
         S_ii = S_ii .* antennaPatternGaussian(atan2(abs(y - y0(ii)), abs(z0(ii))), ...
-            options.thetaBeamwidthY);
+            options.ThetaBeamwidthY);
     end
     
     S = S + S_ii;
 end
 
 end
-
