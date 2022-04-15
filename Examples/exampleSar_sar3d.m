@@ -58,7 +58,7 @@ Img_1 = sar3d(S_1, x, y, z0_1, f, ZeroPadPercent=25);
 Img_2 = sar3d(S_2, x, y, z0_2, f, ZeroPadPercent=25);
 Img_3 = sar3d(S_3, x, y, z0_3, f, ZeroPadPercent=25);
 Img_4 = sar3d(S_4, x, y, z0_4, f, ZeroPadPercent=25);
-Img_5 = sar3d(S_5, x, y, z0_4, f, ZeroPadPercent=25);
+Img_5 = sar3d(S_5, x, y, z0_5, f, ZeroPadPercent=25);
 
 %% Plot
 figure;
