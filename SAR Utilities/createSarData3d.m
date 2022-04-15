@@ -8,7 +8,7 @@ function [S] = createSarData3d(x, y, f, x0, y0, z0, a0, options)
 %   S = createSarData3d(x, y, f, x0, y0, z0);
 %   S = createSarData3d(x, y, f, x0, y0, z0, a0);
 %   S = createSarData3d(x, y, f, x0, y0, z0, UseRangeForAmplitude=false);
-%   S = createSarData3d(x, y, f, x0, y0, z0, a0, SpeedOfLight=299.78e6);
+%   S = createSarData3d(x, y, f, x0, y0, z0, a0, SpeedOfLight=299.79e6);
 % 
 % The output S will be of size length(x) by length(y) by length(f), each
 % value correspoding to the measurement made at the coordinate and
@@ -38,6 +38,9 @@ function [S] = createSarData3d(x, y, f, x0, y0, z0, a0, options)
 %   ThetaBeamwidthX (inf) - Halfpower beamwidth of the antenna in the
 %       xz-plane in radians.
 %   ThetaBeamwidthY (inf) - Same as thetaBeamwidthX for the yz-plane.
+%   Er (1) - Vector of dielectric constants for each layer.
+%   Thk (inf) - Vector of thicknesses for each layer. Thk(end) is assumed
+%       to be inf (i.e., infinite half-space). Must be same lenth as Er.
 %
 % Author: Matt Dvorsky
 
@@ -57,7 +60,7 @@ arguments
     options.Thk(:, 1) {mustBePositive} = inf;
 end
 
-%% Check for Size Mismatch
+%% Check for Argument Size Mismatch
 try
     [x0, y0, z0, a0] = bsx(x0, y0, z0, a0);
 catch
@@ -65,14 +68,43 @@ catch
         " (4th through 7th arguments) must match each other."));
 end
 
+if numel(options.Er) ~= numel(options.Thk)
+    error("Er and Thk must have the same length.");
+end
+
+%% Calculate Dispersion
+numAngles = 101;
+
+ior(1, :) = sqrt(options.Er);
+
+psi = zeros(numAngles, numel(options.Thk));
+psi(:, 1) = (0:numAngles - 1) .* (0.5*pi) ./ numAngles;
+for ii = 2:numel(options.Er)
+    psi(:, ii) = asin(ior(ii - 1) ./ ior(ii) .* sin(psi(:, ii - 1)));
+end
+
 %% Create SAR Data
 k = 2*pi .* f ./ options.SpeedOfLight;
 S = 0*(x + y + f);
 for ii = 1:length(z0)
-    % Create refraction lookup table for specific liftoff.
+    % Calculate R and Psi adjusted for multilayer structure.
+    if numel(options.Er) > 1
+        % Create refraction lookup table for specific liftoff.
+        layerInd = 1 + sum(cumsum(abs(options.Thk)) < abs(z0(ii)));
+        zLayers = abs(options.Thk).';
+        zLayers(layerInd:end) = 0;
+        zLayers(layerInd) = abs(z0(ii)) - abs(sum(options.Thk(1:layerInd - 1)));
+        
+        xQuery = sum(zLayers .* tan(psi), 2);
+        RQuery = sum(zLayers ./ cos(psi) .* ior, 2);
+        R_interp = griddedInterpolant(xQuery, RQuery);
+        
+        R = R_interp(hypot(x - x0(ii), y - y0(ii)));
+    else
+        R = sqrt(options.Er) .* hypot(z0(ii), hypot(x - x0(ii), y - y0(ii)));
+    end
     
-    
-    R = hypot(z0(ii), hypot(x - x0(ii), y - y0(ii)));
+    % Calculate SAR values.    
     S_ii = exp(-2j .* k .* R) .* a0(ii);
     
     if options.UseRangeForAmplitude
