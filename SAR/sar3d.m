@@ -23,6 +23,8 @@ arguments
     options.ZeroPadPercent (1, 1) double = 0;
     options.ZeroPadPercentX (1, 1) double = -1;
     options.ZeroPadPercentY (1, 1) double = -1;
+    options.RemoveAverage (1, 1) {mustBeNumericOrLogical} = true;
+    options.SpeedOfLight (1, 1) {mustBePositive} = 299.792458;
 end
 
 if options.ZeroPadPercentX < 0
@@ -33,12 +35,16 @@ if options.ZeroPadPercentY < 0
     options.ZeroPadPercentY = options.ZeroPadPercent;
 end
 
-%% Calculate k
+%% Remove Average over Frequency
+if options.RemoveAverage
+    S = S - mean(mean(S, 1), 2);
+end
+
+%% Calculate Wavenumbers
 zx = 2 * round((options.ZeroPadPercentX ./ 100) .* length(x));
 zy = 2 * round((options.ZeroPadPercentY ./ 100) .* length(y));
 
-c = 299.792458;
-k(1, 1, :) = 2*pi*f/c;
+k(1, 1, :) = (2*pi) .*f ./ options.SpeedOfLight;
 
 dx = x(2) - x(1);
 dy = y(2) - y(1);
@@ -47,9 +53,7 @@ kx(:, 1, 1) = ifftshift(ix * pi / dx);
 ky(1, :, 1) = ifftshift(iy * pi / dy);
 
 %% Compute SAR Algorithm
-S = S - mean(mean(S, 1), 2);
 WarpedSpectrum = fft2(S, length(kx), length(ky));
-WarpedSpectrum(1, 1, :) = 0;
 
 kz = real(sqrt(4*k.^2 - kx.^2 - ky.^2));
 WarpedSpectrum(4*k.^2 - kx.^2 - ky.^2 <= 0) = 0;
