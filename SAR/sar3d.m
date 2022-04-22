@@ -75,7 +75,7 @@ for ii = 1:numel(options.Thk)
     kz = real(sqrt(4*options.Er(ii)*k0.^2 - kx.^2 - ky.^2));
     
     for iz = find(layerIndices == ii).' % Why is the transpose necessary, Matlab??!!!
-        ImageSpectrum(:, :, iz, :) = sum(prevLayerMult .* WarpedSpectrum ...
+        ImageSpectrum(:, :, iz, :) = mean(prevLayerMult .* WarpedSpectrum ...
             .* exp(1j .* kz .* (abs(z(iz)) - zLayerStart(ii))), 3);
     end
     
