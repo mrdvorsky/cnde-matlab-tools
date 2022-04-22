@@ -41,6 +41,8 @@ function [S] = createSarData3d(x, y, f, x0, y0, z0, a0, options)
 %   Er (1) - Vector of dielectric constants for each layer.
 %   Thk (inf) - Vector of thicknesses for each layer. Thk(end) is assumed
 %       to be inf (i.e., infinite half-space). Must be same lenth as Er.
+%   DispersionTableSize (1001) - Number of points to use for multilayer
+%       dispersion lookup table.
 %
 % Author: Matt Dvorsky
 
@@ -58,6 +60,7 @@ arguments
     options.ThetaBeamwidthY(1, 1) {mustBePositive} = inf;
     options.Er(:, 1) {mustBeGreaterThanOrEqual(options.Er, 1)} = 1;
     options.Thk(:, 1) {mustBePositive} = inf;
+    options.DispersionTableSize(1, 1) {mustBeInteger, mustBePositive} = 101;
 end
 
 %% Check for Argument Size Mismatch
@@ -73,12 +76,11 @@ if numel(options.Er) ~= numel(options.Thk)
 end
 
 %% Calculate Dispersion
-numAngles = 101;
-
 ior(1, :) = sqrt(options.Er);
 
-psi = zeros(numAngles, numel(options.Thk));
-psi(:, 1) = (0:numAngles - 1) .* (0.5*pi) ./ numAngles;
+psi = zeros(options.DispersionTableSize, numel(options.Thk));
+psi(:, 1) = (0:options.DispersionTableSize - 1) .* (0.5*pi) ...
+    ./ options.DispersionTableSize;
 for ii = 2:numel(options.Er)
     psi(:, ii) = asin(ior(ii - 1) ./ ior(ii) .* sin(psi(:, ii - 1)));
 end
@@ -104,7 +106,7 @@ for ii = 1:length(z0)
         R = sqrt(options.Er) .* hypot(z0(ii), hypot(x - x0(ii), y - y0(ii)));
     end
     
-    % Calculate SAR values.    
+    % Calculate SAR values.
     S_ii = exp(-2j .* k .* R) .* a0(ii);
     
     if options.UseRangeForAmplitude
