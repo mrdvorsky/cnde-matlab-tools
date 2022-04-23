@@ -66,9 +66,8 @@ ky(1, :, 1) = ifftshift(iy * pi / dy);
 %% Compute SAR Algorithm
 WarpedSpectrum = fft2(S, length(kx), length(ky));
 
-outSize = size(WarpedSpectrum);
-outSize(3) = length(z);
-ImageSpectrum = zeros(outSize);
+ImageSpectrum = zeros([size(WarpedSpectrum, 1:2), length(z), ...
+    size(WarpedSpectrum, 4:max(4, ndims(WarpedSpectrum)))]);
 
 prevLayerMult = 1;
 for ii = 1:numel(options.Thk)
@@ -87,8 +86,7 @@ end
 Image = ifft2(ImageSpectrum);
 
 %% Crop Output
-outSizeCropped = outSize;
-outSizeCropped(1:2) = [length(x), length(y)];
-Image = reshape(Image(1:length(x), 1:length(y), :), outSizeCropped);
+Image = reshape(Image(1:length(x), 1:length(y), :), ...
+    [length(x), length(y), size(Image, 3:max(3, ndims(Image)))]);
 
 end
