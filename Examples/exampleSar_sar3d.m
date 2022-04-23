@@ -1,3 +1,8 @@
+% This example file shows how to use sar3d to create SAR images.
+%
+% Author: Matt Dvorsky
+
+%% Clear Workspace
 clc;
 clear;
 close all;
@@ -40,7 +45,7 @@ z0_4 = [-50];
 a0_4 = [1, 1j, -1];
 S_4 = createSarData3d(x, y, f, x0_4, y0_4, z0_4, a0_4);
 
-% Example 5: Single target, different antenna beams
+% Example 5: Multiple targets, different antenna beams
 x0_5 = [0, 20, 5];
 y0_5 = [-10, 15, 15];
 z0_5 = [-50];
@@ -90,7 +95,7 @@ showImage(x, y, Img_4, DisplayFormat="MagPhase");
 figure;
 for ii = 1:size(Img_5, 4)
     subplot(2, 2, ii);
-    showImage(x, y, Img_5(:, :, ii), DisplayFormat="Magnitude");
+    showImage(x, y, Img_5(:, :, 1, ii), DisplayFormat="Magnitude");
     colormap jet;
     title(sprintf("Example 5: Beamwidth = %.0f deg", ...
         rad2deg(thetaBeamwidths(ii))));

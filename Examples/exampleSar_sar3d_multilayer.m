@@ -1,3 +1,9 @@
+% This example file shows how to use sar3d to create SAR images of a
+% multilayer structure.
+%
+% Author: Matt Dvorsky
+
+%% Clear Workspace
 clc;
 clear;
 close all;
@@ -63,12 +69,16 @@ colormap jet;
 title("Example 2: Correct Stackup");
 xlabel("x, mm");
 ylabel("z, mm");
+hold on;
+plot([min(x), max(x)], [0; 0] + -cumsum(thk2(1:end - 1)), ":w", Linewidth=1.5);
 subplot(2, 1, 2);
 showImage(x, z_2, Img_2_2(:, y == 0, :), DisplayFormat="Magnitude");
 colormap jet;
 title("Example 2: Wrong Stackup");
 xlabel("x, mm");
 ylabel("z, mm");
+hold on;
+plot([min(x), max(x)], [0; 0] + -cumsum(thk2(1:end - 1)), ":w", Linewidth=1.5);
 
 figure;
 subplot(2, 1, 1);
@@ -77,9 +87,13 @@ colormap jet;
 title("Example 3: Correct Stackup");
 xlabel("x, mm");
 ylabel("z, mm");
+hold on;
+plot([min(x), max(x)], [0; 0] + -cumsum(thk2(1:end - 1)), ":w", Linewidth=1.5);
 subplot(2, 1, 2);
 showImage(x, z_2, Img_3_2(:, y == 0, :), DisplayFormat="Magnitude");
 colormap jet;
 title("Example 3: Wrong Stackup");
 xlabel("x, mm");
 ylabel("z, mm");
+hold on;
+plot([min(x), max(x)], [0; 0] + -cumsum(thk2(1:end - 1)), ":w", Linewidth=1.5);

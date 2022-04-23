@@ -28,7 +28,7 @@ function [Image] = sar3d(S, x, y, z, f, options)
 %       S(:, :, :, ii) will be treated as an independent data set.
 %   x - Vector of sample x-coordinates.
 %   y - Vector of sample y-coordinates.
-%   y - Vector of desired z-coordinates.
+%   z - Vector of desired z-coordinates.
 %   f - Vector of sample frequency coordinates.
 % Outputs:
 %   Img - Matrix of size length(x) by length(y) by length(z) by ..., each

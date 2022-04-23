@@ -1,5 +1,5 @@
 function [S] = createSarData3d(x, y, f, x0, y0, z0, a0, options)
-%CREATESARDATA3D Create uniform SAR data from point source specificication.
+%CREATESARDATA3D Create uniform 3D SAR data from point source specificication.
 % This function returns uniform SAR measurement data that would have
 % occured measuring point targets located at x0(ii), y0(ii), z0(ii)
 % with scattering coefficients a0(ii).
