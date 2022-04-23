@@ -3,7 +3,7 @@ clear;
 close all;
 
 %% Inputs
-f(1, 1, :) = linspace(26.5, 40, 101);
+f(1, 1, :) = linspace(26.5, 40, 21);
 
 dx = 0.5;
 dy = dx;
