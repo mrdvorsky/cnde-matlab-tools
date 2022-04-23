@@ -57,8 +57,16 @@ zy = 2 * round((options.ZeroPadPercentY ./ 100) .* length(y));
 
 k0(1, 1, :) = (2*pi) .*f ./ options.SpeedOfLight;
 
-dx = x(2) - x(1);
-dy = y(2) - y(1);
+dx = 1;
+if numel(x) > 1
+    dx = x(2) - x(1);
+end
+
+dy = 1;
+if numel(y) > 1
+    dy = y(2) - y(1);
+end
+
 [iy, ix] = freqspace([zx + size(S, 1); zy + size(S, 2)]);
 kx(:, 1, 1) = ifftshift(ix * pi / dx);
 ky(1, :, 1) = ifftshift(iy * pi / dy);
