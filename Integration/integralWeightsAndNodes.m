@@ -25,6 +25,14 @@ function [q, nodes_out, weights_out] = integralWeightsAndNodes(fun, a, b, option
 % The output parameters nodes_out and weights_out are the final nodes and
 % weights used. In other words, q = sum(fun(nodes) .* weights);
 %
+% Inputs:
+%   f - Function handle to integrate. Can be array-valued, see above.
+%   a (-1) - Scalar integration lower bound. Must be real and finite.
+%   b (1) - Scalar integration upper bound. Must be real and finite.
+% Outputs:
+%   q - Approximate integral value. Same size as fun((a + b)/2);
+%   nodes_out - Nodes that can be used to calculate integral. See above.
+%   weights_out - Weights that can be used to calculate integral.
 % Optional Arguments:
 %   RelTol (1e-6): Relative function tolerance constraint. See above.
 %   AbsTol (1e-8): Absolute function tolerance constraint. See above.
