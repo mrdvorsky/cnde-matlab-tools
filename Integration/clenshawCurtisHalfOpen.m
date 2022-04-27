@@ -43,7 +43,7 @@ function [nodes, weights] = clenshawCurtisHalfOpen(orderN, L, options)
 % Author: Matt Dvorsky
 
 arguments
-    orderN(1, 1) {mustBeInteger, mustBePositive, mustBeFinite} = 10;
+    orderN(1, 1) {mustBeInteger, mustBePositive} = 10;
     L(1, 1) {mustBeReal, mustBeFinite} = 1;
     options.WeightingFunction;
 end

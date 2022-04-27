@@ -41,7 +41,7 @@ function [nodes, weights] = gaussLegendre(orderN, a, b)
 % Author: Matt Dvorsky
 
 arguments
-    orderN(1, 1) {mustBeInteger, mustBePositive, mustBeFinite} = 10;
+    orderN(1, 1) {mustBeInteger, mustBePositive} = 10;
     a(1, 1) {mustBeReal, mustBeFinite} = -1;
     b(1, 1) {mustBeReal, mustBeFinite} = 1;
 end
