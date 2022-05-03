@@ -85,8 +85,8 @@ if numel(options.Er) ~= numel(options.Thk)
 end
 
 %% Calculate Layer Indices
-layerIndices = 1 + sum(cumsum(abs(options.Thk.')) < abs(z), 2);
 zLayerStart = [0; cumsum(options.Thk(1:end - 1))];  % Start of each layer
+layerIndices = sum(zLayerStart <= abs(z).', 1);
 
 %% Remove Average over Frequency
 if options.RemoveAverage
@@ -94,8 +94,8 @@ if options.RemoveAverage
 end
 
 %% Calculate Wavenumbers
-zx = 2 * round((options.ZeroPadPercentX ./ 100) .* length(x));
-zy = 2 * round((options.ZeroPadPercentY ./ 100) .* length(y));
+zx = round((options.ZeroPadPercentX ./ 100) .* length(x));
+zy = round((options.ZeroPadPercentY ./ 100) .* length(y));
 
 k0(1, 1, :) = (2*pi) .* f ./ options.SpeedOfLight;
 
@@ -123,7 +123,10 @@ prevLayerMult = 1;
 for ii = 1:numel(options.Thk)
     kz = real(sqrt(4*options.Er(ii)*k0.^2 - kx.^2 - ky.^2));
     
-    for iz = find(layerIndices == ii).' % Why is the transpose necessary, Matlab??!!!
+    % Set evanescent modes to zero
+    WarpedSpectrum(kz == 0) = 0;
+    
+    for iz = find(layerIndices == ii)
         ImageSpectrum(:, :, iz, :) = mean(prevLayerMult .* WarpedSpectrum ...
             .* exp(1j .* kz .* (abs(z(iz)) - zLayerStart(ii))), 3);
     end
