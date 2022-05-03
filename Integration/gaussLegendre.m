@@ -32,8 +32,8 @@ function [nodes, weights] = gaussLegendre(orderN, a, b)
 %
 % Inputs:
 %   orderN - Scalar number of nodes to calculate.
-%   a - Scalar integration lower bound. Must be finite.
-%   b - Scalar integration upper bound. Must be finite.
+%   a - Scalar integration lower bound. Must be real and finite.
+%   b - Scalar integration upper bound. Must be real and finite.
 % Outputs:
 %   nodes - Column vector of coordinates at which to evaluate function.
 %   weights - Column vector of weights to perform weighted sum.
@@ -41,9 +41,9 @@ function [nodes, weights] = gaussLegendre(orderN, a, b)
 % Author: Matt Dvorsky
 
 arguments
-    orderN(1, 1) {mustBeInteger, mustBeFinite} = 10;
-    a(1, 1) {mustBeNumeric, mustBeFinite} = -1;
-    b(1, 1) {mustBeNumeric, mustBeFinite} = 1;
+    orderN(1, 1) {mustBeInteger, mustBePositive} = 10;
+    a(1, 1) {mustBeReal, mustBeFinite} = -1;
+    b(1, 1) {mustBeReal, mustBeFinite} = 1;
 end
 
 %% Calculate Nodes

@@ -19,6 +19,9 @@ z(1, :) = -(0:dz:100);
 
 %% Create SAR Data
 % Example 1: Single target
+% Layer 1: er = 1, thk = 20 mm
+% Layer 2: er = 20, thk = 20 mm
+% Layer 3: er = 1, infinite half-space
 x0_1 = [0];
 z0_1 = [-50];
 a0_1 = [1];
@@ -27,6 +30,9 @@ thk1 = [20, 20, inf];
 S_1 = createSarData2d(x, f, x0_1, z0_1, a0_1, Er=er1, Thk=thk1);
 
 % Example 2: Multiple targets, different depths
+% Layer 1: er = 1, thk = 30 mm
+% Layer 2: er = 3, thk = 20 mm
+% Layer 3: er = 5, infinite half-space
 x0_2 = [-20, 0, 20];
 z0_2 = [-30, -50, -70];
 a0_2 = [1];
@@ -35,6 +41,9 @@ thk2 = [30, 20, inf];
 S_2 = createSarData2d(x, f, x0_2, z0_2, a0_2, Er=er2, Thk=thk2);
 
 % Example 3: Same as example 2, but no magnitude decay with range
+% Layer 1: er = 1, thk = 30 mm
+% Layer 2: er = 3, thk = 20 mm
+% Layer 3: er = 5, infinite half-space
 S_3 = createSarData2d(x, f, x0_2, z0_2, a0_2, Er=er2, Thk=thk2, ...
     UseRangeForAmplitude=false);
 

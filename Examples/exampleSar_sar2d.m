@@ -94,6 +94,8 @@ for ii = 1:size(Img_5, 3)
     colormap jet;
     title(sprintf("Example 5: Beamwidth = %.0f deg", ...
         rad2deg(thetaBeamwidths(ii))));
+    xlabel("x, mm");
+    ylabel("z, mm");
 end
 
 
