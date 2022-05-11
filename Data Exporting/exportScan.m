@@ -3,11 +3,11 @@ function [] = exportScan(filenameIn, axisCoordinates, f, Data, HeaderIn, options
 % This function exports and parses a ".scan" file.
 %
 % Example Usage:
-%   exportScan(filename, {x}, Data, Header);
-%   exportScan(filename, {x, y}, Data, Header);
-%   exportScan(filename, {x, y, z, w, ...}, Data, Header);
-%   exportScan(filename, {x, y, z, w, ...}, Data);
-%   exportScan(filename, axisCoordinates, Data, Header, IsUniform=false);
+%   exportScan(filename, {x}, f, Data, Header);
+%   exportScan(filename, {x, y}, f, Data, Header);
+%   exportScan(filename, {x, y, z, w, ...}, f, Data, Header);
+%   exportScan(filename, {x, y, z, w, ...}, f, Data);
+%   exportScan(filename, axisCoordinates, f, Data, Header, IsUniform=false);
 %
 % Inputs:
 %   filenameIn - Path to the output file. If the file has no extension,
@@ -37,12 +37,12 @@ function [] = exportScan(filenameIn, axisCoordinates, f, Data, HeaderIn, options
 % Author: Matt Dvorsky
 
 arguments
-    filenameIn {mustBeText};
-    axisCoordinates cell;
-    f(:, 1) double {mustBeNumeric, mustBeFinite};
+    filenameIn {mustBeTextScalar};
+    axisCoordinates cell {mustBeNonempty};
+    f(:, 1) double {mustBePositive, mustBeFinite, mustBeNonempty};
     Data double;
     HeaderIn(1, 1) = struct();
-    options.IsUniform(1, 1) double = 1;
+    options.IsUniform(1, 1) {mustBeNumericOrLogical} = 1;
 end
 
 %% Check Input Sizes and Determine Header Parameters
