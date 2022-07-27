@@ -46,10 +46,10 @@ function [S] = createSarData2d(x, f, x0, z0, a0, options)
 arguments
     x(:, 1, 1) {mustBeReal};
     f(1, 1, :) {mustBePositive};
-    x0(:, 1) {mustBeReal};
-    z0(:, 1) {mustBeReal};
-    a0(:, 1) = ones(size(x0));
-    options.UseRangeForAmplitude {mustBeNumericOrLogical} = true;
+    x0 {mustBeReal};
+    z0 {mustBeReal};
+    a0 = ones(size(x0));
+    options.UseRangeForAmplitude logical = true;
     options.SpeedOfLight(1, 1) {mustBePositive} = 299.792458;
     options.ThetaBeamwidthX(1, 1) {mustBePositive} = inf;
     options.Er(:, 1) {mustBeGreaterThanOrEqual(options.Er, 1)} = 1;
