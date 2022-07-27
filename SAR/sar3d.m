@@ -65,7 +65,7 @@ arguments
     options.ZeroPadPercent(1, 1) double = 0;
     options.ZeroPadPercentX(1, 1) double = -1;
     options.ZeroPadPercentY(1, 1) double = -1;
-    options.RemoveAverage(1, 1) {mustBeNumericOrLogical} = true;
+    options.RemoveAverage(1, 1) logical = true;
     options.SpeedOfLight(1, 1) {mustBePositive} = 299.792458;
     options.Er(:, 1) {mustBeGreaterThanOrEqual(options.Er, 1)} = 1;
     options.Thk(:, 1) {mustBePositive} = inf;
