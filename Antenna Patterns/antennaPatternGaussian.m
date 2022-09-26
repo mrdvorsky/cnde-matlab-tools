@@ -22,9 +22,13 @@ if p.Results.NormalizeOutputPower == 0
 else
     % Total radiated power (spherical) is 1 Watt
     %  i.e., integral(magOut(theta)^2 * sin(theta), 0, pi) = 2
-    normFactor = sqrt(abs(0.25 * thetaBw .* dawson(0.25 * thetaBw ...
+    normFactor = sqrt(abs(0.25 * thetaBw .* dawsonIntegral(0.25 * thetaBw ...
         ./ sqrt(log(2))) ./ sqrt(log(2))));
     magOut = exp(-log(4)*(theta./thetaBw).^2) ./ normFactor;
 end
 
+end
+
+function [F] = dawsonIntegral(x)
+    F = exp(-x.^2) .* integral(@(t) exp(t.^2), 0, x);
 end
