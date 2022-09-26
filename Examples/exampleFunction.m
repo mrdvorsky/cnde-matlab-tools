@@ -33,7 +33,7 @@ function [out1, out2] = exampleFunction(stringIn, boolIn, optIn, options)
 
 arguments
     stringIn {mustBeTextScalar};            % Scalar String
-    boolIn(:, 1) {mustBeNumericOrLogical};  % Vector of boolean values
+    boolIn(:, 1) logical;                   % Vector of boolean values
     optIn(1, 1) {mustBeReal} = 1.0;         % Scalar real value
     options.PositiveInt(1, 1) {mustBeInteger, mustBePositive};
     options.StringArray(:, :, :) {mustBeText} = "";
