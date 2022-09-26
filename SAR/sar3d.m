@@ -114,7 +114,7 @@ kx(:, 1, 1) = ifftshift(ix * pi / dx);
 ky(1, :, 1) = ifftshift(iy * pi / dy);
 
 %% Compute SAR Algorithm
-WarpedSpectrum = fft2(S, length(kx), length(ky));
+WarpedSpectrum = (1 ./ k0).^1 .* fft2(S, length(kx), length(ky));
 
 ImageSpectrum = zeros([size(WarpedSpectrum, 1:2), length(z), ...
     size(WarpedSpectrum, 4:max(4, ndims(WarpedSpectrum)))]);
@@ -127,7 +127,7 @@ for ii = 1:numel(options.Thk)
     WarpedSpectrum(kz == 0) = 0;
     
     for iz = find(layerIndices == ii)
-        ImageSpectrum(:, :, iz, :) = mean(prevLayerMult .* WarpedSpectrum ...
+        ImageSpectrum(:, :, iz, :) = abs(z(iz)) .* mean(prevLayerMult .* WarpedSpectrum ...
             .* exp(1j .* kz .* (abs(z(iz)) - zLayerStart(ii))), 3);
     end
     
