@@ -115,12 +115,12 @@ for ii = 1:numel(z0)
     
     if isfinite(options.ThetaBeamwidthX)
         S_ii = S_ii .* antennaPatternGaussian(atan2(abs(x - x0(ii)), abs(z0(ii))), ...
-            options.ThetaBeamwidthX);
+            options.ThetaBeamwidthX, NormalizeOutputPower=false).^2;
     end
     
     if isfinite(options.ThetaBeamwidthY)
         S_ii = S_ii .* antennaPatternGaussian(atan2(abs(y - y0(ii)), abs(z0(ii))), ...
-            options.ThetaBeamwidthY);
+            options.ThetaBeamwidthY, NormalizeOutputPower=false).^2;
     end
     
     S = S + S_ii;
