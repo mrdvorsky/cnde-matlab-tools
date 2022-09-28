@@ -23,6 +23,7 @@ function [out1, out2] = exampleFunction(stringIn, boolIn, optIn, options)
 %       to stringIn. Otherwise, it is equal to optIn.
 %   out2 - Second output argument. If PositiveInt was assigned, out2 is
 %       equal to PositiveInt. Otherwise, equal to StringArray.
+%
 % Named Arguments:
 %   PositiveInt - Positive integer optional named argument. No default.
 %   StringArray ("") - String array named optional argument. Default
