@@ -1,5 +1,5 @@
 function [varargout] = unflattenGriddedData(numDims, Data, options)
-%UNFLATTENGRIDDATA Convert a 2D table into a uniform nd-array with grids.
+%UNFLATTENGRIDDEDDATA Convert a 2D table into a uniform nd-array with grids.
 % This functions takes in a 2D array, where each row describes a data
 % point(s) with coordinates (e.g., each row is [x, y, z, d1, d2, ...]),
 % and returns a multi-dimensional array(s) describing each data column
@@ -18,16 +18,16 @@ function [varargout] = unflattenGriddedData(numDims, Data, options)
 % described by the column with index "GridColumns(1)".
 %
 % Example Usage:
-%   [x, y, Data] = unflattedGriddedData(2, xFlat, yFlat, DataFlat);
-%   [x, y, Data] = unflattedGriddedData(2, DataFlat2D);
-%   [x, y, Data] = unflattedGriddedData(2, [xFlat, yFlat, DataFlat]);
-%   [x, y, z, Data] = unflattedGriddedData(3, xFlat, yFlat, zFlat, DataFlat);
-%   [x, y, z, Data1, Data2, ...] = unflattedGriddedData(3, ...
+%   [x, y, Data] = unflattenGriddedData(2, xFlat, yFlat, DataFlat);
+%   [x, y, Data] = unflattenGriddedData(2, DataFlat2D);
+%   [x, y, Data] = unflattenGriddedData(2, [xFlat, yFlat, DataFlat]);
+%   [x, y, z, Data] = unflattenGriddedData(3, xFlat, yFlat, zFlat, DataFlat);
+%   [x, y, z, Data1, Data2, ...] = unflattenGriddedData(3, ...
 %       xFlat, yFlat, zFlat, DataFlat1, DataFlat2, ...);
 %
-%   [Data, x, y] = unflattedGriddedData(2, DataFlat, xFlat, yFlat, ...
+%   [Data, x, y] = unflattenGriddedData(2, DataFlat, xFlat, yFlat, ...
 %       GridColumns=[2, 3]).
-%   [x, y, Data] = unflattedGriddedData(2, xFlat, yFlat, DataFlat, ...
+%   [x, y, Data] = unflattenGriddedData(2, xFlat, yFlat, DataFlat, ...
 %       GridColumns=[2, 1]).    % Data will be length(y)-by-length(x)
 %
 % The output data and coordinate vectors are all compatible with each
