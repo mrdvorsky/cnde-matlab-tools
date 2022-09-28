@@ -39,7 +39,7 @@ function [varargout] = flattenGriddedData(gridVectors, Data, options)
 % Author: Matt Dvorsky
 
 arguments
-    gridVectors(1, :) {mustBeNonempty};
+    gridVectors(1, :) cell {mustBeNonempty};
 end
 
 arguments (Repeating)
