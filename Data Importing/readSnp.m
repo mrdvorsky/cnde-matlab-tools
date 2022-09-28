@@ -1,33 +1,33 @@
-function [S, f, commentLines, Z0] = readSnp(filenameIn)
+function [S, f, Z0, commentLines] = readSnp(filename)
 %READSNP Read the *.snp file and adjust units to GHz.
 % Imports an *.snp file specified by filenameIn. If filenameIn does not
 % specify an extension, this function will search for files with the name
-% "{filenameIn}.s*p". The units of the output will be in GHz regardless of
+% "{filename}.s*p". The units of the output will be in GHz regardless of
 % the units used in the file.
 %
 % Example Usage:
 %   [S, f] = readSnp("file");   % Finds any file with the name "file.s*p".
 %   [S, f] = readSnp("file.s2p");
-%   [S, f, commentLines] = readSnp("file.s1p");
+%   [S, f, Z0, commentLines] = readSnp("file.s1p");
 %
 % Inputs:
-%   filenameIn - Filename to search for. If no extension is given, will
+%   filename - Filename to search for. If no extension is given, will
 %       search for any ".s*p" file.
 % Outputs:
 %   S - S-parameter array with size nPorts-by-nPorts-by-nFrequencies-by-...
 %   f - Frequency vector, in GHz.
-%   commentLines - String vector containing all lines starting with "!".
 %   Z0 - System impedance.
+%   commentLines - String vector containing all lines starting with "!".
 %
 % Author: Matt Dvorsky
 
 arguments
-    filenameIn {mustBeTextScalar};
+    filename {mustBeTextScalar};
 end
 
-%% Open File
+%% Search For File
 % Search for ".s*p" file if no extension was provided.
-[path, name, ext] = fileparts(filenameIn);
+[path, name, ext] = fileparts(filename);
 if (ext == "")
     filenameSearch = fullfile(path, strcat(name, ".s*p"));
     fileMatches = dir(filenameSearch);
@@ -40,8 +40,6 @@ if (ext == "")
             strjoin({fileMatches.name}, ", "));
     end
     filename = fullfile(fileMatches(1).folder, fileMatches(1).name);
-else
-    filename = filenameIn;
 end
 
 %% Read Data
@@ -57,18 +55,19 @@ if numel(optionLine) < 6
 end
 
 if nargout >= 3
-    commentLines = FileLines(startsWith(FileLines, "!"));
+    Z0 = str2double(optionLine(6));
 end
 
 if nargout >= 4
-    Z0 = str2double(optionLine(6));
+    commentLines = FileLines(startsWith(FileLines, "!"));
 end
 
 %% Format Data
 numPorts = round(sqrt(0.5*(size(FileData, 2) - 1)));
 if (numPorts*numPorts) ~= 0.5*(size(FileData, 2) - 1)
-    error("Wrong number of columns in '%s'. File format may be incorrect.", ...
-        filename);
+    error("Wrong number of columns (%d) in '%s'. Number of columns " + ...
+        "should be a one plus a square number. File " + ...
+        "format may be incorrect.", size(FileData, 2), filename);
 end
 
 % Check for duplicated frequency vector.
