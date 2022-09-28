@@ -65,7 +65,7 @@ end
 
 %% Check for Argument Size Mismatch
 try
-    [x0, y0, z0, a0] = bsx(x0, y0, z0, a0);
+    [x0, y0, z0, a0] = makeArraysSameSize(x0, y0, z0, a0);
 catch
     error(strcat("Non-singleton dimensions of x0, y0, z0, and a0", ...
         " (4th through 7th arguments) must match each other."));

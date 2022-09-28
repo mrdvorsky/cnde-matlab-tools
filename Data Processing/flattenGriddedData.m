@@ -52,7 +52,7 @@ end
 
 %% Check Inputs
 % Make all elements of Data be equal size.
-[Data{:}] = bsx(Data{:});
+[Data{:}] = makeArraysSameSize(Data{:});
 
 % Check for missing grid vectors.
 if numel(gridVectors) < ndims(Data{1})

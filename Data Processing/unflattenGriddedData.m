@@ -18,12 +18,12 @@ function [varargout] = unflattenGriddedData(numDims, Data, options)
 % described by the column with index "GridColumns(1)".
 %
 % Example Usage:
-%   [x, y, Data] = unflattedGriddedData(2, xFlat, yFlat, DataFlat).
-%   [x, y, Data] = unflattedGriddedData(2, DataFlat2D).
-%   [x, y, Data] = unflattedGriddedData(2, [xFlat, yFlat, DataFlat]).
-%   [x, y, z, Data] = unflattedGriddedData(3, xFlat, yFlat, zFlat, DataFlat).
+%   [x, y, Data] = unflattedGriddedData(2, xFlat, yFlat, DataFlat);
+%   [x, y, Data] = unflattedGriddedData(2, DataFlat2D);
+%   [x, y, Data] = unflattedGriddedData(2, [xFlat, yFlat, DataFlat]);
+%   [x, y, z, Data] = unflattedGriddedData(3, xFlat, yFlat, zFlat, DataFlat);
 %   [x, y, z, Data1, Data2, ...] = unflattedGriddedData(3, ...
-%       xFlat, yFlat, zFlat, DataFlat1, DataFlat2, ...).
+%       xFlat, yFlat, zFlat, DataFlat1, DataFlat2, ...);
 %
 %   [Data, x, y] = unflattedGriddedData(2, DataFlat, xFlat, yFlat, ...
 %       GridColumns=[2, 3]).
@@ -61,11 +61,20 @@ function [varargout] = unflattenGriddedData(numDims, Data, options)
 
 arguments
     numDims(1, 1) {mustBeInteger, mustBePositive};
+end
+
+arguments (Repeating)
     Data(:, :) {mustBeNonempty};
+end
+
+arguments
     options.GridColumns(1, :) {mustBeInteger, mustBePositive} = [];
 end
 
 %% Check Inputs
+% Concatenate Data cell array into one 2D table.
+Data = cat(2, Data{:});
+
 if isempty(options.GridColumns)
     options.GridColumns = 1:numDims;
 end
@@ -105,10 +114,15 @@ for ii = 1:numel(options.GridColumns)
 end
 
 %% Check for Extra Data
-if prod(cell2mat(gridDimensions)) ~= size(Data, 1)
+extraDimSize = size(Data, 1) ./ prod(cell2mat(gridDimensions));
+if extraDimSize > 1     %#ok<BDSCI> 
     warning("Extra dimensions found in input data. An additional " + ...
         "dimenion (%d) will be added to the output to accommodate " + ...
         "extra data.", numDims + 1);
+    
+    % Reorganize extra dimension so it is last.
+    Data = reshape(pagetranspose(reshape(Data, extraDimSize, [], size(Data, 2))), ...
+        [], size(Data, 2));
 end
 
 %% Assign Output

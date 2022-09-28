@@ -43,7 +43,7 @@ end
 
 %% Set Outputs
 % Make all elements of Data be equal size.
-[Data{1:length(Data)}] = bsx(Data{:});
+[Data{1:length(Data)}] = makeArraysSameSize(Data{:});
 
 % Linearize each input array.
 Data = cellfun(@(x) x(:), Data, UniformOutput=false);

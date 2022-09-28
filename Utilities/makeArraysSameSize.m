@@ -1,0 +1,48 @@
+function [varargout] = makeArraysSameSize(Arrays)
+%MAKEARRAYSSAMESIZE Make inputs the same size by duplicating along singleton dimensions.
+% This functions takes in multiple nd-arrays with compatible sizes (see
+% MATLAB documentation on compatible array sizes) and returns each after
+% duplicating along any singleton dimensions such that all have the same
+% size.
+%
+% Example Usage:
+%   % x and y will be 5-by-5
+%   [x, y] = makeArraysSameSize(ones(5, 1), ones(1, 5));
+%
+%   % x and y will be 5-by-6-by-7
+%   [x, y] = makeArraysSameSize(ones(5, 6, 1), ones(5, 1, 7));
+%
+%   % Error: Dimension 2 mismatch
+%   [x, y] = makeArraysSameSize(ones(5, 6), ones(1, 5));
+%
+% Inputs:
+%   Arrays (Repeating) - Arrays with compatible sizes.
+% Outputs:
+%   ArraysOut (Repeating) - Input arrays after duplicating data.
+%
+% Author: Matt Dvorsky
+
+arguments (Repeating)
+    Arrays {mustBeNonempty};
+end
+
+%% Check Inputs
+maxInputDim = max(cellfun(@(x) ndims(x), Arrays));
+inputDims = cell2mat(...
+    cellfun(@(x) size(x, 1:maxInputDim).', Arrays, UniformOutput=false)).';
+outputDims = max(inputDims, [], 1);
+
+% Check for dimension mismatch.
+isMismatch = any((inputDims ~= outputDims) & (inputDims ~= 1), 1);
+if any(isMismatch)
+    error("Mismatch in dimension (%d). Mismatches in input dimensions " + ...
+        "are only allowed if due to singleton dimensions.", find(isMismatch, 1));
+end
+
+%% Format Output
+varargout = cell(size(Arrays));
+for ii = 1:numel(Arrays)
+    varargout{ii} = repmat(Arrays{ii}, outputDims ./ inputDims(ii, :));
+end
+
+
