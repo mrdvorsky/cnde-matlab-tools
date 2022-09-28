@@ -42,7 +42,7 @@ arguments
     f(:, 1) double {mustBePositive, mustBeFinite, mustBeNonempty};
     Data double;
     HeaderIn(1, 1) = struct();
-    options.IsUniform(1, 1) {mustBeNumericOrLogical} = 1;
+    options.IsUniform(1, 1) logical = 1;
 end
 
 %% Check Input Sizes and Determine Header Parameters
