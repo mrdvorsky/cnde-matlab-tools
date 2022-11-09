@@ -75,17 +75,20 @@ end
 % Concatenate Data cell array into one 2D table.
 Data = cat(2, Data{:});
 
+% Get number of columns.
+numColumns = size(Data, 2);
+
 if isempty(options.GridColumns)
     options.GridColumns = 1:numDims;
 end
-if ~all(options.GridColumns >= 1 & options.GridColumns <= size(Data, 2)) ...
+if ~all(options.GridColumns >= 1 & options.GridColumns <= numColumns) ...
         || numel(unique(options.GridColumns)) ~= numDims
     error("'GridColumns' arguments must contain (%d) unique and " + ...
         "valid column indices.", numDims);
 end
 
 %% Determine Grid Vectors
-varargout = cell(size(Data, 2), 1);
+varargout = cell(numColumns, 1);
 gridDimensions = cell(1, numDims);
 Data = sortrows(Data, flip(options.GridColumns));
 
@@ -115,18 +118,18 @@ end
 
 %% Check for Extra Data
 extraDimSize = size(Data, 1) ./ prod(cell2mat(gridDimensions));
-if extraDimSize > 1     %#ok<BDSCI> 
+if extraDimSize > 1     %#ok<BDSCI>
     warning("Extra dimensions found in input data. An additional " + ...
         "dimenion (%d) will be added to the output to accommodate " + ...
         "extra data.", numDims + 1);
     
     % Reorganize extra dimension so it is last.
-    Data = reshape(pagetranspose(reshape(Data, extraDimSize, [], size(Data, 2))), ...
-        [], size(Data, 2));
+    Data = reshape(pagetranspose(reshape(Data, extraDimSize, [], numColumns)), ...
+        [], numColumns);
 end
 
 %% Assign Output
-for cc = 1:size(Data, 2)
+for cc = 1:numColumns
     if isempty(varargout{cc})
         varargout{cc} = reshape(Data(:, cc), gridDimensions{:}, []);
     end
