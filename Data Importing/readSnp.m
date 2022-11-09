@@ -8,7 +8,7 @@ function [S, f, Z0, commentLines] = readSnp(filename)
 % Example Usage:
 %   [S, f] = readSnp("file");   % Finds any file with the name "file.s*p".
 %   [S, f] = readSnp("file.s2p");
-%   [S, f, Z0, commentLines] = readSnp("file.s1p");
+%   [S, f, Z0, commentLines] = readSnp("file");
 %
 % Inputs:
 %   filename - Filename to search for. If no extension is given, will
@@ -25,7 +25,7 @@ arguments
     filename {mustBeTextScalar};
 end
 
-%% Search For File
+%% Search for File
 % Search for ".s*p" file if no extension was provided.
 [path, name, ext] = fileparts(filename);
 if (ext == "")
@@ -78,8 +78,10 @@ if any(fcounts(1) ~= fcounts) || numel(unique(f)) ~= numel(f)
     error("Frequency column is invalid in '%s'.", filename);
 end
 
-S = reshape(complex(FileData(:, 2:2:end), FileData(:, 3:2:end)), ...
-    numPorts, numPorts, numel(f), []);
+S = permute(reshape(...
+    complex(FileData(:, 2:2:end), FileData(:, 3:2:end)), ...
+    numel(f), numPorts, numPorts, []), ...
+    [2, 3, 1, 4]);
 
 %% Check for Units and Data Format
 switch optionLine(2)
