@@ -28,8 +28,8 @@ function [varargout] = flattenGriddedData(gridVectors, Data, options)
 %   DataTable - 2D array, where each column is the linearized column vector
 %       corresponding to either the grid coordinates or the array value(s).
 %   DataFlat (Repeating) - If SeparateOutputs is true, each output
-%       parameter will be a 1D column vector corresponding colum of the
-%       DataTable output above.
+%       parameter will be a 1D column vector corresponding to the column
+%       of the DataTable output above.
 %       
 % Named Arguments:
 %   SeparateOutputs (false) - If true, each output parameter will be a 1D
