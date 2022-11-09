@@ -23,26 +23,20 @@ function [varargout] = makeArraysSameSize(Arrays)
 % Author: Matt Dvorsky
 
 arguments (Repeating)
-    Arrays {mustBeNonempty};
+    Arrays;
 end
+mustHaveCompatibleSizes(Arrays{:});
 
-%% Check Inputs
+%% Format Output
 maxInputDim = max(cellfun(@(x) ndims(x), Arrays));
 inputDims = cell2mat(...
     cellfun(@(x) size(x, 1:maxInputDim).', Arrays, UniformOutput=false)).';
 outputDims = max(inputDims, [], 1);
 
-% Check for dimension mismatch.
-isMismatch = any((inputDims ~= outputDims) & (inputDims ~= 1), 1);
-if any(isMismatch)
-    error("Mismatch in dimension (%d). Mismatches in input dimensions " + ...
-        "are only allowed if due to singleton dimensions.", find(isMismatch, 1));
-end
-
-%% Format Output
 varargout = cell(size(Arrays));
 for ii = 1:numel(Arrays)
     varargout{ii} = repmat(Arrays{ii}, outputDims ./ inputDims(ii, :));
 end
 
+end
 
