@@ -45,7 +45,7 @@ arguments
     x(:, 1) double;
     y(:, 1) double;
     ImgIn(:, :) double;
-    options.DisplayFormat {mustBeMember(options.DisplayFormat, ...
+    options.DisplayFormat {mustBeTextScalar, mustBeMember(options.DisplayFormat, ...
         ["None", "Magnitude", "dB", "Phase", "Real", "Imag", "MagPhase"])} = "None";
     options.Normalize(1, 1) {mustBeNumericOrLogical} = false;
     options.NormalizeFactor(1, 1) {mustBeNumeric} = 1;
