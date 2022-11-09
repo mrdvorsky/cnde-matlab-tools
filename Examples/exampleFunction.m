@@ -25,7 +25,7 @@ function [out1, out2] = exampleFunction(stringIn, boolIn, optIn, options)
 %       equal to PositiveInt. Otherwise, equal to StringArray.
 %
 % Named Arguments:
-%   PositiveInt - Positive integer optional named argument. No default.
+%   PositiveOddInt - Positive odd integer optional named argument. No default.
 %   StringArray ("") - String array named optional argument. Default
 %       value is an array with an empty string and should be listed in
 %       parentheses.
@@ -36,7 +36,7 @@ arguments
     stringIn {mustBeTextScalar};            % Scalar String
     boolIn(:, 1) logical;                   % Vector of boolean values
     optIn(1, 1) {mustBeReal} = 1.0;         % Scalar real value
-    options.PositiveInt(1, 1) {mustBeInteger, mustBePositive};
+    options.PositiveOddInt(1, 1) {mustBePositiveOddInteger};    % Custom validation defined below
     options.StringArray(:, :, :) {mustBeText} = "";
 end
 
@@ -53,5 +53,15 @@ else
     out2 = options.StringArray;
 end
 
+end
+
+%% Custom Argument Validation Function
+function mustBePositiveOddInteger(num)
+    mustBeInteger(num);
+    mustBePositive(num);
+    if mod(num, 2) ~= 1
+        throwAsCaller(MException("MATLAB:mustBePositiveOddInteger", ...
+            "Value must be a positive odd integer."));
+    end
 end
 
