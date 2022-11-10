@@ -32,7 +32,7 @@ for ii = 1:N
 end
 
 % Get T from equations
-[~, ~, V] = svd(equations, 'econ');
+[~, ~, V] = svd(equations);
 T = V(:, end); % Solution to the homogeneous least squares problem (Ax=0)
 
 T = reshape(T, [N, N, 4]);
