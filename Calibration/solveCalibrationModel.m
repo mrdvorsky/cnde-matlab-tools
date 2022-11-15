@@ -1,4 +1,4 @@
-function [T] = solveCalibrationModel(S, Sm)
+function [A, T] = solveCalibrationModel(S, Sm)
 %SOLVECALIBRATIONMODEL Solve calibration model for n-port network analyzer.
 % The error adapter (T) for a non-ideal network analyzer is found given
 % n-port measurements (Sm) of multiple calibration standards (S). The
@@ -39,47 +39,31 @@ end
 %% Check Inputs
 nPorts = size(S, 1);
 nFreqs = size(S, 3);
-nCals = size(S, 4);
 if size(S, 2) ~= nPorts
     error("Argument 'S' and 'Sm' must have size " + ...
         "(nPorts, nPorts, nFreqs, nStandards).");
 end
 
 %% Build System of Equations for T1...T4 into the Matrix Form Ax=0
-A = zeros(nCals*nPorts.^2, 4*nPorts.^2, nFreqs);
-
-for ii = 1:nPorts
-    for jj = 1:nPorts
-        for cc = 1:nCals
-            Teq = zeros(nPorts, nPorts, 4, nFreqs);
-            
-            Teq(ii, :, 1, :) = S(:, jj, :, cc);
-            Teq(ii, jj, 2, :) = 1;
-            Teq(:, :, 3, :) = -pagetranspose(Sm(ii, :, :, cc) .* S(:, jj, :, cc));
-            Teq(:, jj, 4, :) = -Sm(ii, :, :, cc);
-            
-            eqIndex = ii + nPorts*(jj - 1 + nPorts*(cc - 1));
-            A(eqIndex, :) = Teq(:);
-        end
-    end
-end
-
+% Reshape inputs for easier matrix manipulation.
 eyeN1 = eye(nPorts, nPorts);
 eyeN2 = reshape(eyeN1, [1, 1, nPorts, nPorts]);
 S = reshape(pagetranspose(S), [1, 1, size(S, 1:4)]);
 Sm = reshape(pagetranspose(-Sm), [size(Sm, 1:2), 1, 1, size(Sm, 3:4)]);
 
+% Put equations in correct form.
 T1 = permute(eyeN1 .* S,     [2, 3, 1, 4, 5, 6]);
 T2 = permute(eyeN1 .* eyeN2, [2, 3, 1, 4, 5, 6]);
 T3 = permute(Sm    .* S,     [2, 3, 1, 4, 5, 6]);
 T4 = permute(Sm    .* eyeN2, [2, 3, 1, 4, 5, 6]);
 
+% Reshape into final matrix equation Ax=0.
 [T1, T2, T3, T4] = makeArraysSameSize(T1, T2, T3, T4);
 A = reshape(permute(cat(4, T1, T2, T3, T4), [1, 2, 6, 3, 4, 5]), ...
     [], 4*nPorts.^2, nFreqs);
 
-% Get T from equations
-[~, ~, V] = pagesvd(A);
+%% Solve Matrix Equation
+[~, ~, V] = pagesvd(A, "vector");
 T = V(:, end, :); % Solution to the homogeneous least squares problem (Ax=0)
 
 T = reshape(T, nPorts, nPorts, 4, nFreqs);
