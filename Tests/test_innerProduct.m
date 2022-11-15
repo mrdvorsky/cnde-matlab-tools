@@ -7,9 +7,9 @@ close all;
 
 %% Inputs
 numTrials = 20;
-numDims = 5;
-maxDimSize = 100;
-err_cutoff = 1e-10;
+maxDimSize = [5000, 13, 3, 128, 31];
+numDims = numel(maxDimSize);
+err_cutoff = sqrt(eps);
 
 %% Test
 for ii = 1:numTrials
