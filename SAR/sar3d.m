@@ -69,6 +69,8 @@ arguments
     options.SpeedOfLight(1, 1) {mustBePositive} = 299.792458;
     options.Er(:, 1) {mustBeGreaterThanOrEqual(options.Er, 1)} = 1;
     options.Thk(:, 1) {mustBePositive} = inf;
+    options.BistaticSeparationX(1, 1) {mustBeReal} = 0;
+    options.BistaticSeparationY(1, 1) {mustBeReal} = 0;
 end
 
 if options.ZeroPadPercentX < 0
@@ -119,20 +121,45 @@ WarpedSpectrum = (1 ./ k0).^1 .* fft2(S, length(kx), length(ky));
 ImageSpectrum = zeros([size(WarpedSpectrum, 1:2), length(z), ...
     size(WarpedSpectrum, 4:max(4, ndims(WarpedSpectrum)))]);
 
-prevLayerMult = 1;
-for ii = 1:numel(options.Thk)
-    kz = real(sqrt(4*options.Er(ii)*k0.^2 - kx.^2 - ky.^2));
-    
-    % Set evanescent modes to zero
-    WarpedSpectrum(kz == 0) = 0;
-    
-    for iz = find(layerIndices == ii)
-        ImageSpectrum(:, :, iz, :) = abs(z(iz)) .* mean(prevLayerMult .* WarpedSpectrum ...
-            .* exp(1j .* kz .* (abs(z(iz)) - zLayerStart(ii))), 3);
+if (options.BistaticSeparationX == 0) && (options.BistaticSeparationY == 0)
+    prevLayerMult = 1;
+    for ii = 1:numel(options.Thk)
+        kz = real(sqrt(4*options.Er(ii)*k0.^2 - kx.^2 - ky.^2));
+
+        % Set evanescent modes to zero
+        WarpedSpectrum(kz == 0) = 0;
+
+        for iz = find(layerIndices == ii)
+            ImageSpectrum(:, :, iz, :) = abs(z(iz)) .* mean(prevLayerMult .* WarpedSpectrum ...
+                .* exp(1j .* kz .* (abs(z(iz)) - zLayerStart(ii))), 3);
+        end
+
+        if ii ~= numel(options.Thk)
+            prevLayerMult = prevLayerMult .* exp(1j .* kz .* options.Thk(ii));
+        end
     end
-    
-    if ii ~= numel(options.Thk)
-        prevLayerMult = prevLayerMult .* exp(1j .* kz .* options.Thk(ii));
+else
+    for ii = 1:numel(options.Thk)
+        kz = real(sqrt(4*options.Er(ii)*k0.^2 - kx.^2 - ky.^2));
+
+        % Set evanescent modes to zero
+        WarpedSpectrum(kz == 0) = 0;
+
+        for iz = find(layerIndices == ii)
+            xPadded = 0.5 * kx .* (numel(kx).*dx.^2 ./ pi);
+            yPadded = 0.5 * ky .* (numel(ky).*dy.^2 ./ pi);
+            if z(iz) ~= 0
+                specPSF = fft2(createSarData3d(xPadded, yPadded, f, 0, 0, z(iz), 1, ...
+                    Er=options.Er, Thk=options.Thk, ...
+                    BistaticSeparationX=options.BistaticSeparationX, ...
+                    BistaticSeparationY=options.BistaticSeparationY));
+            else
+                specPSF = 0;
+            end
+
+            ImageSpectrum(:, :, iz, :) = abs(z(iz)).^2 .* mean(WarpedSpectrum ...
+                .* conj(specPSF), 3);
+        end
     end
 end
 

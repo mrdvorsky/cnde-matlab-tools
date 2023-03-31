@@ -53,7 +53,7 @@ arguments
     x0 {mustBeReal};
     y0 {mustBeReal};
     z0 {mustBeReal};
-    a0 = ones(size(x0));
+    a0 = 1;
     options.UseRangeForAmplitude logical = true;
     options.SpeedOfLight(1, 1) {mustBePositive} = 299.792458;
     options.ThetaBeamwidthX(1, 1) {mustBePositive} = inf;
@@ -61,6 +61,8 @@ arguments
     options.Er(:, 1) {mustBeGreaterThanOrEqual(options.Er, 1)} = 1;
     options.Thk(:, 1) {mustBePositive} = inf;
     options.DispersionTableSize(1, 1) {mustBeInteger, mustBePositive} = 101;
+    options.BistaticSeparationX(1, 1) {mustBeReal} = 0;
+    options.BistaticSeparationY(1, 1) {mustBeReal} = 0;
 end
 
 %% Check for Argument Size Mismatch
@@ -101,16 +103,26 @@ for ii = 1:numel(z0)
         RQuery = sum(zLayers ./ cos(psi) .* ior, 2);
         R_interp = griddedInterpolant(xQuery, RQuery);
         
-        R = R_interp(hypot(x - x0(ii), y - y0(ii)));
+        R1 = R_interp(hypot(...
+            x - x0(ii) - 0.5*options.BistaticSeparationX, ...
+            y - y0(ii) - 0.5*options.BistaticSeparationY));
+        R2 = R_interp(hypot(...
+            x - x0(ii) + 0.5*options.BistaticSeparationX, ...
+            y - y0(ii) + 0.5*options.BistaticSeparationY));
     else
-        R = sqrt(options.Er) .* hypot(z0(ii), hypot(x - x0(ii), y - y0(ii)));
+        R1 = hypot(z0(ii), hypot(...
+            x - x0(ii) - 0.5*options.BistaticSeparationX, ...
+            y - y0(ii) - 0.5*options.BistaticSeparationY));
+        R2 = hypot(z0(ii), hypot(...
+            x - x0(ii) + 0.5*options.BistaticSeparationX, ...
+            y - y0(ii) + 0.5*options.BistaticSeparationY));
     end
     
     % Calculate SAR values.
-    S_ii = exp(-2j .* k .* R) .* a0(ii);
+    S_ii = exp(-1j .* k .* (R1 + R2)) .* a0(ii);
     
     if options.UseRangeForAmplitude
-        S_ii = S_ii ./ R.^2;
+        S_ii = S_ii ./ (R1 .* R2);
     end
     
     if isfinite(options.ThetaBeamwidthX)
