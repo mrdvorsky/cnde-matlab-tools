@@ -22,9 +22,9 @@ catch
 end
 
 try
-    cal = readSnp(strcat(fullfile(fileDirectory, ...
+    Sp = readSnp(strcat(fullfile(fileDirectory, ...
         strcat(fileName, calAppend)), ".s2p"));
-    calData = cal.Parameters(shortChannel(1), shortChannel(2), :);
+    calData = Sp(shortChannel(1), shortChannel(2), :);
 catch
     error("File '%s.s2p' does not exist or has the wrong format.", fullfile(fileDirectory, fileName));
 end

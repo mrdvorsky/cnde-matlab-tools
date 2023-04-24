@@ -27,8 +27,8 @@ DataCircular = 0*DataLinear;
 for xx = 1:size(DataLinear, 1)
     for yy = 1:size(DataLinear, 2)
         for ff = 1:size(DataLinear, 3)
-            DataLinear(xx, yy, ff, :, :) = A * NPortCal(...
-                squeeze(DataLinear(xx, yy, ff, :, :)), calFile.Tlin(:, :, :, ff)) * A.';
+            DataLinear(xx, yy, ff, :, :) = A * applyCalibration(...
+                calFile.Tlin(:, :, :, ff), squeeze(DataLinear(xx, yy, ff, :, :))) * A.';
             DataCircular(xx, yy, ff, :, :) = linToCirc ...
                 * squeeze(DataLinear(xx, yy, ff, :, :)) * linToCirc.';
         end
