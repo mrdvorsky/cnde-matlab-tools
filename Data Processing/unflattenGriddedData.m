@@ -90,7 +90,8 @@ end
 %% Determine Grid Vectors
 varargout = cell(numColumns, 1);
 gridDimensions = cell(1, numDims);
-Data = sortrows(Data, flip(options.GridColumns));
+Data = sortrows(Data, flip(options.GridColumns), ...
+    ComparisonMethod="real");
 
 % Loop over input columns to find grid vectors
 currentStep = 1;
