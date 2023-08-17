@@ -25,7 +25,7 @@ end
 maxInputDim = max(cellfun(@(x) ndims(x), Arrays));
 inputDims = cell2mat(...
     cellfun(@(x) size(x, 1:maxInputDim).', Arrays, UniformOutput=false)).';
-outputDims = max(inputDims, [], 1);
+outputDims = max(inputDims, [], 1) .* (min(inputDims, [], 1) ~= 0);
 
 dimMismatch = any((inputDims ~= outputDims) & (inputDims ~= 1), 1);
 if any(dimMismatch)
