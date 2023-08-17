@@ -54,6 +54,11 @@ end
 outputSize = AB_size;
 outputSize(dims) = 1;
 
+if prod(outputSize) == 0
+    AB = zeros(outputSize);
+    return;
+end
+
 %% Deal with Summation Dimensions Where Either A or B are Singleton.
 A_singletonDims = intersect(find(size(A, 1:maxDims) == 1), dims);
 B_singletonDims = intersect(find(size(B, 1:maxDims) == 1), dims);
