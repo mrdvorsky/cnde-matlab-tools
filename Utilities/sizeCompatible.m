@@ -33,6 +33,7 @@ end
 arguments
     options.Dimension(1, :) {mustBeValidDimension} = "all";
 end
+mustHaveCompatibleSizes(Arrays{:});
 
 %% Calculate Size
 numDims = max(cellfun(@ndims, Arrays));
@@ -41,9 +42,10 @@ if strcmp(options.Dimension, "all")
     options.Dimension = 1:numDims;
 end
 
-dimSizes = max(cell2mat(...
+ArraySizes = cell2mat(...
     cellfun(@(A) size(A, options.Dimension), Arrays, ...
-    UniformOutput=false).'), [], 1);
+    UniformOutput=false).');
+dimSizes = max(ArraySizes, [], 1) .* (min(ArraySizes, [], 1) ~= 0);
 
 end
 
