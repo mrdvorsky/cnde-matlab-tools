@@ -24,8 +24,10 @@ function [varargout] = showImage(x, y, ImgIn, options, imagescOptions)
 %   y - vector of coordinates of ImgIn (first dimension).
 %   ImgIn - Array containing image. Should have at most 2 non-singleton
 %       dimensions. Can be complex if DisplayFormat is specified.
+%
 % Outputs:
 %   Passed through from "imagesc". See imagesc documentation for details.
+%
 % Named Options:
 %   DisplayFormat ("None") - For a complex-valued image, this argument
 %       specifies which component to show. Options are "None", "Magnitude",
@@ -44,14 +46,14 @@ function [varargout] = showImage(x, y, ImgIn, options, imagescOptions)
 arguments
     x(:, 1) double;
     y(:, 1) double;
-    ImgIn(:, :) double;
+    ImgIn(:, :) double {mustBeValidImageSize(ImgIn, x, y)};
     options.DisplayFormat {mustBeTextScalar, mustBeMember(options.DisplayFormat, ...
         ["None", "Magnitude", "dB", "Phase", "Real", "Imag", "MagPhase"])} = "None";
-    options.Normalize(1, 1) {mustBeNumericOrLogical} = false;
-    options.NormalizeFactor(1, 1) {mustBeNumeric} = 1;
-    options.PhaseMultiplier(1, 1) {mustBeNumeric} = 1;
-    options.ShowColorbar(1, 1) {mustBeNumericOrLogical} = true;
-    options.ColorbarLabel(1, 1) {mustBeTextScalar};
+    options.Normalize(1, 1) logical = false;
+    options.NormalizeFactor(1, 1) {mustBePositive} = 1;
+    options.PhaseMultiplier(1, 1) {mustBePositive} = 1;
+    options.ShowColorbar(1, 1) logical = true;
+    options.ColorbarLabel {mustBeTextScalar};
     options.Axes(1, 1) {mustBeA(options.Axes, "Axes")};
     
     imagescOptions.AlphaData;
@@ -100,13 +102,14 @@ end
 
 if options.DisplayFormat == "MagPhase"
     [varargout{1:nargout}] = imagesc(options.Axes, x, y, ...
-        squeeze(options.PhaseMultiplier .* rad2deg(angle(Img))).', ...
-        imagescOptions, AlphaData=squeeze(abs(Img)).');
+        options.PhaseMultiplier .* rad2deg(angle(Img)).', ...
+        imagescOptions, AlphaData=abs(Img).');
     set(options.Axes, "Color", "k");
     colormap(options.Axes, "hsv");
 else
-    [varargout{1:nargout}] = imagesc(options.Axes, x, y, squeeze(Img).', ...
+    [varargout{1:nargout}] = imagesc(options.Axes, x, y, Img.', ...
         imagescOptions);
+    colormap(options.Axes, "jet");
 end
 
 axis(options.Axes, "image");
@@ -122,5 +125,21 @@ if options.ShowColorbar
     colorbarHandle.Label.String = colorbarLabel;
 end
 
+end
+
+
+
+%% Custom Argument Validation Function
+function mustBeValidImageSize(Img, x, y)
+    if all(size(Img) == [numel(x), numel(y)])
+        return;
+    end
+    if (numel(Img) == numel(x)*numel(y)) && (isscalar(x) || isscalar(y))
+        return;
+    end
+    throwAsCaller(MException("MATLAB:mustBeValidImageSize", ...
+        "Image size (%d, %d) is inconsistent with the lengths " + ...
+        "of the x- and y-coordinate vectors (%d, %d).", ...
+        size(Img, 1), size(Img, 2), numel(x), numel(y)));
 end
 
