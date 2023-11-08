@@ -106,10 +106,14 @@ if options.DisplayFormat == "MagPhase"
         imagescOptions, AlphaData=abs(Img).');
     set(options.Axes, "Color", "k");
     colormap(options.Axes, "hsv");
+    clim(options.Axes, [-180, 180]);
 else
     [varargout{1:nargout}] = imagesc(options.Axes, x, y, Img.', ...
         imagescOptions);
     colormap(options.Axes, "jet");
+    if options.DisplayFormat == "Magnitude"
+        clim(options.Axes, [0, inf]);
+    end
 end
 
 axis(options.Axes, "image");
