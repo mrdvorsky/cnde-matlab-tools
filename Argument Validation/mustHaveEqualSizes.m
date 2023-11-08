@@ -7,7 +7,7 @@ function [] = mustHaveEqualSizes(Arrays, options)
 %   arguments
 %       Array1;
 %       Array2 {mustHaveEqualSizes(Array1, Array2)};    % Check all dimensions.
-%       Array3 {mustHaveEqualSizes(Array1, Array3, Dimenions=[1, 3])};
+%       Array3 {mustHaveEqualSizes(Array1, Array3, Dimensions=[1, 3])};
 %   end
 %
 %   arguments (Repeating)
@@ -22,6 +22,7 @@ arguments (Repeating)
 end
 arguments
     options.Dimensions(1, :) {mustBeValidDimension} = "all";
+    options.ExcludeDimensions(1, :) {mustBeValidDimension} = [];
 end
 
 %% Check Sizes
@@ -29,6 +30,7 @@ maxInputDim = max(cellfun(@(x) ndims(x), Arrays));
 if strcmp(options.Dimensions, "all")
     options.Dimensions = 1:maxInputDim;
 end
+options.Dimensions = setdiff(options.Dimensions, options.ExcludeDimensions);
 maxInputDim = max(maxInputDim, max(options.Dimensions));
 
 inputDims = cell2mat(...
