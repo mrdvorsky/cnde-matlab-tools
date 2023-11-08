@@ -49,7 +49,7 @@ arguments
 end
 
 %% Compute Spectral Coordinates
-varargout = cell(min(numel(xVectors), nargout), 1);
+varargout = cell(min(numel(xVectors), max(1, nargout)), 1);
 for ii = 1:numel(varargout)
     N = numel(xVectors{ii});
 
