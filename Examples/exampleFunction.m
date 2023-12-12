@@ -18,6 +18,7 @@ function [out1, out2] = exampleFunction(stringIn, boolIn, optIn, options)
 %   stringIn - Scalar string input. List requirements here.
 %   boolIn - Boolean input.
 %   optIn (1) - Optional numeric input. List defaults in parentheses.
+%
 % Outputs:
 %   out1 - First output argument. If all of boolIn are true, out1 is equal
 %       to stringIn. Otherwise, it is equal to optIn.
