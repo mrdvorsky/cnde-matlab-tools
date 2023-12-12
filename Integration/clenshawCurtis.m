@@ -68,7 +68,10 @@ end
 
 %% Calculate Weights using DCT Type 1
 % Use even ifft to calculate DCT-1.
-weights = real(ifft([moments; moments(end - 1:-1:2)]));
+weights = ifft([moments; moments(end - 1:-1:2)]);
+if all(isreal(moments))
+    weights = real(weights);
+end
 weights = weights(1:N + 1);
 weights(2:end - 1) = 2*weights(2:end - 1);
 
