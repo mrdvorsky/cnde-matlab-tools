@@ -1,4 +1,4 @@
-function [varargout] = importSdt(filenameIn)
+function [varargout] = importSdt(filenameIn, options)
 %IMPORTSDT Imports an SDT file from InspectionWare.
 % This function imports am SDT file from InspectionWare given the SDT
 % filename with or without the ".sdt" extension. Returns a cell array of
@@ -35,6 +35,7 @@ function [varargout] = importSdt(filenameIn)
 
 arguments
     filenameIn {mustBeTextScalar};
+    options.MaxHeaderSize(1, 1) {mustBePositive, mustBeInteger} = 100000;
 end
 
 %% Check Filepath Input
@@ -46,9 +47,23 @@ else
 end
 
 %% Read File Data
-allData = split(fileread(filename), sprintf("|^Data Set^|\r\n"));
-HeaderString = string(allData{1});
-RawData = uint8(allData{2});
+fileID = fopen(filename, "r");
+RawData = fread(fileID, "uint8=>uint8");
+fclose(fileID);
+
+HeaderData = char(RawData(1:min(numel(RawData), options.MaxHeaderSize))).';
+HeaderSplit = split(HeaderData, sprintf("|^Data Set^|\r\n"));
+
+if numel(HeaderSplit) < 2
+    error("Error reading '%s'. Could not find the string " + ...
+        "'|^Data Set^|\\r\\n' in the first (%d) bytes of the SDT file. " + ...
+        "File may be corrupted or the header may be larger than " + ...
+        "the 'MaxHeaderSize' argument.", ...
+        filename, options.MaxHeaderSize);
+end
+
+HeaderString = string(HeaderSplit{1});
+RawData = RawData(strlength(HeaderString) + 14:end);
 
 %% Parse Header
 [axisCoordinates, t, Header] = parseSdtHeader(HeaderString);
@@ -57,14 +72,14 @@ RawData = uint8(allData{2});
 numOutputDimensions = nargout - 3;
 
 if numOutputDimensions < Header.numAxes
-    error("Requested number of output dimensions (%d) is " + ...
-        "less than the number of dimensions in the SDT file (%d).", ...
-        numOutputDimensions, Header.numAxes);
+    error("Error reading '%s'. Requested number of output dimensions " + ...
+        "(%d) is less than the number of dimensions in the SDT file (%d).", ...
+        filename, numOutputDimensions, Header.numAxes);
 elseif numOutputDimensions > Header.numAxes
-    warning("Requested number of output dimensions (%d) is greater " + ...
-        "than the number of dimensions in the scan file (%d). " + ...
-        "Extra singleton dimensions will be added to the output.", ...
-        numOutputDimensions, Header.numAxes);
+    warning("Error reading '%s'. Requested number of output dimensions " + ...
+        "(%d) is greater than the number of dimensions in the scan " + ...
+        "file (%d). Extra singleton dimensions will be added to the output.", ...
+        filename, numOutputDimensions, Header.numAxes);
 end
 
 for ii = 1:numel(axisCoordinates)
