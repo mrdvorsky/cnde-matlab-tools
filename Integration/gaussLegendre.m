@@ -1,17 +1,21 @@
-function [nodes, weights] = gaussLegendre(orderN, a, b)
+function [nodes, weights] = gaussLegendre(N, a, b)
 %GAUSSLEGENDRE Generate Gauss-Legendre weights and nodes for closed interval integration.
 % This function generates the weights and nodes required to compute a
 % definite integral over a closed interval. The weights and nodes are
 % defined using the Gauss-Legendre Quadrature rules.
 %
+% **Note**: Only use this function when integrating polynomials. Otherwise,
+% the "fejer2" functions is often better and is more general (e.g., it
+% supports arbitrary weighting functions and error estimation).
+%
 % The function outputs "nodes" and "weights" can be used to approximate
 % the definite integral of a function f(x)dx over the interval [a,b] by
 % computing q = sum(weights .* f(nodes)). This should give approximately
 % the same result as q = integral(f, a, b), with a higher value of
-% orderN resulting in a better approximation. The parameter orderN is
-% the number of points at which to evaluate f(x).
+% N resulting in a better approximation. The parameter N is the number of
+% points at which to evaluate f(x).
 %
-% If f(x) is a polynomial with degree less than 2*orderN, the result
+% If f(x) is a polynomial with degree less than 2*N, the result
 % will be exact.
 %
 % Use of these quadrature rules will never result in evalation of the
@@ -31,7 +35,7 @@ function [nodes, weights] = gaussLegendre(orderN, a, b)
 %   q = sum(fun(nodes) .* weights, 1);
 %
 % Inputs:
-%   orderN - Scalar number of nodes to calculate.
+%   N - Scalar number of nodes to calculate.
 %   a - Scalar integration lower bound. Must be real and finite.
 %   b - Scalar integration upper bound. Must be real and finite.
 % Outputs:
@@ -41,16 +45,16 @@ function [nodes, weights] = gaussLegendre(orderN, a, b)
 % Author: Matt Dvorsky
 
 arguments
-    orderN(1, 1) {mustBeInteger, mustBePositive} = 10;
+    N(1, 1) {mustBeInteger, mustBePositive} = 10;
     a(1, 1) {mustBeReal, mustBeFinite} = -1;
     b(1, 1) {mustBeReal, mustBeFinite} = 1;
 end
 
 %% Calculate Nodes
 % Golub-Welsh Algorithm
-alpha(:, 1) = 1:(orderN - 1);
+alpha(:, 1) = 1:(N - 1);
 beta = alpha ./ sqrt(4*alpha.^2 - 1);
-J = spdiags([0; beta], 1, orderN, orderN) + spdiags([beta; 0], -1, orderN, orderN);
+J = spdiags([0; beta], 1, N, N) + spdiags([beta; 0], -1, N, N);
 
 % The nodes are the eigenvalues of the the matrix J
 nodes = eig(J);
@@ -66,7 +70,7 @@ pn = nodes;                 % P_1(x) = x
 
 pn_prime_prev = 0*nodes;    % P_0'(x) = 0
 pn_prime = 1 + 0*nodes;     % P_1'(x) = 1
-for n = 2:orderN
+for n = 2:N
     pn_next = ((2*n - 1).*nodes.*pn - (n - 1).*pn_prev) ./ n;
     pn_deriv_next = ((2*n - 1).*(pn + nodes.*pn_prime) ...
         - (n - 1).*pn_prime_prev) ./ n;
