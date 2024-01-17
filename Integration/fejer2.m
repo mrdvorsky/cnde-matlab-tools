@@ -9,31 +9,35 @@ function [nodes, weights, errorWeights] = fejer2(N, a, b, options)
 % The function outputs "nodes" and "weights" can be used to approximate
 % the definite integral of a function f(x)dx over the interval [a,b] by
 % computing q = sum(weights .* f(nodes)). This should give approximately
-% the same result as q = integral(f, a, b), with a higher value of
+% the same result as "q = integral(f, a, b)", with a higher value of
 % N resulting in a better approximation. The error in q can be estimated
 % using the output parameter errorWeights using the formula 
-% qErr = sum(errorWeights .* f(nodes)).
+% "qErr = sum(errorWeights .* f(nodes))".
 %
 % If f(x) is a polynomial with degree less than N, the result will
 % be exact.
 %
 % A weighting function w(x) ("WeightingFunction") can be optionally
-% supplied such that the integral q = sum(weights .* f(nodes)) corresponds
-% to the integral of f(x)w(x)dx over the closed interval [a,b]. In this
-% case, the convergence depend only on the behavior of  f(x), regardless of
-% the behavior of w(x). The input "WeightingFunction" should be a function
-% handle that accepts an array of scalar inputs and returns an array of
-% scalar outputs. The default value is effectively w(x) = 1.
+% supplied such that the integral "q = sum(weights .* f(nodes))"
+% corresponds to the integral of f(x)w(x)dx over the closed interval [a,b].
+% In this case, the convergence depend only on the behavior of  f(x),
+% regardless of the behavior of w(x). The input "WeightingFunction" should
+% be a function handle that accepts an array of scalar inputs and returns
+% an array of scalar outputs. The default value is effectively w(x) = 1.
 %
-% Alternatively, the sinusoidal "moments" of the weighting function M_k
-% (i.e., "M_k = integral(@(x) w(x) .* sin(k*x), a, b)") can be specified
-% directly, which is useful if these integrals are known analytically. The
-% "WeightingMoments" arguments should contain the vector of moments 
-% M_k, where k = 1:N.
+% Alternatively, the sinusoidal "moments" of the weighting function "M_k"
+% (i.e., 
+%   "M_k = integral(@(x) w(0.5*(b - a) .* cos(x) + 0.5*(a + b)) ...
+%                       .* sin(k*x), 0, pi)"
+% ) 
+% can be specified directly, which is useful if these integrals are known
+% analytically. The "WeightingMoments" arguments should contain the vector
+% of moments "M_k", where "k = 1:N".
 %
 % Example Usage:
 %   [nodes, weights] = fejer2(N, a, b);
-%   [nodes, weights, errorWeights] = fejer2(N, a, b, WeightingFunction=@(x) exp(-x));
+%   [nodes, weights, errorWeights] = fejer2(N, a, b, ...
+%                       WeightingFunction=@(x) exp(-x));
 %   q = sum(fun(nodes) .* weights, 1);
 %   qErr = sum(fun(nodes) .* errorWeights, 1);
 %
@@ -51,14 +55,14 @@ function [nodes, weights, errorWeights] = fejer2(N, a, b, options)
 %   WeightingFunction (@(x) 1) - Weighting function for the integral. See
 %       above. Must accept an array of scalars and return the same.
 %   WeightingMoments - Moments M_k, where k = 1:N of the weighting
-%       function, see above. Specify either this or >WeightingFunction".
+%       function, see above. Specify either this or "WeightingFunction".
 %
 % Author: Matt Dvorsky
 
 arguments
-    N(1, 1) {mustBeInteger, mustBePositive} = 10;
-    a(1, 1) {mustBeReal, mustBeFinite} = -1;
-    b(1, 1) {mustBeReal, mustBeFinite} = 1;
+    N(1, 1) {mustBeInteger, mustBePositive};
+    a(1, 1) {mustBeReal, mustBeFinite};
+    b(1, 1) {mustBeReal, mustBeFinite};
 
     options.WeightingFunction(1, 1);
     options.WeightingMoments(:, 1);
@@ -87,7 +91,8 @@ if ~isfield(options, "WeightingMoments")
     if isfield(options, "WeightingFunction")
         for kk = 1:length(options.WeightingMoments)
             options.WeightingMoments(kk) = integral(...
-                @(x) options.WeightingFunction(0.5*(b - a) .* cos(x) + 0.5*(a + b)) ...
+                @(x) options.WeightingFunction(...
+                0.5*(b - a) .* cos(x) + 0.5*(a + b)) ...
                 .* sin((kk)*x), 0, pi);
         end
     end
