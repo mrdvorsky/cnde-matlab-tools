@@ -63,7 +63,7 @@ if numel(HeaderSplit) < 2
 end
 
 HeaderString = string(HeaderSplit{1});
-RawData = RawData(strlength(HeaderString) + 14:end);
+RawData(1:strlength(HeaderString) + 14) = [];
 
 %% Parse Header
 [axisCoordinates, t, Header] = parseSdtHeader(HeaderString);
