@@ -5,7 +5,7 @@ function [nodes, weights, varargout] = fejer2_halfOpen(N, L, a, options)
 % and nodes are defined using the Fejer Type II Quadrature rules. These
 % rules do not result in function evalution at the endpoints 0 or inf. The
 % input "L" is a scale factor input that affects the convergence of the
-% integral.
+% integral. More specifically, the central node will be L.
 %
 % The function outputs "nodes" and "weights" can be used to approximate
 % the definite integral of a function f(x)dx over the interval [a,inf) by
@@ -29,8 +29,13 @@ function [nodes, weights, varargout] = fejer2_halfOpen(N, L, a, options)
 %
 % Alternatively, the sinusoidal "moments" of the weighting function "M_k"
 % (i.e., 
-%   "M_k = integral(@(x) (2*L) * w(a + L * cot(0.5*x).^2) ...
-%                           .* sin(k*x) ./ (1 - cos(x)).^2, 0, pi)"
+%   M_k = integral(@(x) (2*L) * w(a + L * cot(0.5*x).^2) ...
+%                            .* sin(k*x) ./ (1 - cos(x)).^2, 0, pi);
+%
+%       or
+%
+%   M_k = integral(@(x) w(x) .* sin(2*k * acot(sqrt((x - a)./L))) ...
+%                            ./ sin(2   * acot(sqrt((x - a)./L))), 0, inf);
 % )
 % can be specified directly, which is useful if these integrals are known
 % analytically. The "WeightingMoments" arguments should contain the vector
