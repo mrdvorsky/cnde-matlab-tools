@@ -1,12 +1,12 @@
 clc;
 clear;
-% close all;
+close all;
 
 %% Inputs
 f = @(x) polyval([1, 1, 1], x ./ (1 + x.^2));
 w = @(x) exp(-1.01*11.0123j * x) .* exp(-0.1 * x);
 
-N = 20;
+N = 21;
 
 a = -0;
 L = 1;
@@ -24,13 +24,14 @@ for kk = 1:N
     Mk(kk) = integral(@(x) (2*L) * w(a + L * cot(0.5*x).^2) ...
                           .* sin(kk*x) ./ (1 - cos(x)).^2, 0, pi);
 end
-[x4, x4_weights] = fejer2_halfOpen(N, L, a, WeightingMoments=Mk);
+[x4, x4_weights, x4_error] = fejer2_halfOpen(N, L, a, WeightingMoments=Mk);
 I4 = sum(f(x4) .* x4_weights);
 
 
 err2 = db(I1 - I2)
 err3 = db(I1 - I3)
 err4 = db(I1 - I4)
+errEst4 = db(sum(f(x4) .* x4_error))
 
 
 

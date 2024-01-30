@@ -5,7 +5,7 @@ function [nodes, weights] = gaussLegendre(N, a, b)
 % defined using the Gauss-Legendre Quadrature rules.
 %
 % **Note**: Only use this function when integrating polynomials. Otherwise,
-% the "fejer2" functions is often better and is more general (e.g., it
+% the "fejer2" function is often better and is more general (e.g., it
 % supports arbitrary weighting functions and error estimation).
 %
 % The function outputs "nodes" and "weights" can be used to approximate
