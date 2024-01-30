@@ -63,6 +63,8 @@ function [nodes, weights, varargout] = fejer2_halfOpen(N, L, a, options)
 %       above. Must accept an array of scalars and return the same.
 %   WeightingMoments - Moments "M_k", where "k = 1:N" of the weighting
 %       function, see above. Specify either this or "WeightingFunction".
+%   IntegralRelTol (1e-6) - Tolerance to use for integral when weighting
+%       function is provided.
 %
 % Author: Matt Dvorsky
 
@@ -73,6 +75,7 @@ arguments
 
     options.WeightingFunction(1, 1);
     options.WeightingMoments(:, 1);
+    options.IntegralRelTol(1, 1) {mustBePositive} = 1e-6;
 end
 
 %% Check Inputs
@@ -97,7 +100,8 @@ if isfield(options, "WeightingFunction")
     [x, weights, varargout{1:nargout - 2}] = fejer2(N, -1, 1, ...
         WeightingFunction=@(x) (2*L) * options.WeightingFunction(...
         a + L .* (1 + x) ./ (1 - x)) ...
-        ./ (1 - x).^2);
+        ./ (1 - x).^2, ...
+        IntegralRelTol=options.IntegralRelTol);
 
     % Adjust for Half-Open interval.
     nodes = a + L .* (1 + x) ./ (1 - x);

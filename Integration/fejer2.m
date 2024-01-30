@@ -56,6 +56,8 @@ function [nodes, weights, errorWeights] = fejer2(N, a, b, options)
 %       above. Must accept an array of scalars and return the same.
 %   WeightingMoments - Moments M_k, where k = 1:N of the weighting
 %       function, see above. Specify either this or "WeightingFunction".
+%   IntegralRelTol (1e-6) - Tolerance to use for integral when weighting
+%       function is provided.
 %
 % Author: Matt Dvorsky
 
@@ -66,6 +68,7 @@ arguments
 
     options.WeightingFunction(1, 1);
     options.WeightingMoments(:, 1);
+    options.IntegralRelTol(1, 1) {mustBePositive} = 1e-6;
 end
 
 %% Check Inputs
@@ -93,7 +96,8 @@ if ~isfield(options, "WeightingMoments")
             options.WeightingMoments(kk) = integral(...
                 @(x) options.WeightingFunction(...
                 0.5*(b - a) .* cos(x) + 0.5*(a + b)) ...
-                .* sin((kk)*x), 0, pi);
+                .* sin((kk)*x), 0, pi, ...
+                RelTol=options.IntegralRelTol);
         end
     end
 end
@@ -102,8 +106,8 @@ end
 momentsDST = 0.5j * fft([0; options.WeightingMoments; ...
     0; -flip(options.WeightingMoments)]);
 
-theta(:, 1) = pi * n ./ (N + 1);
-weights(:, 1) = 2 * sin(theta) .* momentsDST(2:N + 1) ./ (N + 1);
+theta(:, 1) = flip(pi * n ./ (N + 1));
+weights(:, 1) = flip(2 * sin(theta) .* momentsDST(2:N + 1) ./ (N + 1));
 
 %% Calculate Nodes
 nodes(:, 1) = cos(theta);
