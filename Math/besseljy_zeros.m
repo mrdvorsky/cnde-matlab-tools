@@ -48,8 +48,8 @@ end
 alpha = zeros(n, 1);
 beta = zeros(n, 1);
 for ii = 1:numel(k)
-    ab = null([besseljy(nu, k(ii) .* r2, 1, 0), ...
-        besseljy(nu, k(ii) .* r2, 0, 1)]);
+    ab = null([besseljy(1, 0, nu, k(ii) .* r2), ...
+        besseljy(1, 0, nu, k(ii) .* r2)]);
     alpha(ii) = ab(1);
     beta(ii) = ab(2);
 end
