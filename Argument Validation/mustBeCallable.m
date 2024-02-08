@@ -25,6 +25,13 @@ arguments
 end
 
 %% Check Argument
+if isnumeric(fun) || iscell(fun)
+    throwAsCaller(MException("MATLAB:mustBeCallable", ...
+        sprintf("Argument must be callable with (%d) arguments, " + ...
+        "i.e., it should be callable as 'fun(%s)'.", ...
+        numel(funArgs), callArgString)));
+end
+
 try
     fun(funArgs{:});
 catch ex

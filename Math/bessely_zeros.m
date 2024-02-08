@@ -27,11 +27,11 @@ fun = @(y) bessely(nu, y);
 yzeros = zeros(n, 1);
 yzeros(1) = fzero(fun, nu + 2.41*(nu < 10));
 for ii = 2:n
-    j_guess = yzeros(ii - 1) + pi*[0.9, 1.1];
-    while sum(sign(fun(j_guess))) ~= 0
-        j_guess(2) = 1.1*j_guess(2) - 0.1*yzeros(ii - 1);
+    y_guess = yzeros(ii - 1) + pi*[0.9, 1.1];
+    while sum(sign(fun(y_guess))) ~= 0
+        y_guess(2) = 1.1*y_guess(2) - 0.1*yzeros(ii - 1);
     end
-    yzeros(ii) = fzero(fun, j_guess);
+    yzeros(ii) = fzero(fun, y_guess);
 end
 
 end

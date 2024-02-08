@@ -1,4 +1,4 @@
-function [val] = besseljyprime(nu, z, alpha, beta, scale)
+function [val] = besseljyprime(alpha, beta, nu, z, scale)
 %BESSELJYPRIME Derivative of "besseljy".
 % Use the same way as "besseljy". Computes the derivative of besseljy.
 %
@@ -7,10 +7,10 @@ function [val] = besseljyprime(nu, z, alpha, beta, scale)
 %   val = besseljyprime(a, b, nu, z, true); % Scaled by exp(-abs(imag(z))).
 %
 % Inputs:
-%   nu - Bessel function order. See "besselj" documentation.
-%   z - Value to evaluate at.
 %   alpha - Coefficient of besselj.
 %   beta - Coefficient of bessely.
+%   nu - Bessel function order. See "besselj" documentation.
+%   z - Value to evaluate at.
 %   scale (0) - Whether to scale output by exp(-abs(imag(Z))). See
 %       "besselj" documentation for more information.
 %
@@ -20,10 +20,10 @@ function [val] = besseljyprime(nu, z, alpha, beta, scale)
 % Author: Matt Dvorsky
 
 arguments
-    nu;
-    z;
     alpha;
     beta;
+    nu;
+    z;
     scale(1, 1) = 0;
 end
 

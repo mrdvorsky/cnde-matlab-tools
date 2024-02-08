@@ -27,11 +27,11 @@ fun = @(y) besselyprime(nu, y);
 ypzeros = zeros(n, 1);
 ypzeros(1) = fzero(fun, nu + 2.4*(nu < 10));
 for ii = 2:n
-    jp_guess = ypzeros(ii - 1) + pi*[0.9, 1.1];
-    while sum(sign(fun(jp_guess))) ~= 0
-        jp_guess(2) = 1.1*jp_guess(2) - 0.1*ypzeros(ii - 1);
+    yp_guess = ypzeros(ii - 1) + pi*[0.9, 1.1];
+    while sum(sign(fun(yp_guess))) ~= 0
+        yp_guess(2) = 1.1*yp_guess(2) - 0.1*ypzeros(ii - 1);
     end
-    ypzeros(ii) = fzero(fun, jp_guess);
+    ypzeros(ii) = fzero(fun, yp_guess);
 end
 
 end
