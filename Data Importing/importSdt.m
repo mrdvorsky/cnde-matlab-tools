@@ -29,7 +29,8 @@ function [varargout] = importSdt(filenameIn, options)
 %   Header - Struct with various parsed information from the file header.
 %
 % Named Arguments:
-%   .
+%   MaxHeaderSize (100000) - Maximum size of SDT header, in bytes. If the
+%       header is longer than this, an error will be thrown.
 %
 % Author: Matt Dvorsky
 
@@ -47,7 +48,11 @@ else
 end
 
 %% Read File Data
-fileID = fopen(filename, "r");
+[fileID, fopenError] = fopen(filename, "r");
+if fileID == -1
+    error("Can't open file '%s' because: %s.", filename, fopenError);
+end
+
 RawData = fread(fileID, "uint8=>uint8");
 fclose(fileID);
 
