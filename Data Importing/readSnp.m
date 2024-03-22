@@ -84,23 +84,23 @@ S = permute(reshape(...
     [2, 3, 1, 4]);
 
 %% Check for Units and Data Format
-switch optionLine(2)
-    case "HZ"
+switch lower(optionLine(2))
+    case "hz"
         f = 1e-9 * f;
-    case "KHZ"
+    case "khz"
         f = 1e-6 * f;
-    case "MHZ"
+    case "mhz"
         f = 1e-3 * f;
-    case "GHZ"
+    case "ghz"
     otherwise
         error("Unit spec '%s' invalid in '%s'.", optionLine(2), filename);
 end
 
-switch optionLine(4)
-    case "RI"
-    case "MA"
+switch lower(optionLine(4))
+    case "ri"
+    case "ma"
         S = real(S) .* exp(1j .* deg2rad(imag(S)));
-    case "DB"
+    case "db"
         S = 10.^(0.05 * real(S)) .* exp(1j .* deg2rad(imag(S)));
     otherwise
         error("Format spec '%s' invalid in '%s'.", optionLine(4), filename);
