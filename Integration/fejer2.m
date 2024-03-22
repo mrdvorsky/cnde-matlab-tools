@@ -106,6 +106,10 @@ end
 momentsDST = 0.5j * fft([0; options.WeightingMoments; ...
     0; -flip(options.WeightingMoments)]);
 
+if all(isreal(options.WeightingMoments))
+    momentsDST = real(momentsDST);
+end
+
 theta(:, 1) = flip(pi * n ./ (N + 1));
 weights(:, 1) = flip(2 * sin(theta) .* momentsDST(2:N + 1) ./ (N + 1));
 
