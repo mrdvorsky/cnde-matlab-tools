@@ -63,8 +63,11 @@ A = reshape(permute(cat(4, T1, T2, T3, T4), [1, 2, 6, 3, 4, 5]), ...
     [], 4*nPorts.^2, nFreqs);
 
 %% Solve Matrix Equation
-[~, ~, V] = pagesvd(A, "vector");
-T = V(:, end, :); % Solution to the homogeneous least squares problem (Ax=0)
+% [~, ~, V] = pagesvd(A, "vector");
+% T = V(:, end, :); % Solution to the homogeneous least squares problem (Ax=0)
+
+T = [pagemldivide(A(:, 1:end-1, :), -A(:, end, :)); ...
+    ones(1, 1, size(A, 3))];
 
 T = reshape(T, nPorts, nPorts, 4, nFreqs);
 
