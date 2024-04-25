@@ -8,7 +8,7 @@ function [varargout] = importSdt(filenameIn, options)
 % This function supports any number of scan dimensions, and will read this
 % information from the header of the SDT file. The number of output
 % arguments will determine the dimensionality of the output data, which
-% must be greater than the number of dimensions in the SDT file.
+% must at least the number of dimensions in the SDT file.
 %
 % Example Usage:
 %   [Data, x, y, t, Header] = importSdt("testFile");
