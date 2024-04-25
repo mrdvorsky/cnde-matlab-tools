@@ -4,14 +4,11 @@ function [varargout] = cropArray(Arrays, coord, coordMin, coordMax, options)
 % and maximum coordinate values in each dimension are specified.
 %
 % Example Usage:
-%   [ImageCropped, xCropped, yCropped] = ...
-%       cropData(Image, x, xMin, xMax, y, yMin, yMax);
-%   [ImageCropped, xCropped, yCropped] = ...
-%       cropData(Image, [], [], [], y, yMin, []);   % Only crop y.
-%   [DataCropped, c1Cropped, c2Cropped, ...] = ...
-%       cropData(Data, c1, c1Min, c1Max, c2, c2Min, c2Max, ...);
-%   [A1cropped, A2cropped, ..., c1Cropped, c2Cropped, ...] = ...
-%       cropData({A1, A2, ...}, c1, c1Min, c1Max, c2, c2Min, c2Max, ...);
+%   [Img, x, y] = cropArray(Img, x, xMin, xMax, y, yMin, yMax);
+%   [Img, x, y] = cropArray(Img, [], [], [], y, yMin, []);  % Only crop y.
+%   [Data, c1, c2, ...] = cropArray(Data, c1, c1Min, c1Max, c2, c2Min, c2Max, ...);
+%   [A1, A2, ..., c1, c2, ...] = cropArray({A1, A2, ...}, ...
+%                           c1, c1Min, c1Max, c2, c2Min, c2Max, ...);
 %
 % Inputs:
 %   Arrays - Array or cell array of compatible arrays to be cropped.
