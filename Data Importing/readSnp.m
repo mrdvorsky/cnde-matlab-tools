@@ -42,9 +42,7 @@ if (ext == "")
     filename = fullfile(fileMatches(1).folder, fileMatches(1).name);
 end
 
-%% Read Data
-FileData = readmatrix(filename, FileType="text", ...
-    OutputType="double", CommentStyle="!");
+%% Read Header Data
 FileLines = readlines(filename);
 
 %% Parse Option Line and Comment Lines
@@ -61,6 +59,11 @@ end
 if nargout >= 4
     commentLines = FileLines(startsWith(FileLines, "!"));
 end
+
+%% Read Data
+FileData = readmatrix(filename, FileType="text", ...
+    OutputType="double", CommentStyle="!", ...
+    NumHeaderLines=find(startsWith(FileLines, "#"), 1));
 
 %% Format Data
 numPorts = round(sqrt(0.5*(size(FileData, 2) - 1)));
