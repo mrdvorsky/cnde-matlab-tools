@@ -6,8 +6,8 @@ function [varargout] = zeroPadArray(Arrays, coord, options)
 % Example Usage:
 %   [Img, x, y] = zeroPadArray(Img, x, y, ZeroPadPercent=100);      % Double dim sizes
 %   [Img, x, y] = zeroPadArray(Img, x, y, ZeroPadPercent=[100, 0]); % Only pad x
-%   [Img, x, y] = zeroPadArray(Img, x, [], ZeroPadPercent=100);     % Only pad x
-%   [Img, x, y] = zeroPadArray(Img, x, [], ZeroPadCount=20);        % Pad 20 elements each
+%   [Img, x, ~] = zeroPadArray(Img, x, [], ZeroPadPercent=100);     % Only pad x
+%   [Img, ~, y] = zeroPadArray(Img, [], y, ZeroPadCount=20);        % Pad 20 elements each
 %   [Img, x, y, ...] = zeroPadArray(Img, x, y, ...);
 %   [Img1, Img2, ... , x, y, ...] = zeroPadArray({Img1, Img2, ...}, x, y, ...);
 %
@@ -126,8 +126,9 @@ for dd = 1:numel(coord)
         outputInds = outputInds - round(0.5 * padCounts(dd));
     end
 
-    varargout{dd + coordOffset} = ...
-        interp1(coord{dd}, outputInds, "linear", "extrap");
+    varargout{dd + coordOffset} = reshape(...
+        interp1(coord{dd}(:), outputInds, "linear", "extrap"), ...
+        [ones(1, dd - 1), numel(outputInds), 1]);
 end
 
 end
