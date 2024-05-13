@@ -3,11 +3,11 @@ clear;
 % close all;
 
 %% Inputs
-S = [1, -1, exp(0.5j), 1j];
+S = [1, -1, exp(0.5j)];
 % S = [S, 0.5*S];
 
-offInds = [1];
-offInds = [2, 3, 4];
+% offInds = [1];
+offInds = [1, 2, 3];
 dt = 0.0001;
 
 %% Create Plot Info
