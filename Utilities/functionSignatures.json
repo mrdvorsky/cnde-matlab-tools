@@ -1,0 +1,15 @@
+{
+    "_schemaVersion": "1.0.0",
+
+
+    "renameMatFileFields":
+    {
+        "inputs":
+        [
+            {"name":"filename", "kind":"required", "type":["file=*.mat"], "purpose":".mat file to rename"}
+        ]
+    }
+
+
+
+}
