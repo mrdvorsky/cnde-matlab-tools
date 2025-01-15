@@ -21,11 +21,11 @@ decFacY = 25;
 
 %% Get Max Phase
 phaseMax = 0.5 * angle(mean((Ex(:) + Ey(:)).^2));
-options.PlotPhasesDeg = rad2deg(phaseMax);
+% options.PlotPhasesDeg = rad2deg(phaseMax);
 
 %% Get Quiver Orientation
-scaleMax = max(hypot(Ex(:), Ey(:)));
-arrowScale = 0.4 * min(abs(x(2) - x(1)), abs(y(2) - y(1)));
+scaleMax = max(hypot(real(Ex(:)), real(Ey(:))));
+arrowScale = 0.7 * min(abs(x(2) - x(1)), abs(y(2) - y(1)));
 for ii = 1:numel(options.PlotPhasesDeg)
     u = real(Ex .* exp(-1j .* deg2rad(options.PlotPhasesDeg(ii)))) ./ scaleMax;
     v = real(Ey .* exp(-1j .* deg2rad(options.PlotPhasesDeg(ii)))) ./ scaleMax;
@@ -40,12 +40,17 @@ for ii = 1:numel(options.PlotPhasesDeg)
     uq = u(1:decFacX:end, 1:decFacY:end) * min(decFacX, decFacY);
     vq = v(1:decFacX:end, 1:decFacY:end) * min(decFacX, decFacY);
     
+    % hold on;
+    % quiver(xq, yq, arrowScale*uq.', arrowScale*vq.', 0, "b", ...
+    %     LineWidth=1.0, MaxHeadSize=100);
+    % hold on;
+    % quiver(xq, yq, -arrowScale*uq.', -arrowScale*vq.', 0, "b", ...
+    %     LineWidth=1.0, ShowArrowHead="off");
+
     hold on;
-    quiver(xq, yq, arrowScale*uq.', arrowScale*vq.', 0, "b", ...
-        LineWidth=1.0, MaxHeadSize=100);
-    hold on;
-    quiver(xq, yq, -arrowScale*uq.', -arrowScale*vq.', 0, "b", ...
-        LineWidth=1.0, ShowArrowHead="off");
+    quiver(xq.' - arrowScale*uq.', yq.' - arrowScale*vq.', ...
+        2*arrowScale*uq.', 2*arrowScale*vq.', 0, "b", ...
+        LineWidth=0.8, MaxHeadSize=40);
     title(sprintf("Phase = %g deg", options.PlotPhasesDeg(ii)));
 end
 
