@@ -4,7 +4,9 @@ function [nodes, weights, errorWeights] = fejer2(N, a, b, options)
 % definite integral over a closed interval. The weights and nodes are
 % defined using the Fejer Type II Quadrature rules. These rules are very
 % similar to the Clenshaw-Curtis rules, but do not result in evalution of
-% the funtion at the endpoints a and b.
+% the funtion at the endpoints a and b. Note that a and b CAN be complex,
+% in which case the integration path will be a straight line, and will
+% follow standard complex contour integration rules.
 %
 % The function outputs "nodes" and "weights" can be used to approximate
 % the definite integral of a function f(x)dx over the interval [a,b] by
@@ -63,8 +65,8 @@ function [nodes, weights, errorWeights] = fejer2(N, a, b, options)
 
 arguments
     N(1, 1) {mustBeInteger, mustBePositive};
-    a(1, 1) {mustBeReal, mustBeFinite};
-    b(1, 1) {mustBeReal, mustBeFinite};
+    a(1, 1) {mustBeFinite};
+    b(1, 1) {mustBeFinite};
 
     options.WeightingFunction(1, 1);
     options.WeightingMoments(:, 1);

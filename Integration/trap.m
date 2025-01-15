@@ -3,8 +3,8 @@ function [nodes, weights, errorWeights] = trap(N, a, b)
 % This function generates the weights and nodes required to compute a
 % definite integral over a closed interval. The weights and nodes are
 % defined using the trapezoidal midpoint rules, which are only accurate if
-% used over a period of a smooth, periodic function. These do not result in
-% evalution of the funtion at the endpoints a and b.
+% used over one period of a smooth, periodic function. These do not result
+% in evalution of the function at the endpoints a and b.
 %
 % **Note**: Only use this function when integrating smooth, periodic
 % functions over an integer number of periods. Otherwise, the "fejer2"
@@ -42,8 +42,8 @@ function [nodes, weights, errorWeights] = trap(N, a, b)
 
 arguments
     N(1, 1) {mustBeInteger, mustBePositive};
-    a(1, 1) {mustBeReal, mustBeFinite};
-    b(1, 1) {mustBeReal, mustBeFinite};
+    a(1, 1) {mustBeFinite};
+    b(1, 1) {mustBeFinite};
 end
 
 %% Check Inputs
