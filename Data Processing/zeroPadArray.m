@@ -86,7 +86,7 @@ padCounts = ceil(options.ZeroPadCount);
 varargout = cell(numel(Arrays) + numel(coord), 1);
 for ii = 1:numel(Arrays)
     for dd = 1:numel(coord)
-        if isempty(coord{dd})
+        if isempty(coord{dd}) || (padCounts(dd) == 0)
             continue;
         end
         if size(Arrays{ii}, dd) ~= numel(coord{dd})

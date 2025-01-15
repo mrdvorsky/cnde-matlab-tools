@@ -53,7 +53,7 @@ if fileID == -1
     error("Can't open file '%s' because: %s.", filename, fopenError);
 end
 
-RawData = fread(fileID, "uint8=>uint8");
+RawData = fread(fileID, options.MaxHeaderSize, "uint8=>uint8");
 fclose(fileID);
 
 HeaderData = char(RawData(1:min(numel(RawData), options.MaxHeaderSize))).';
@@ -68,7 +68,7 @@ if numel(HeaderSplit) < 2
 end
 
 HeaderString = string(HeaderSplit{1});
-RawData(1:strlength(HeaderString) + 14) = [];
+dataStartInd = strlength(HeaderString) + 14;
 
 %% Parse Header
 [axisCoordinates, t, Header] = parseSdtHeader(HeaderString);
@@ -98,40 +98,49 @@ axisCoordinates = [axisCoordinates; ...
 axisSizes = cellfun(@numel, axisCoordinates);
 
 %% Read Data
-if Header.RawDataSizeBytes > numel(RawData)
-    error("Size of data in file (%d) is less than the " + ...
-        "expected data size based on the header (%d).", ...
-        numel(RawData), Header.RawDataSizeBytes);
-end
+fileID = fopen(filename, "r");
+try
+    fseek(fileID, 0, 1);
+    numBytesInFile = ftell(fileID);
 
-DataSets = cell(Header.numDataSets, 1);
-for ii = 1:Header.numDataSets
-    t{ii} = shiftdim(t{ii}(:), -numOutputDimensions);
-    
-    numDataElementsCurrent = prod(axisSizes) * numel(t{ii}) ...
-        * double(Header.DataSetDict{ii}("Element Size (bytes)"));
-    RawDataCurrent = RawData(1:numDataElementsCurrent);
-
-    dataRepr = Header.DataSetDict{ii}("Element Representation");
-    switch dataRepr
-        case "INTEGER 16"
-            DataCurrent = inv(2^16) ...
-                .* double(typecast(RawDataCurrent, "int16"));
-            DataCurrent = Header.DataSetRangeMin(ii) + (DataCurrent + 0.5) ...
-                .* (Header.DataSetRangeMax(ii) - Header.DataSetRangeMin(ii));
-        case "FLOAT 32"
-            DataCurrent = inv(1) ...
-                .* double(typecast(RawDataCurrent, "single"));
-        otherwise
-            error("DataSet representation '%s' not supported.", ...
-                dataRepr);
+    if Header.RawDataSizeBytes > (numBytesInFile - dataStartInd)
+        error("Size of data in file (%d) is less than the " + ...
+            "expected data size based on the header (%d).", ...
+            numel(RawData), Header.RawDataSizeBytes);
     end
 
-    DataSets{ii} = permute(...
-        reshape(DataCurrent, [numel(t{ii}); axisSizes].'), ...
-        circshift(1:numel(axisSizes) + 1, -1));
+    fseek(fileID, dataStartInd, -1);
 
-    RawData = RawData(numDataElementsCurrent + 1:end);
+    DataSets = cell(Header.numDataSets, 1);
+    for ii = 1:Header.numDataSets
+        t{ii} = shiftdim(t{ii}(:), -numOutputDimensions);
+
+        numDataElementsCurrent = prod(axisSizes) * numel(t{ii});
+        
+        valRange = Header.DataSetRangeMax(ii) - Header.DataSetRangeMin(ii);
+        valMin = Header.DataSetRangeMin(ii);
+        dataRepr = Header.DataSetDict{ii}("Element Representation");
+        switch dataRepr
+            case "INTEGER 16"
+                DataCurrent = fread(fileID, numDataElementsCurrent, "int16=>int16");
+                DataCurrent = single(valMin + 0.5*valRange) ...
+                    + single(valRange / (2^16)) * single(DataCurrent);
+            case "FLOAT 32"
+                DataCurrent = fread(fileID, numDataElementsCurrent, "single=>single");
+            otherwise
+                error("DataSet representation '%s' not supported.", ...
+                    dataRepr);
+        end
+
+        DataSets{ii} = permute(...
+            reshape(DataCurrent, [numel(t{ii}); axisSizes].'), ...
+            circshift(1:numel(axisSizes) + 1, -1));
+
+        RawData = RawData(numDataElementsCurrent + 1:end);
+    end
+catch ex
+    fclose(fileID);
+    rethrow(ex);
 end
 
 %% Set Outputs
