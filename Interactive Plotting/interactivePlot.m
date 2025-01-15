@@ -11,7 +11,7 @@ arguments
     options.Axes(1, 1);
     options.DragClampFun(1, 1) {mustBeCallable(...
         options.DragClampFun, {0, 0}, "x, y")} = @(x, y) [x, y];
-    options.MarkerSize(1, 1) {mustBePositive} = 12;
+    options.MarkerSize(1, 1) {mustBePositive} = 20;
     options.MarkerColor(1, 1) string = "k";
 end
 
@@ -23,13 +23,24 @@ end
 %% Plot Markers
 handle_marker = plot(options.Axes, x, y, ".", ...
     MarkerSize=options.MarkerSize, ...
-    Color=options.MarkerColor);
+    Color=options.MarkerColor, ...
+    HandleVisibility="off");
 
 xlim(options.Axes, xlim(options.Axes));
 ylim(options.Axes, ylim(options.Axes));
 
 handle_marker.ButtonDownFcn={@clickMarker, ...
     handle_marker, updateFun, options.DragClampFun};
+
+%% Run Drag Handler Once
+xy_clamped = options.DragClampFun(x, y);
+x_clamped = xy_clamped(:, 1);
+y_clamped = xy_clamped(:, 2);
+if iscell(updateFun)
+    updateFun{1}(x_clamped, y_clamped, 1, updateFun{2:end});
+else
+    updateFun(x_clamped, y_clamped, 1);
+end
 
 end
 
@@ -62,21 +73,20 @@ function dragMarker(~, ~, ax, cursorInd, handle_marker, updateFun, dragClampFun)
     xPoint = xy(1);
     yPoint = xy(2);
 
-    x = handle_marker.XData;
-    y = handle_marker.YData;
+    x = handle_marker.XData(:);
+    y = handle_marker.YData(:);
 
     x(cursorInd) = xPoint;
     y(cursorInd) = yPoint;
-    
-    handle_marker.XData = x;
-    handle_marker.YData = y;
 
     if iscell(updateFun)
-        updateFun{1}(x, y, updateFun{2:end});
+        [x, y] = updateFun{1}(x, y, cursorInd, updateFun{2:end});
     else
-        updateFun(x, y);
+        [x, y] = updateFun(x, y, cursorInd);
     end
-    
+
+    handle_marker.XData = x;
+    handle_marker.YData = y;
 end
 
 
