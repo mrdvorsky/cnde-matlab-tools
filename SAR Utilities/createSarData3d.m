@@ -9,6 +9,7 @@ function [S] = createSarData3d(x, y, f, x0, y0, z0, a0, options)
 %   S = createSarData3d(x, y, f, x0, y0, z0, a0);
 %   S = createSarData3d(x, y, f, x0, y0, z0, UseRangeForAmplitude=false);
 %   S = createSarData3d(x, y, f, x0, y0, z0, a0, SpeedOfLight=299.79e6);
+%   S = createSarData3d(x, y, f, x0, y0, z0, a0, BistaticSeparationX=10);
 % 
 % The output S will be of size length(x) by length(y) by length(f), each
 % value correspoding to the measurement made at the coordinate and
@@ -21,16 +22,17 @@ function [S] = createSarData3d(x, y, f, x0, y0, z0, a0, options)
 %   x - Vector of sample x-coordinates.
 %   y - Vector of sample y-coordinates.
 %   f - Vector of sample frequency coordinates.
-%   x0 - Vector of point target x-coordinates. Inputs x0, y0, z0, and a0
+%   x0 - Array of point target x-coordinates. Inputs x0, y0, z0, and a0
 %       must have compatible sizes.
-%   y0 - Vector of point target y-coordinates.
-%   z0 - Vector of point target z-coordinates.
-%   a0 (optional) - Vector of point target reflectivities. Must be same
-%       length as x0. Defaults to ones(size(x0));
+%   y0 - Array of point target y-coordinates.
+%   z0 - Array of point target z-coordinates.
+%   a0 (optional) - Array of point target reflectivities.
+%
 % Outputs:
 %   S - Matrix of size length(x) by length(y) by length(f), each value
 %       correspoding to the measurement made at the coordinate and
 %       frequency corresponding to the same indices in the inputs x, y, f.
+%
 % Named Arguments:
 %   UseRangeForAmplitude (true) - Specifies whether or not to include the
 %       1/R^2 term to scale the magnitude of the output.
@@ -43,6 +45,10 @@ function [S] = createSarData3d(x, y, f, x0, y0, z0, a0, options)
 %       to be inf (i.e., infinite half-space). Must be same lenth as Er.
 %   DispersionTableSize (1001) - Number of points to use for multilayer
 %       dispersion lookup table.
+%   BistaticSeparationX (0) - Separation between transmit and receive
+%       antennas along the x-dimension.
+%   BistaticSeparationY (0) - Separation between transmit and receive
+%       antennas along the y-dimension.
 %
 % Author: Matt Dvorsky
 
@@ -66,12 +72,7 @@ arguments
 end
 
 %% Check for Argument Size Mismatch
-try
-    [x0, y0, z0, a0] = makeArraysSameSize(x0, y0, z0, a0);
-catch
-    error(strcat("Non-singleton dimensions of x0, y0, z0, and a0", ...
-        " (4th through 7th arguments) must match each other."));
-end
+[x0, y0, z0, a0] = makeArraysSameSize(x0, y0, z0, a0);
 
 if numel(options.Er) ~= numel(options.Thk)
     error("Er and Thk must have the same length.");
