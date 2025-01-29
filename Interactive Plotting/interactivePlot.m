@@ -37,10 +37,12 @@ xy_clamped = options.DragClampFun(x, y);
 x_clamped = xy_clamped(:, 1);
 y_clamped = xy_clamped(:, 2);
 if iscell(updateFun)
-    updateFun{1}(x_clamped, y_clamped, 1, updateFun{2:end});
+    [x, y] = updateFun{1}(x_clamped, y_clamped, 1, updateFun{2:end});
 else
-    updateFun(x_clamped, y_clamped, 1);
+    [x, y] = updateFun(x_clamped, y_clamped, 1);
 end
+handle_marker.XData = x;
+handle_marker.YData = y;
 
 end
 
