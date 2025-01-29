@@ -47,7 +47,7 @@ function [varargout] = showImage(x, y, ImgIn, options, imagescOptions)
 arguments
     x(:, 1);
     y(:, 1);
-    ImgIn(:, :) {mustBeValidImageSize(ImgIn, x, y)};
+    ImgIn(:, :) {mustBeFinite, mustBeValidImageSize(ImgIn, x, y)};
     options.DisplayFormat {mustBeTextScalar, mustBeMember(options.DisplayFormat, ...
         ["Magnitude", "dB", "Phase", "Real", "Imag", "MagPhase"])};
     
