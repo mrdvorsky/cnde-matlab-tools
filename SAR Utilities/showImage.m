@@ -49,7 +49,8 @@ arguments
     y(:, 1);
     ImgIn(:, :) {mustBeFinite, mustBeValidImageSize(ImgIn, x, y)};
     options.DisplayFormat {mustBeTextScalar, mustBeMember(options.DisplayFormat, ...
-        ["Magnitude", "dB", "Phase", "Real", "Imag", "MagPhase"])};
+        ["Magnitude", "dB", "Real", "Imag", "RealAbs", "ImagAbs", ...
+        "Phase", "MagPhase", "Animated"])};
     
     options.Normalize(1, 1) logical = false;
     options.NormalizeFactor(1, 1) {mustBePositive} = 1;
@@ -60,6 +61,10 @@ arguments
     options.Axes(1, 1) {mustBeA(options.Axes, "Axes")};
 
     options.ShowDisplayFormatMenu(1, 1) logical = true;
+    options.AnimationFPS(1, 1) ...
+        {mustBeInRange(options.AnimationFPS, 0, 20, "exclude-lower")} = 20;
+    options.AnimationPeriodSeconds(1, 1) ...
+        {mustBeInRange(options.AnimationPeriodSeconds, 0.5, 10)} = 2;
     
     imagescOptions.AlphaData;
     imagescOptions.AlphaDataMapping;
@@ -79,7 +84,7 @@ if ~isfield(options, "Axes")
 end
 
 maxImgAbs = max(abs(ImgIn(:)));
-if strcmp(options.DisplayFormat, "MagPhase")
+if any(strcmp(options.DisplayFormat, ["MagPhase", "Animated"]))
     [varargout{1:max(nargout, 1)}] = imagesc(options.Axes, x, y, ...
         options.PhaseMultiplier .* rad2deg(angle(ImgIn)).', ...
         imagescOptions, ...
@@ -116,7 +121,18 @@ if options.ShowDisplayFormatMenu
     else
         menu = uimenu(fig, Text="Display Format");
         
-        displayItems = ["Magnitude", "dB", "Real", "Imag", "Phase", "MagPhase"];
+        displayItems = [...
+            "Magnitude", ...
+            "dB", ...
+            "Real", ...
+            "Imag", ...
+            "RealAbs", ...
+            "ImagAbs", ...
+            "Phase", ...
+            "MagPhase", ...
+            "Animated" ...
+            ];
+
         for ii = 1:numel(displayItems)
             item = uimenu(menu, Text=displayItems(ii), ...
                 MenuSelectedFcn=@displayFormatUpdateFun);
@@ -134,7 +150,32 @@ if options.ShowDisplayFormatMenu
         dataStruct.PlotHandle = varargout{1};
         dataStruct.options = options;
         dataStruct.maxImgAbs = maxImgAbs;
+        
+        % Set up animation.
+        animMapSize = 256;
+
+        animationColorMap = interp1( ...
+            linspace(-1, 1, 1024), ...
+            colormapplusminus(1024), ...
+            cosd(linspace(-180, 180, animMapSize)));
+        
+        shiftCountPerUpdate = animMapSize ...
+            ./ (options.AnimationPeriodSeconds .* options.AnimationFPS);
+        dataStruct.animationTimer = timer(...
+            Name=sprintf("Fig_%d_timer", fig.Number), ...
+            ExecutionMode="fixedRate", ...
+            Period=0.001*round(1000/options.AnimationFPS), ...
+            TimerFcn={@animationTimerFunction, ...
+                options.Axes, animationColorMap, shiftCountPerUpdate});
+        
+        fig.CloseRequestFcn = @closeRequest;
+
+        % Store data in figure.
         guidata(fig, dataStruct);
+
+        if strcmp(options.DisplayFormat, "Animated")
+            start(dataStruct.animationTimer);
+        end
     end
 end
 
@@ -153,8 +194,18 @@ function displayFormatUpdateFun(eventSource, ~)
 
     updateData = guidata(eventSource);
     updateData.options.DisplayFormat = eventSource.Text;
+
+    if ~strcmp(updateData.options.DisplayFormat, "Animated")
+        stop(updateData.animationTimer);
+    end
+
     updateDisplayFormat(updateData.Img, updateData.PlotHandle, ...
         updateData.options, updateData.maxImgAbs);
+    
+    if strcmp(updateData.options.DisplayFormat, "Animated")
+        start(updateData.animationTimer);
+    end
+    
     guidata(eventSource, updateData);
 end
 
@@ -173,7 +224,7 @@ function normalizeUpdateFunction(eventSource, ~)
 end
 
 function updateDisplayFormat(Img, PlotHandle, options, maxImgAbs)
-    if strcmp(options.DisplayFormat, "MagPhase")
+    if any(strcmp(options.DisplayFormat, ["MagPhase", "Animated"]))
         PlotHandle.CData = rad2deg(angle(Img.'));
         PlotHandle.AlphaData = convertImage(Img.', options, maxImgAbs);
     else
@@ -188,7 +239,24 @@ function updateDisplayFormat(Img, PlotHandle, options, maxImgAbs)
     end
 end
 
+%% Window Animation Functions
+function closeRequest(eventSource, ~)
+    try
+        figureData = guidata(eventSource);
+        stop(figureData.animationTimer);
+        delete(figureData.animationTimer);
+    catch ex
+        delete(eventSource);
+        rethrow(ex);
+    end
+    delete(eventSource);
+end
 
+function animationTimerFunction(eventSource, ~, axis, animColor, shiftCountPerUpdate)
+    colormap(axis, circshift(animColor, ...
+        round(shiftCountPerUpdate*eventSource.TasksExecuted), 1));
+    drawnow limitrate;
+end
 
 %% Helper Functions
 function ImgOut = convertImage(ImgIn, options, maxVal)
@@ -202,13 +270,19 @@ function ImgOut = convertImage(ImgIn, options, maxVal)
             ImgOut = abs(ImgIn) * scaleFactor;
         case "dB"
             ImgOut = db(ImgIn * scaleFactor);
-        case "Phase"
-            ImgOut = rad2deg(angle(ImgIn));
         case "Real"
             ImgOut = real(ImgIn) * scaleFactor;
         case "Imag"
             ImgOut = imag(ImgIn) * scaleFactor;
+        case "RealAbs"
+            ImgOut = real(ImgIn) * scaleFactor;
+        case "ImagAbs"
+            ImgOut = imag(ImgIn) * scaleFactor;
+        case "Phase"
+            ImgOut = rad2deg(angle(ImgIn));
         case "MagPhase"
+            ImgOut = abs(ImgIn) .* (options.NormalizeFactor ./ maxVal);
+        case "Animated"
             ImgOut = abs(ImgIn) .* (options.NormalizeFactor ./ maxVal);
         otherwise
             error("'DisplayFormat' argument '%s' is not recognized", ...
@@ -222,17 +296,23 @@ function colorbarLabel = getColorbarLabel(displayFormat)
             colorbarLabel = "Magnitude (Linear)";
         case "dB"
             colorbarLabel = "Magnitude (dB)";
-        case "Phase"
-            colorbarLabel = "Phase (deg)";
         case "Real"
             colorbarLabel = "Real";
         case "Imag"
             colorbarLabel = "Imag";
+        case "RealAbs"
+            colorbarLabel = "Real";
+        case "ImagAbs"
+            colorbarLabel = "Imag";
+        case "Phase"
+            colorbarLabel = "Phase (deg)";
         case "MagPhase"
+            colorbarLabel = "Phase (deg)";
+        case "Animated"
             colorbarLabel = "Phase (deg)";
         otherwise
             error("'DisplayFormat' argument '%s' is not recognized", ...
-                options.DisplayFormat);
+                displayFormat);
     end
 end
 
@@ -251,16 +331,25 @@ function setColormap(axes, options, maxVal)
         case "dB"
             colormap(axes, "jet");
             clim([-options.ColorScaleRangeDB, 0] + db(maxVal));
-        case "Phase"
-            colormap(axes, "hsv");
-            clim([-180, 180]);
         case "Real"
             colormap(axes, "colormapplusminus");
             clim([-maxVal, maxVal]);
         case "Imag"
             colormap(axes, "colormapplusminus");
             clim([-maxVal, maxVal]);
+        case "RealAbs"
+            colormap(axes, "colormapplusminusabs");
+            clim([-maxVal, maxVal]);
+        case "ImagAbs"
+            colormap(axes, "colormapplusminusabs");
+            clim([-maxVal, maxVal]);
+        case "Phase"
+            colormap(axes, "hsv");
+            clim([-180, 180]);
         case "MagPhase"
+            colormap(axes, "hsv");
+            clim([-180, 180]);
+        case "Animated"
             colormap(axes, "hsv");
             clim([-180, 180]);
         otherwise
