@@ -91,7 +91,7 @@ To add new utilities:
 ---
 
 ## License
-Distributed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
+Distributed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ---
 
