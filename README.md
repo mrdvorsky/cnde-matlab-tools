@@ -1,10 +1,10 @@
-# MATLAB Research Utilities 🧬🔧
+# MATLAB CNDE Research Utilities
 
 ![GitLab](https://img.shields.io/badge/GitLab-%23181717.svg?style=flat&logo=gitlab&logoColor=white)
 ![MATLAB](https://img.shields.io/badge/MATLAB-R2023b%2B-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-A curated collection of MATLAB tools for accelerating research workflows in the [Your Lab Name] laboratory. 
+A curated collection of MATLAB tools for accelerating research workflows in the CNDE laboratory.
 
 ---
 
@@ -48,10 +48,7 @@ ver  % Check for:
 ### Core Modules
 | Category          | Key Functions                     | Description                                  |
 |-------------------|-----------------------------------|----------------------------------------------|
-| **Data I/O**      | `importSdt`, `exportToCSV`        | Handle lab-specific file formats             |
-| **Visualization** | `plot_spectra`, `createHeatmap`   | Publication-ready figures                    |
-| **Analysis**      | `normalizeData`, `batchFFT`       | Signal processing and statistics             |
-| **Instrument**    | `oscilloscopeControl`             | Interface with lab hardware                  |
+| **Data I/O**      | `importSdt`, `importScan`         | Handle lab-specific file formats             |
 
 ---
 
@@ -69,20 +66,12 @@ xlabel('Time (ns)');
 ylabel('Amplitude (V)');
 ```
 
-### Batch Process Folder of CSVs
-```matlab
-results = batch_process_data(...
-    'InputDir', 'raw_data/', ...
-    'Function', @(x) normalizeData(x, 'method', 'zscore'), ...
-    'OutputDir', 'processed/');
-```
-
 ---
 
 ## Contributing
 
 To add new utilities:
-1. **Fork** the repository.
+1. **Fork** or **clone** the repository.
 2. Create a feature branch:
    ```bash
    git checkout -b feat/your-feature-name
@@ -107,9 +96,7 @@ Distributed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
 ---
 
 ## Contact
-- **Lab Lead**: Dr. Jane Doe – [jane.doe@lab.edu](mailto:jane.doe@lab.edu)
-- **Maintainer**: John Smith – [john.smith@lab.edu](mailto:john.smith@lab.edu)
-- **Lab Website**: [https://lab.edu](https://lab.edu)
+- **Maintainer**: Matt Dvorsky – [mdvorsky@iastate.edu](mailto:mdvorsky@iastate.edu)
 
 ---
 
@@ -118,4 +105,4 @@ Distributed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
 - **SDT import errors**: Check file format compatibility in `importSdt.m`.
 - **Missing toolboxes**: Install required toolboxes via MATLAB Add-On Explorer.
 
-Report issues [here](https://gitlab.com/your-lab-name/matlab-utilities/-/issues).
+Report issues [here](https://git.ece.iastate.edu/amntl/matlab/-/issues).
