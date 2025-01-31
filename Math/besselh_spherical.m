@@ -9,9 +9,11 @@ function [val] = besselh_spherical(nu, kind, z, scale)
 %
 % Inputs:
 %   nu - Bessel function order. Must be an integer.
+%   kind - Value of 1, or 2, indicating the 'kind' of the hankel function.
+%       See the "besselh" documentation for more info.
 %   z - Value to evaluate at.
 %   scale (0) - Whether to scale output by exp(-abs(imag(Z))). See
-%       "bessely" documentation for more information.
+%       "besselh" documentation for more information.
 %
 % Outputs:
 %   val - Value of spherical bessely function at "z".
