@@ -24,7 +24,7 @@ function [varargout] = showImage(x, y, ImgIn, options)
 %
 % Inputs:
 %   x - vector of coordinates of ImgIn (first dimension).
-%   y - vector of coordinates of ImgIn (first dimension).
+%   y - vector of coordinates of ImgIn (second dimension).
 %   ImgIn - Array containing image. Should have at most 2 non-singleton
 %       dimensions. Can be complex.
 %
