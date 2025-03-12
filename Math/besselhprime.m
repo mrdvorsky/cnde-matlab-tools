@@ -14,10 +14,10 @@ function [val] = besselhprime(nu, kind, z, scale)
 %       See the "besselh" documentation for more info.
 %   z - Value to evaluate at.
 %   scale (0) - Whether to scale output by exp(-abs(imag(Z))). See
-%       "besselj" documentation for more information.
+%       "besselh" documentation for more information.
 %
 % Outputs:
-%   val - Value of besselj derivative.
+%   val - Value of besselh derivative.
 %
 % Author: Matt Dvorsky
 
