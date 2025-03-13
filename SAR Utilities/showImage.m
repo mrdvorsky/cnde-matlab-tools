@@ -54,7 +54,7 @@ arguments
     ImgIn(:, :) {mustBeFinite, mustBeValidImageSize(ImgIn, x, y)};
     options.DisplayFormat {mustBeTextScalar, mustBeMember(options.DisplayFormat, ...
         ["Magnitude", "dB", "Real", "Imag", "RealAbs", "ImagAbs", ...
-        "Phase", "MagPhase", "Animated"])};
+        "Phase", "MagPhase", "Animated"])} = "Real";
     
     options.Normalize(1, 1) logical = false;
     options.NormalizeFactor(1, 1) {mustBePositive} = 1;
@@ -76,16 +76,8 @@ arguments
 end
 
 %% Show Image
-if ~isfield(options, "DisplayFormat")
-    if ~isreal(ImgIn)
-        warning("Complex data was passed in, but the 'DisplayFormat' " + ...
-            "argument was not specified. Only the real part will be shown");
-    end
-    options.DisplayFormat = "Real";
-end
-
 if ~isfield(options, "Axis")
-    options.Axis = gca;
+    options.Axis = gca();
 end
 
 maxImgAbs = max(abs(ImgIn(:)));
