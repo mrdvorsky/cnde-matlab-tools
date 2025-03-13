@@ -9,13 +9,10 @@ function [varargout] = showImage(x, y, ImgIn, options)
 %   h = showImage(x, y, Img);
 %   showImage(x, y, Img, DisplayFormat="Magnitude");
 %   showImage(x, y, Img, DisplayFormat="Magnitude", Normalize=true);
-%   showImage(x, y, Img, DisplayFormat="MagPhase", PhaseMultiplier=2);
 %
 % If the "DisplayFormat" option is set to "MagPhase", the image will be
 % shown using color to represent phase, and intesity to represent
-% magnitude. The named options NormalizeFactor and PhaseMultiplier are
-% scale factors for the image intensity and phase colormap, respectively,
-% in this case.
+% magnitude.
 %
 % If the "DisplayFormat" option is set to "Animated", a time changing
 % image will be shown. This will be similar to the "Real" or "Imag"
@@ -40,11 +37,14 @@ function [varargout] = showImage(x, y, ImgIn, options)
 %   NormalizeFactor (1) - If Normalize=true or DisplayFormat="MagPhase",
 %       this scaling factor is applied post-normalization.
 %   ColorScaleRangeDB (60) - Range, in dB to plot when in any 'dB' mode.
-%   PhaseMultiplier (1) - If DisplayFormat="MagPhase", this scale factor is
-%       applied to the phase before displaying.
 %   ShowColorbar (true) - Whether or not to display colorbar.
 %   ColorbarLabel - If specified, use as the colorbar label string.
+%   Interpolation ("Nearest") - Type of image scaling interpolation to
+%       use. Essentially, should the image be pixelated or smooth.
 %   Axis (gca()) - Axis on which to plot.
+%   ShowMenu (true) - If true, add a context menu with display options.
+%   AnimationFPS (30) - Animation update rate, if animation mode is on.
+%   AnimationPeriodSeconds (2) - Animation periodicity.
 %
 % Author: Matt Dvorsky
 
@@ -59,16 +59,18 @@ arguments
     options.Normalize(1, 1) logical = false;
     options.NormalizeFactor(1, 1) {mustBePositive} = 1;
     options.ColorScaleRangeDB(1, 1) {mustBePositive} = 60;
-    options.PhaseMultiplier(1, 1) {mustBePositive} = 1;
+
+    options.Interpolation {mustBeTextScalar, ...
+        mustBeMember(options.Interpolation, ["Nearest", "Bilinear"])} = "Nearest";
     
     options.ShowColorbar(1, 1) logical = true;
     options.ColorbarLabel {mustBeTextScalar};
-    options.Axis(1, 1) {mustBeA(options.Axis, "Axis")};
+    options.Axis(1, 1) matlab.graphics.axis.Axes;
 
-    options.ShowDisplayFormatMenu(1, 1) logical = true;
+    options.ShowMenu(1, 1) logical = true;
 
     options.AnimationFPS(1, 1) ...
-        {mustBeInRange(options.AnimationFPS, 0, 20, "exclude-lower")} = 20;
+        {mustBeInRange(options.AnimationFPS, 0, 30, "exclude-lower")} = 30;
     options.AnimationPeriodSeconds(1, 1) ...
         {mustBeInRange(options.AnimationPeriodSeconds, 0.5, 10)} = 2;
 end
@@ -87,13 +89,15 @@ if ~isfield(options, "Axis")
 end
 
 maxImgAbs = max(abs(ImgIn(:)));
+[varargout{1:max(nargout, 1)}] = imagesc(options.Axis, x, y, ...
+    convertImage(ImgIn.', options, maxImgAbs), ...
+    Interpolation=options.Interpolation, ...
+    AlphaDataMapping="scaled");
+options.Axis.ALim = [0, 1];
+
 if any(strcmp(options.DisplayFormat, ["MagPhase", "Animated"]))
-    [varargout{1:max(nargout, 1)}] = imagesc(options.Axis, x, y, ...
-        options.PhaseMultiplier .* rad2deg(angle(ImgIn)).', ...
-        AlphaData=convertImage(ImgIn.', options, maxImgAbs));
-else
-    [varargout{1:max(nargout, 1)}] = imagesc(options.Axis, x, y, ...
-        convertImage(ImgIn.', options, maxImgAbs));
+    varargout{1}.CData = rad2deg(angle(ImgIn.'));
+    varargout{1}.AlphaData = convertImage(ImgIn.', options, maxImgAbs);
 end
 
 axis(options.Axis, "image");
@@ -115,21 +119,22 @@ end
 
 %% Add UI to Allow Changing Colormap
 fig = options.Axis.Parent;
-if options.ShowDisplayFormatMenu && ~isa(fig, "matlab.ui.Figure")
+if options.ShowMenu && ~isa(fig, "matlab.ui.Figure")
     warning("Parent object of the current axis is not a figure. " + ...
         "Complex format menu will be disabled.");
-    options.ShowDisplayFormatMenu = false;
+    options.ShowMenu = false;
 end
 
-if ~options.ShowDisplayFormatMenu && strcmp(options.DisplayFormat, "Animated")
+if ~options.ShowMenu && strcmp(options.DisplayFormat, "Animated")
     warning("The 'DisplayFormat' argument was set to 'Animated', " + ...
         "but the 'ShowDisplayFormatMenu' argument was 'false'. " + ...
         "The display format will be set to 'MagPhase' instead.")
 end
 
-if options.ShowDisplayFormatMenu
+if options.ShowMenu
     menu = uimenu(fig, Text="Display Format");
 
+    % Complex Format
     displayItems = [...
         "Magnitude", ...
         "dB", ...
@@ -149,12 +154,32 @@ if options.ShowDisplayFormatMenu
             item.Checked = "on";
         end
     end
+
+    % Normalization
     item = uimenu(menu, Text="Normalize", Separator="on", ...
         MenuSelectedFcn={@normalizeUpdateFunction, options.Axis});
     if options.Normalize
         item.Checked = "on";
     end
 
+    % Interpolation
+    interpItems = [...
+        "Nearest", ...
+        "Bilinear"
+        ];
+
+    for ii = 1:numel(interpItems)
+        item = uimenu(menu, Text=interpItems(ii), ...
+            MenuSelectedFcn={@interpolationUpdateFun, options.Axis});
+        if strcmp(interpItems(ii), options.Interpolation)
+            item.Checked = "on";
+        end
+        if ii == 1
+            item.Separator="on";
+        end
+    end
+
+    % Axis Storage
     dataStruct.Img = ImgIn;
     dataStruct.PlotHandle = varargout{1};
     dataStruct.options = options;
@@ -202,7 +227,7 @@ function displayFormatUpdateFun(eventSource, ~, axis)
         return;
     end
 
-    for ii = 2:numel(eventSource.Parent.Children)
+    for ii = 4:numel(eventSource.Parent.Children)
         eventSource.Parent.Children(ii).Checked = "off";
     end
     eventSource.Checked = "on";
@@ -235,6 +260,21 @@ function normalizeUpdateFunction(eventSource, ~, axis)
     updateData.options.Normalize = (eventSource.Checked == "on");
     updateDisplayFormat(updateData.Img, updateData.PlotHandle, ...
         updateData.options, updateData.maxImgAbs);
+    axis.UserData = updateData;
+end
+
+function interpolationUpdateFun(eventSource, ~, axis)
+    if eventSource.Checked == "on"
+        return;
+    end
+
+    for ii = 1:2
+        eventSource.Parent.Children(ii).Checked = "off";
+    end
+    eventSource.Checked = "on";
+
+    updateData = axis.UserData;
+    updateData.PlotHandle.Interpolation = eventSource.Text;
     axis.UserData = updateData;
 end
 
