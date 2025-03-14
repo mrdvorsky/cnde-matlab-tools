@@ -302,7 +302,7 @@ end
 function animationTimerFunction(eventSource, ~, axis, animColor, shiftCountPerUpdate)
     colormap(axis, circshift(animColor, ...
         round(shiftCountPerUpdate*eventSource.TasksExecuted), 1));
-    drawnow limitrate;
+    drawnow;
 end
 
 %% Helper Functions
