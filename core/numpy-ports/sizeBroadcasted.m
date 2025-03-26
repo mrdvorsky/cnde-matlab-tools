@@ -1,13 +1,12 @@
-function [dimSizes] = sizeCompatible(Arrays, options)
-%SIZECOMPATIBLE Gets the size vector of the singleton expanded array inputs.
+function [dimSizes] = sizeBroadcasted(Arrays, options)
+%SIZEBROADCASTED Gets the size vector of the broadcasted version of input arrays.
 % The output will be a vector containing the size of all inputs after
 % using a binary operation to combine them together. For example,
-% 'sizeCompatible(A, B, C, Dimension=dims)' is functionally equivalent to
+% 'sizeBroadcasted(A, B, C, Dimension=dims)' is functionally equivalent to
 % 'size(A + B + C, dims)', except no actual computation of 'A + B + C' is
 % performed.
 %
-% All inputs must have compatible sizes (see MATLAB documentation on
-% compatible array sizes for more information).
+% All inputs must have broadcastable sizes.
 %
 % Example Usage:
 %   newSize = sizeCompatible(A, B, C);
@@ -16,7 +15,7 @@ function [dimSizes] = sizeCompatible(Arrays, options)
 %   newSize = sizeCompatible(A, B, C, ..., Dimension=[1, 7]);
 %
 % Inputs:
-%   Arrays (repeating) - Input arrays with compatible sizes.
+%   Arrays (repeating) - Input arrays with broadcastable sizes.
 % Outputs:
 %   dimSizes - Row vector containing the size of each dimension specified
 %       by the Dimension named argument.
@@ -33,7 +32,7 @@ end
 arguments
     options.Dimension(1, :) {mustBeValidDimension} = "all";
 end
-mustHaveCompatibleSizes(Arrays{:});
+mustBeBroadcastable(Arrays{:});
 
 %% Calculate Size
 numDims = max(cellfun(@ndims, Arrays));
