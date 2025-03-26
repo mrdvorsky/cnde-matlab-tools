@@ -1,17 +1,19 @@
 function [varargout] = cropArray(Arrays, coord, coordMin, coordMax, options)
 %CROPARRAY Crop multidimensional gridded data by min and max.
-% This function crops data from a multidimensional array, where the minimum
-% and maximum coordinate values in each dimension are specified.
+% This function crops data from a multidimensional array, where the
+% minimum and maximum coordinate values in each dimension are specified.
 %
 % Example Usage:
 %   [Img, x, y] = cropArray(Img, x, xMin, xMax, y, yMin, yMax);
 %   [Img, x, y] = cropArray(Img, [], [], [], y, yMin, []);  % Only crop y.
 %   [Data, c1, c2, ...] = cropArray(Data, c1, c1Min, c1Max, c2, c2Min, c2Max, ...);
+%   
+%   % Multiple arrays.
 %   [A1, A2, ..., c1, c2, ...] = cropArray({A1, A2, ...}, ...
 %                           c1, c1Min, c1Max, c2, c2Min, c2Max, ...);
 %
 % Inputs:
-%   Arrays - Array or cell array of compatible arrays to be cropped.
+%   Arrays - Array or cell array of "broadcastable" arrays to be cropped.
 %   coord (Repeating) - Coordinate vector of each dimension. If empty, this
 %       dimension will be ignored.
 %   coordMin (Repeating) - Min value of coord to remain in cropped array.

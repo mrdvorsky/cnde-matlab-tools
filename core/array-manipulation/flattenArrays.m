@@ -1,10 +1,8 @@
 function [varargout] = flattenArrays(Data, options)
 %FLATTENARRAYS Flatten multi-dimensional array(s) into 1D vectors.
-% This function takes in an arbitrary number of array-valued arguments of
-% compatible sizes (see MATLAB documentation on compatible array sizes)
-% and linearizes each into a 1D column vector of the same length after
-% making each of the inputs the same size by duplicating along singleton
-% dimensions.
+% This function takes in an arbitrary number of array-valued arguments that
+% are "broadcastable" and linearizes each into a 1D column vector of the
+% same length after broadcasting.
 % 
 % The output can be a 2D array, where each column is one of the
 % linearized input arrays (default), or each column can be a separate

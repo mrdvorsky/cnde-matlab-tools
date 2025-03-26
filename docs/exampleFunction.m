@@ -12,6 +12,7 @@ function [out1, out2] = exampleFunction(stringIn, boolIn, optIn, options)
 %   [out1, out2] = exampleFunction("a", "b");                   % Error
 %   [out1, out2] = exampleFunction("a", false, StringArray=[]); % Error
 %
+%
 % Include additional documentation here.
 %
 % Inputs:
@@ -25,7 +26,7 @@ function [out1, out2] = exampleFunction(stringIn, boolIn, optIn, options)
 %   out2 - Second output argument. If PositiveInt was assigned, out2 is
 %       equal to PositiveInt. Otherwise, equal to StringArray.
 %
-% Named Arguments:
+% Named Arguments: (Always capitalize first letter for named arguments)
 %   PositiveOddInt - Positive odd integer optional named argument. No default.
 %   StringArray ("") - String array named optional argument. Default
 %       value is an array with an empty string and should be listed in
@@ -34,11 +35,12 @@ function [out1, out2] = exampleFunction(stringIn, boolIn, optIn, options)
 % Author: Matt Dvorsky
 
 arguments
-    stringIn {mustBeTextScalar};            % Scalar String
+    stringIn(1, 1) string;                  % Scalar String
     boolIn(:, 1) logical;                   % Vector of boolean values
     optIn(1, 1) {mustBeReal} = 1.0;         % Scalar real value
+
     options.PositiveOddInt(1, 1) {mustBePositiveOddInteger};    % Custom validation defined below
-    options.StringArray(:, :, :) {mustBeText} = "";
+    options.StringArray(:, :, :) string = "";
 end
 
 %% Assign Output Values
@@ -59,11 +61,12 @@ end
 
 
 %% Custom Argument Validation Function
+% Always indent the extra functions at the end of a file.
 function mustBePositiveOddInteger(num)
     mustBeInteger(num);
     mustBePositive(num);
     if mod(num, 2) ~= 1
-        throwAsCaller(MException("MATLAB:mustBePositiveOddInteger", ...
+        throwAsCaller(MException("CNDE:mustBePositiveOddInteger", ...
             "Value must be a positive odd integer."));
     end
 end

@@ -11,10 +11,11 @@ function [varargout] = importSdt(filenameIn, options)
 % must at least the number of dimensions in the SDT file.
 %
 % Example Usage:
-%   [Data, x, y, t, Header] = importSdt("testFile");
-%   [Data, x, y, z, t, Header] = importSdt("testFile.sdt");
+%   [Data, x, y, t, Header] = importSdt("testFile");        % 2D scan.
+%   [Data, x, y, z, t, Header] = importSdt("testFile.sdt"); % 3D scan.
 %   DataLast = Data{end};       % Get last data set.
 %   tLast = t{end};             % Get last time vector.
+%
 %
 % Inputs:
 %   filename - Scalar string containing the filepath. Can have the ".sdt"
@@ -35,7 +36,8 @@ function [varargout] = importSdt(filenameIn, options)
 % Author: Matt Dvorsky
 
 arguments
-    filenameIn {mustBeTextScalar};
+    filenameIn(1, 1) string;
+
     options.MaxHeaderSize(1, 1) {mustBePositive, mustBeInteger} = 100000;
 end
 
@@ -157,92 +159,90 @@ end
 
 %% Header Parsing Helper Function
 function [axisCoordinates, t, Header] = parseSdtHeader(headerString)
-
-% Convert header into dictionarys for easy lookup.
-HeaderLines = splitlines(headerString);
-HeaderLines = HeaderLines(strlength(HeaderLines) ~= 0);
-
-dataStartLines = startsWith(HeaderLines, whitespacePattern(0, inf) + "-");
-HeaderSplit = mat2cell(HeaderLines, groupcounts(cumsum(dataStartLines)));
-
-HeaderDict = cell(numel(HeaderSplit), 1);
-for gg = 1:numel(HeaderDict)
-    HeaderDict{gg} = dictionary();
-    for ii = 2:numel(HeaderSplit{gg})
-        keyValue = split(HeaderSplit{gg}(ii), ":");
-        HeaderDict{gg}(strtrim(keyValue{1})) = strtrim(keyValue{2});
-    end
-end
-
-Header.FileDict = HeaderDict{1};
-Header.numAxes = double(Header.FileDict("Number of Scan Axes"));
-Header.numDataSets = double(Header.FileDict("Number of Data Subsets"));
-
-Header.AxisDict = HeaderDict(2:1 + Header.numAxes);
-Header.DataSetDict = HeaderDict(1 + Header.numAxes + (1:Header.numDataSets));
-
-% Add file information to Header struct.
-Header.headerString = headerString;
-Header.headerLines = HeaderLines;
-
-% Parse axis coordinate data.
-Header.AxisUnits = strings(Header.numAxes, 1);
-axisCoordinates = cell(Header.numAxes, 1);
-for ii = 1:numel(axisCoordinates)
-    axisSize = double(Header.AxisDict{ii}("Number of Sample Points"));
-
-    if axisSize ~= 1
-        [axisStart, ~] = convertUnitToMM(Header.AxisDict{ii}("Minimum Sample Position"));
-        [axisSpacing, axisUnit] = convertUnitToMM(Header.AxisDict{ii}("Sample Resolution"));
-    else
-        axisStart = 0;
-        axisSpacing = 1;
-        axisUnit = "mm";
-    end
-
-    axisCoordinates{ii} = axisSpacing.*(0:axisSize - 1) + axisStart;
+    % Convert header into dictionarys for easy lookup.
+    HeaderLines = splitlines(headerString);
+    HeaderLines = HeaderLines(strlength(HeaderLines) ~= 0);
     
-    Header.AxisUnits(ii) = axisUnit;
-end
-
-% Parse DataSet information.
-Header.DataSetLabels = strings(Header.numDataSets, 1);
-Header.DataSetRangeMin = zeros(Header.numDataSets, 1);
-Header.DataSetRangeMax = zeros(Header.numDataSets, 1);
-Header.DataSetRangeUnits = strings(Header.numDataSets, 1);
-Header.DataSetTimeUnits = strings(Header.numDataSets, 1);
-Header.RawDataSizeBytes = 0;
-t = cell(Header.numDataSets, 1);
-for ii = 1:numel(t)
-    Header.DataSetLabels(ii) = Header.DataSetDict{ii}("Subset Label");
-
-    tSize = double(Header.DataSetDict{ii}("Number of Sample Points"));
+    dataStartLines = startsWith(HeaderLines, whitespacePattern(0, inf) + "-");
+    HeaderSplit = mat2cell(HeaderLines, groupcounts(cumsum(dataStartLines)));
     
-    if tSize ~= 1
-        [tStart, tUnit] = convertUnitToNS(Header.DataSetDict{ii}("Minimum Sample Position"));
-        tSpacing = convertUnitToNS(Header.DataSetDict{ii}("Sample Resolution"));
-    else
-        tStart = 0;
-        tSpacing = 1;
-        tUnit = "ns";
+    HeaderDict = cell(numel(HeaderSplit), 1);
+    for gg = 1:numel(HeaderDict)
+        HeaderDict{gg} = dictionary();
+        for ii = 2:numel(HeaderSplit{gg})
+            keyValue = split(HeaderSplit{gg}(ii), ":");
+            HeaderDict{gg}(strtrim(keyValue{1})) = strtrim(keyValue{2});
+        end
     end
-
-    t{ii} = tSpacing.*(0:tSize - 1) + tStart;
-
+    
+    Header.FileDict = HeaderDict{1};
+    Header.numAxes = double(Header.FileDict("Number of Scan Axes"));
+    Header.numDataSets = double(Header.FileDict("Number of Data Subsets"));
+    
+    Header.AxisDict = HeaderDict(2:1 + Header.numAxes);
+    Header.DataSetDict = HeaderDict(1 + Header.numAxes + (1:Header.numDataSets));
+    
+    % Add file information to Header struct.
+    Header.headerString = headerString;
+    Header.headerLines = HeaderLines;
+    
+    % Parse axis coordinate data.
+    Header.AxisUnits = strings(Header.numAxes, 1);
+    axisCoordinates = cell(Header.numAxes, 1);
+    for ii = 1:numel(axisCoordinates)
+        axisSize = double(Header.AxisDict{ii}("Number of Sample Points"));
+    
+        if axisSize ~= 1
+            [axisStart, ~] = convertUnitToMM(Header.AxisDict{ii}("Minimum Sample Position"));
+            [axisSpacing, axisUnit] = convertUnitToMM(Header.AxisDict{ii}("Sample Resolution"));
+        else
+            axisStart = 0;
+            axisSpacing = 1;
+            axisUnit = "mm";
+        end
+    
+        axisCoordinates{ii} = axisSpacing.*(0:axisSize - 1) + axisStart;
+        
+        Header.AxisUnits(ii) = axisUnit;
+    end
+    
+    % Parse DataSet information.
+    Header.DataSetLabels = strings(Header.numDataSets, 1);
+    Header.DataSetRangeMin = zeros(Header.numDataSets, 1);
+    Header.DataSetRangeMax = zeros(Header.numDataSets, 1);
+    Header.DataSetRangeUnits = strings(Header.numDataSets, 1);
+    Header.DataSetTimeUnits = strings(Header.numDataSets, 1);
+    Header.RawDataSizeBytes = 0;
+    t = cell(Header.numDataSets, 1);
+    for ii = 1:numel(t)
+        Header.DataSetLabels(ii) = Header.DataSetDict{ii}("Subset Label");
+    
+        tSize = double(Header.DataSetDict{ii}("Number of Sample Points"));
+        
+        if tSize ~= 1
+            [tStart, tUnit] = convertUnitToNS(Header.DataSetDict{ii}("Minimum Sample Position"));
+            tSpacing = convertUnitToNS(Header.DataSetDict{ii}("Sample Resolution"));
+        else
+            tStart = 0;
+            tSpacing = 1;
+            tUnit = "ns";
+        end
+    
+        t{ii} = tSpacing.*(0:tSize - 1) + tStart;
+    
+        Header.RawDataSizeBytes = Header.RawDataSizeBytes ...
+            + tSize * double(Header.DataSetDict{ii}("Element Size (bytes)"));
+    
+        [dataSetRange, dataSetUnit] = ...
+            convertRangeToUnit(Header.DataSetDict{ii}("Measurement Range"));
+        Header.DataSetRangeMin(ii) = dataSetRange(1);
+        Header.DataSetRangeMax(ii) = dataSetRange(1) + dataSetRange(2);
+        Header.DataSetRangeUnits(ii) = dataSetUnit;
+        Header.DataSetTimeUnits(ii) = tUnit;
+    end
+    
     Header.RawDataSizeBytes = Header.RawDataSizeBytes ...
-        + tSize * double(Header.DataSetDict{ii}("Element Size (bytes)"));
-
-    [dataSetRange, dataSetUnit] = ...
-        convertRangeToUnit(Header.DataSetDict{ii}("Measurement Range"));
-    Header.DataSetRangeMin(ii) = dataSetRange(1);
-    Header.DataSetRangeMax(ii) = dataSetRange(1) + dataSetRange(2);
-    Header.DataSetRangeUnits(ii) = dataSetUnit;
-    Header.DataSetTimeUnits(ii) = tUnit;
-end
-
-Header.RawDataSizeBytes = Header.RawDataSizeBytes ...
-    .* prod(cellfun(@numel, axisCoordinates));
-
+        .* prod(cellfun(@numel, axisCoordinates));
 end
 
 %% Unit Conversion Helper Functions
@@ -257,7 +257,8 @@ function [val_mm, unit] = convertUnitToMM(val_text)
             unit = "mm";
         otherwise
             val_mm  = val;
-            warning("Unit specifier '%s' not supported.", unit);
+            warning("Unit specifier '%s' not supported. " + ...
+                "No unit conversion will be performed.", unit);
     end
 end
 
@@ -272,7 +273,8 @@ function [val_ns, unit] = convertUnitToNS(val_text)
             unit = "ns";
         otherwise
             val_ns = val;
-            warning("Unit specifier '%s' not supported.", unit);
+            warning("Unit specifier '%s' not supported. " + ...
+                "No unit conversion will be performed.", unit);
     end
 end
 
@@ -288,6 +290,7 @@ function [val, unit] = convertRangeToUnit(val_text)
             val = 1000 * val;
             unit = "ns";
         otherwise
-            warning("Unit specifier '%s' not supported.", unit);
+            warning("Unit specifier '%s' not supported. " + ...
+                "No unit conversion will be performed.", unit);
     end
 end

@@ -2,7 +2,36 @@
     "_schemaVersion": "1.0.0",
 
 
+    "exportScan":
+    {
+        "inputs":
+        [
+            {"name":"filenameIn", "kind":"required", "type":["file=*.scan"], "purpose":"Name of '.scan' file to export to."}
+        ]
+    },
 
+    "importScan":
+    {
+        "inputs":
+        [
+            {"name":"filenameIn", "kind":"required", "type":["file=*.scan"], "purpose":"Name of '.scan' file to import."}
+        ]
+    },
 
+    "importSdt":
+    {
+        "inputs":
+        [
+            {"name":"filenameIn", "kind":"required", "type":["file=*.sdt"], "purpose":"Name of '.sdt' file to import."}
+        ]
+    },
+
+    "importSnp":
+    {
+        "inputs":
+        [
+            {"name":"filenameIn", "kind":"required", "type":["file=*.snp,*.s1p,*.s2p,*.s3p,*.s4p"], "purpose":"Name of '.snp' file to import."}
+        ]
+    }
 
 }

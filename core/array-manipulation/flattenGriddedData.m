@@ -4,14 +4,11 @@ function [varargout] = flattenGriddedData(gridVectors, Data, options)
 % describing each dimension of the array, and flattens it into a table
 % where each row contains one elements of the array and its coordinates
 % (e.g., each row could be [x, y, z, value]). Multiple inputs arrays can
-% be provided, as long as they have compatible sizes (see MATLAB
-% documentation on compatible array sizes), each adding an additional
-% column to the output. In such a case, each of the inputs will be made
-% the same size by duplicating along singleton dimensions.
+% be provided, as long as they "broadcastable", each adding an additional
+% column to the output.
 %
-% The output can be a 2D array, where each column is one of the
-% linearized input arrays (default), or each column can be a separate
-% output.
+% The output is a 2D array, where each column is one of the linearized
+% input arrays (default), or each column can be a separate output.
 % 
 % Example Usage:
 %   DataTable = flattenGriddedData({x, y, z}, Data);
@@ -24,6 +21,7 @@ function [varargout] = flattenGriddedData(gridVectors, Data, options)
 %       dimension of the array input(s).
 %   Data (Repeating) - Arrays of arbitrary size. All elements must have
 %       compatible sizes.
+%
 % Outputs:
 %   DataTable - 2D array, where each column is the linearized column vector
 %       corresponding to either the grid coordinates or the array value(s).

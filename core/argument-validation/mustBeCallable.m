@@ -21,7 +21,7 @@ function [] = mustBeCallable(fun, funArgs, callArgString)
 arguments
     fun;
     funArgs(:, 1) {mustBeA(funArgs, "cell")};
-    callArgString {mustBeTextScalar} = "";
+    callArgString(1, 1) string = "";
 end
 
 %% Check Argument

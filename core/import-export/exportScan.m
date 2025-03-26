@@ -1,13 +1,17 @@
 function [] = exportScan(filenameIn, axisCoordinates, f, Data, HeaderIn, options)
-%IMPORTSCAN Export a ".scan" file like that created by the amntl scanner program.
-% This function exports and parses a ".scan" file.
+%IMPORTSCAN Export a ".scan" file like that created by the CNDE scanner program.
+% This function exports and parses a ".scan" file. This is a custom file
+% format that is used by the CNDE scan-controller program.
 %
 % Example Usage:
-%   exportScan(filename, {x}, f, Data, Header);
-%   exportScan(filename, {x, y}, f, Data, Header);
-%   exportScan(filename, {x, y, z, w, ...}, f, Data, Header);
-%   exportScan(filename, {x, y, z, w, ...}, f, Data);
+%   % Uniform (gridded) scan.
+%   exportScan(filename, {x}, f, Data, Header);     % 1D scan.
+%   exportScan(filename, {x, y}, f, Data, Header);  % 2D scan.
+%   exportScan(filename, {x, y, z, w, ...}, f, Data, Header);   % ND scan.
+%
+%   % Non-uniform scan.
 %   exportScan(filename, axisCoordinates, f, Data, Header, IsUniform=false);
+%
 %
 % Inputs:
 %   filenameIn - Path to the output file. If the file has no extension,
@@ -15,9 +19,9 @@ function [] = exportScan(filenameIn, axisCoordinates, f, Data, HeaderIn, options
 %   axisCoordinates - Cell array containing the coordinates of each
 %       dimension. For uniform data, numel(axisCoordinates{ii}) should be
 %       equal to size(Data, ii), and each should be uniformly-increasing
-%       when put in column order.
-%       For nonuniform data, length(axisCoordinates{ii}) should be equal to
-%       size(Data, 1) for all ii.
+%       when put in column order. For nonuniform data,
+%       numel(axisCoordinates{ii}) should be equal tof size(Data, 1) for
+%       all ii.
 %   f - Vector of frequencies in GHz.
 %   Data - The value of Data(i1, i2, ..., ff, cc) should be equal to the
 %       measurement made at coordinate (x(i0), y(i1), ...) when using a
@@ -31,17 +35,19 @@ function [] = exportScan(filenameIn, axisCoordinates, f, Data, HeaderIn, options
 %       .description - String describing the scan.
 %       .deviceName - String describing the measurement device used.
 %       .channelNames - Array of strings giving the name of each channel.
-%   IsUniform (optional, default=true) - Boolean specifying whether the
-%       data is uniform.
+%
+% Named Arguments:
+%   IsUniform (true) - Boolean specifying whether the data is uniform.
 %
 % Author: Matt Dvorsky
 
 arguments
-    filenameIn {mustBeTextScalar};
+    filenameIn(1, 1) string;
     axisCoordinates cell {mustBeNonempty};
     f(:, 1) double {mustBePositive, mustBeFinite, mustBeNonempty};
     Data double;
     HeaderIn(1, 1) = struct();
+    
     options.IsUniform(1, 1) logical = 1;
 end
 

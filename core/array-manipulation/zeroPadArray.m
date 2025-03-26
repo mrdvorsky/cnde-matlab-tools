@@ -1,6 +1,6 @@
 function [varargout] = zeroPadArray(Arrays, coord, options)
-%ZEROPADARRAY Zero pad multidimensional gridded data.
-% This function zero pads data from a multidimensional array, and
+%ZEROPADARRAY Zero-pad multidimensional gridded data.
+% This function zero-pads data from a multidimensional array, and
 % extrapolates the uniform linear grid coordinate vectors.
 %
 % Example Usage:
@@ -8,7 +8,11 @@ function [varargout] = zeroPadArray(Arrays, coord, options)
 %   [Img, x, y] = zeroPadArray(Img, x, y, ZeroPadPercent=[100, 0]); % Only pad x
 %   [Img, x, ~] = zeroPadArray(Img, x, [], ZeroPadPercent=100);     % Only pad x
 %   [Img, ~, y] = zeroPadArray(Img, [], y, ZeroPadCount=20);        % Pad 20 elements each
-%   [Img, x, y, ...] = zeroPadArray(Img, x, y, ...);
+%   
+%   % Works with any number of dimensions.
+%   [Array, x, y, z, ...] = zeroPadArray(Array, x, y, z, ...);
+%
+%   % Can work on multiple arrays at the same time.
 %   [Img1, Img2, ... , x, y, ...] = zeroPadArray({Img1, Img2, ...}, x, y, ...);
 %
 % Inputs:
@@ -35,15 +39,13 @@ function [varargout] = zeroPadArray(Arrays, coord, options)
 arguments
     Arrays {mustBeValidArraysArgument};
 end
-
 arguments (Repeating)
     coord {mustBeVectorOrEmpty};
 end
-
 arguments
     options.ZeroPadPercent(1, :) {mustBeNonnegative};
     options.ZeroPadCount(1, :) {mustBeNonnegative} = 0;
-    options.Direction(1, :) {mustBeMember(options.Direction, ...
+    options.Direction(1, :) string {mustBeMember(options.Direction, ...
         ["both", "pre", "post"])} = "both";
 end
 
@@ -52,15 +54,15 @@ if ~iscell(Arrays)
 end
 
 %% Check Inputs
-if isfield(options, "ZeroPadPercent") && numel(options.ZeroPadPercent) == 1
+if isfield(options, "ZeroPadPercent") && isscalar(options.ZeroPadPercent)
     options.ZeroPadPercent = repmat(options.ZeroPadPercent, 1, numel(coord));
 end
 
-if numel(options.ZeroPadCount) == 1
+if isscalar(options.ZeroPadCount)
     options.ZeroPadCount = repmat(options.ZeroPadCount, 1, numel(coord));
 end
 
-if numel(options.Direction) == 1
+if isscalar(options.Direction)
     options.Direction = repmat(options.Direction, 1, numel(coord));
 end
 
@@ -132,6 +134,8 @@ for dd = 1:numel(coord)
 end
 
 end
+
+
 
 %% Argument Validation Functions
 function mustBeValidArraysArgument(Arrays)

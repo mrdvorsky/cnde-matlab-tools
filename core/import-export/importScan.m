@@ -1,17 +1,17 @@
-function [varargout] = importScan(filenameIn, options)
-%IMPORTSCAN Import a ".scan" file created by the amntl scanner program.
-% This function imports and parses a ".scan" file.
+function [varargout] = importScan(filenameIn)
+%IMPORTSCAN Import a ".scan" file created by the CNDE scanner program.
+% This function imports and parses a ".scan" file. This is a custom file
+% format that is used by the CNDE scan-controller program.
 %
 % Example Usage:
-%   [x, y, f, Data, Header] = importScan(filename);
-%   [x, y, z, f, Data, Header] = importScan(filename);
+%   [x, y, f, Data, Header] = importScan(filename);     % 2D scan file.
+%   [x, y, z, f, Data, Header] = importScan(filename);  % 3D scan file.
+%
 %
 % Inputs:
 %   filenameIn - Path to the file. If the file has no extension, ".scan"
 %       will be automatically appended.
-%   NumOutputDimensions (optional) - The number of output dimensions to
-%       use. This should be equal to the number of dimensions specified in
-%       the output parameters.
+%
 % Output:
 %   x, y, z, ... - Vectors containing the coordinates of each scan point.
 %       If the scan is uniform, each vector will contain a unique, sorted,
@@ -44,23 +44,10 @@ function [varargout] = importScan(filenameIn, options)
 % Author: Matt Dvorsky
 
 arguments
-    filenameIn {mustBeTextScalar};
-    options.NumOutputDimensions(1, 1) = -1;
+    filenameIn(1, 1) string;
 end
 
-%% Check Inputs
-if options.NumOutputDimensions < 0
-    options.NumOutputDimensions = nargout - 3;
-end
-
-if options.NumOutputDimensions ~= nargout - 3
-    outputParameterString = strcat(join(compose("axis%d, ", ...
-        1:options.NumOutputDimensions), ""), "Data, Header");
-    warning(strcat("Number of output dimensions is not consistent with ", ...
-        "the number of output parameters. The format of the function call ", ...
-        "should be [%s] = importScan(filename, NumOutputDimensions=%d);"), ...
-        outputParameterString, options.NumOutputDimensions);
-end
+outputDimensionCount = nargout - 3;
 
 %% Open File
 % Add ".scan" extension if filenameIn has no extension.
@@ -102,9 +89,9 @@ Header.deviceName = string(fread(fileHandle, ...
 
 isUniform = fread(fileHandle, 1, "double");
 Header.isUniform = isUniform;
-numDims = fread(fileHandle, 1, "double");
-dimOrder = 1 + fread(fileHandle, numDims, "double");
-dimSize = fread(fileHandle, numDims, "double");
+numFileDims = fread(fileHandle, 1, "double");
+dimOrder = 1 + fread(fileHandle, numFileDims, "double");
+dimSize = fread(fileHandle, numFileDims, "double");
 numChannels = fread(fileHandle, 1, "double");
 
 Header.channelNames = strings(numChannels, 1);
@@ -117,14 +104,14 @@ end
 numF = fread(fileHandle, 1, "double");
 isComplex = fread(fileHandle, 1, "double");
 
-axisCoordinates = cell(numDims, 1);
+axisCoordinates = cell(numFileDims, 1);
 if isUniform
     % In the uniform case, numSteps(n) will contain the size of the nth
     % dimension. The file will contain numSteps(n) data points for each
     % dimension, specifying the relative coordinates of each uniform grid.
     % Then, the absolute coordinates are specified in the same way. The
     % absolute coordinates are currently ignored.
-    for ii = 1:numDims  % Get relative location vector.
+    for ii = 1:numFileDims  % Get relative location vector.
         axisCoordinates(ii) = {fread(fileHandle, dimSize(ii), "double")};
     end
     fread(fileHandle, sum(dimSize), "double"); % Discard absolute location.
@@ -134,10 +121,10 @@ else
     % dimension, specifying the relative coordinates of each every scan
     % point grid. Then, the absolute coordinates are specified in the same
     % way. The absolute coordinates are currently ignored.
-    for ii = 1:numDims  % Get relative location.
+    for ii = 1:numFileDims  % Get relative location.
         axisCoordinates(ii) = {fread(fileHandle, dimSize(1), "double")};
     end
-    fread(fileHandle, dimSize(1) .* numDims, "double"); % Discard absolute location.
+    fread(fileHandle, dimSize(1) .* numFileDims, "double"); % Discard absolute location.
 end
 
 % Next, the file contains the vector of frequencies in GHz
@@ -186,38 +173,38 @@ end
 fclose(fileHandle);
 
 %% Check File Dimensions and Requested Output Dimensions
-if options.NumOutputDimensions < numDims
-    if all(dimSize(options.NumOutputDimensions + 1:end) == 1)
+if outputDimensionCount < numFileDims
+    if all(dimSize(outputDimensionCount + 1:end) == 1)
         % In this case, the number of dimensions of Data can be reduced,
         % since the extra dimensions are singleton. We can fix this by
         % removing these elements in dimOrder and dimSize.
-        numDims = options.NumOutputDimensions;
-        dimOrder(dimOrder > options.NumOutputDimensions) = [];
-        dimSize = dimSize(1:options.NumOutputDimensions);
+        numFileDims = outputDimensionCount;
+        dimOrder(dimOrder > outputDimensionCount) = [];
+        dimSize = dimSize(1:outputDimensionCount);
     else
         error(strcat("Requested number of output dimensions (%d) is ", ...
             "less than the number of dimensions in the scan file (%d)."), ...
-            options.NumOutputDimensions, find(dimSize > 1, 1, "last"));
+            outputDimensionCount, find(dimSize > 1, 1, "last"));
     end
 end
 
-if options.NumOutputDimensions > numDims
+if outputDimensionCount > numFileDims
     warning(strcat("Requested number of output dimensions (%d) is greater ", ...
         "than the number of dimensions in the scan file (%d). ", ...
         "Extra singleton dimensions will be added to the output."), ...
-        options.NumOutputDimensions, numDims);
+        outputDimensionCount, numFileDims);
 end
 
 %% Set Output Coordinates and Frequencies
-varargout = cell(options.NumOutputDimensions + 3, 1);
+varargout = cell(outputDimensionCount + 3, 1);
 
 % Set output coordinate vectors to values parsed from scan file.
-for ii = 1:numDims
+for ii = 1:numFileDims
     varargout{ii} = axisCoordinates{ii};
 end
 
 % Set remaining requested output coordinate vectors to 0.
-for ii = (numDims + 1):options.NumOutputDimensions
+for ii = (numFileDims + 1):outputDimensionCount
     if isUniform
         varargout{ii} = 0;
     else
@@ -229,13 +216,13 @@ end
 % Set output axis order based on number of requested channels.
 % Add additional indices to axis order if needed, and add 1's to the output
 % dimensions sizes.
-outputDimOrder = [dimOrder; ((numDims + 1):options.NumOutputDimensions).'];
-outputDimSize = [dimSize; 1 + 0*((numDims + 1):options.NumOutputDimensions).'];
+outputDimOrder = [dimOrder; ((numFileDims + 1):outputDimensionCount).'];
+outputDimSize = [dimSize; 1 + 0*((numFileDims + 1):outputDimensionCount).'];
 
 Data = reshape(Data, numF, numChannels, []);
 if isUniform
     % Flip every other row, column, etc., to account for raster scan.
-    for ii = 1:(numDims - 1)
+    for ii = 1:(numFileDims - 1)
         Data = reshape(Data, numF, numChannels, ...
             prod(outputDimSize(outputDimOrder(1:ii-1))), ...
             outputDimSize(outputDimOrder(ii)), []);
@@ -277,8 +264,8 @@ end
 Header.namedArguments = fields;
 
 %% Set Remaining Outputs
-varargout{options.NumOutputDimensions + 1} = f;
-varargout{options.NumOutputDimensions + 2} = Data;
-varargout{options.NumOutputDimensions + 3} = Header;
+varargout{outputDimensionCount + 1} = f;
+varargout{outputDimensionCount + 2} = Data;
+varargout{outputDimensionCount + 3} = Header;
 
 end
