@@ -7,15 +7,14 @@ function [] = mustBeBroadcastable(Arrays, options)
 % Example Usage:
 %   arguments
 %       Array1;
-%       Array2 {mustHaveCompatibleSizes(Array1, Array2)};   % Check all dimensions.
-%       Array3 {mustHaveCompatibleSizes(Array1, Array2, Array3, ...
+%       Array2 {mustBeBroadcastable(Array1, Array2)};   % Check all dimensions.
+%       Array3 {mustBeBroadcastable(Array1, Array2, Array3, ...
 %           Dimensions=[1, 3])};
 %   end
-%
 %   arguments (Repeating)
 %       Arrays;
 %   end
-%   mustHaveCompatibleSizes(Arrays{:});
+%   mustBeBroadcastable(Arrays{:});
 %
 % Author: Matt Dvorsky
 

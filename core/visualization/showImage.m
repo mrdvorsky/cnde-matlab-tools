@@ -10,6 +10,7 @@ function [varargout] = showImage(x, y, ImgIn, options)
 %   showImage(x, y, Img, DisplayFormat="Magnitude");
 %   showImage(x, y, Img, DisplayFormat="Magnitude", Normalize=true);
 %
+%
 % If the "DisplayFormat" option is set to "MagPhase", the image will be
 % shown using color to represent phase, and intesity to represent
 % magnitude.
@@ -52,6 +53,7 @@ arguments
     x(:, 1);
     y(:, 1);
     ImgIn(:, :) {mustBeFinite, mustBeValidImageSize(ImgIn, x, y)};
+    
     options.DisplayFormat {mustBeTextScalar, mustBeMember(options.DisplayFormat, ...
         ["Magnitude", "dB", "Real", "Imag", "RealAbs", "ImagAbs", ...
         "Phase", "MagPhase", "Animated"])} = "Real";
@@ -60,11 +62,11 @@ arguments
     options.NormalizeFactor(1, 1) {mustBePositive} = 1;
     options.ColorScaleRangeDB(1, 1) {mustBePositive} = 60;
 
-    options.Interpolation {mustBeTextScalar, ...
-        mustBeMember(options.Interpolation, ["Nearest", "Bilinear"])} = "Nearest";
+    options.Interpolation(1, 1) string {mustBeMember(options.Interpolation, ...
+        ["Nearest", "Bilinear"])} = "Nearest";
     
     options.ShowColorbar(1, 1) logical = true;
-    options.ColorbarLabel {mustBeTextScalar};
+    options.ColorbarLabel(1, 1) string;
     options.Axis(1, 1) matlab.graphics.axis.Axes;
 
     options.ShowMenu(1, 1) logical = true;

@@ -11,6 +11,7 @@ function [colorMap] = colormapplusminus(n)
 %   colormap colormapPlusMinus;
 %   clim(scale * [-1, 1]);
 %
+%
 % Inputs:
 %   n - Number of points in colormap array.
 %
@@ -27,20 +28,11 @@ end
 rampUp(:, 1) = linspace(0, 1, ceil(0.5 * n));
 rampDown = flip(rampUp((1 + mod(n, 2)):end));
 
-% greenMap = [0*rampDown;   rampUp];
-% redMap   = [  rampDown; 0*rampUp];
-% blueMap  = [  rampDown;   rampUp].^2 * 1.0;
-
 greenMap = [0*rampDown;   rampUp];
 blueMap  = [  rampDown; 0*rampUp];
 redMap   = (1 - 2*abs([  rampDown;   rampUp] - 0.5)) * 0.0;
 
 colorMap = [redMap, greenMap, blueMap];
-
-% test1 = winter(floor(0.5 * n));
-% test2 = winter(ceil(0.5 * n));
-% 
-% colorMap = [flip(test2(:, [2, 1, 3])); test1];
 
 end
 

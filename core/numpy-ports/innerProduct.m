@@ -21,6 +21,7 @@ function [AB] = innerProduct(A, B, dims, options)
 %   [AB] = innerProduct(A, B, "all");
 %   [AB] = innerProduct(A, B, [1, 4], SummationMode="Mean");
 %
+%
 % Inputs:
 %   A, B - Input arrays to be multiplied. Must have compatible sizes.
 %   dim - Dimension to sum along. Can be a positive integer vector or
@@ -36,14 +37,14 @@ function [AB] = innerProduct(A, B, dims, options)
 
 arguments
     A;
-    B {mustHaveCompatibleSizes(A, B)};
+    B {mustBeBroadcastable(A, B)};
     dims(1, :) {mustBeValidDimension};
-    options.SummationMode {mustBeTextScalar, ...
-        mustBeMember(options.SummationMode, ["Sum", "Mean"])} = "Sum";
+    options.SummationMode(1, 1)  string ...
+        {mustBeMember(options.SummationMode, ["sum", "mean"])} = "sum";
 end
 
 %% Check Inputs
-AB_size = sizeCompatible(A, B);
+AB_size = sizeBroadcasted(A, B);
 maxDims = numel(AB_size);
 
 dims = dims(dims <= maxDims);

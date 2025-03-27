@@ -11,6 +11,7 @@ function [colorMap] = colormapplusminusabs(n)
 %   colormap colormapPlusMinus;
 %   clim(scale * [-1, 1]);
 %
+%
 % Inputs:
 %   n - Number of points in colormap array.
 %
@@ -24,15 +25,6 @@ arguments
 end
 
 %% Create Colormap Array
-% rampUp(:, 1) = linspace(0, 1, ceil(0.5 * n));
-% rampDown = flip(rampUp((1 + mod(n, 2)):end));
-% 
-% greenMap = [0*rampDown;   rampUp];
-% redMap   = [  rampDown; 0*rampUp];
-% blueMap  = [  rampUp;   rampDown].^2 * 0.0;
-% 
-% colorMap = [redMap, greenMap, blueMap];
-
 test1 = jet(floor(0.5 * n));
 test2 = jet(ceil(0.5 * n));
 

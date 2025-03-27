@@ -16,7 +16,7 @@ function [] = renameMatFileFields(filename)
 % Author: Matt Dvorsky
 
 arguments
-    filename {mustBeTextScalar};
+    filename(1, 1) string;
 end
 
 %% Load File

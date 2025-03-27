@@ -1,5 +1,5 @@
 function [out1, out2] = exampleFunction(stringIn, boolIn, optIn, options)
-%EXAMPLEFUNCTION Example function showing documentation standards.
+%Example function showing documentation standards.
 % Use this function as an example of how to document and use argument
 % validation in your own functions.
 %

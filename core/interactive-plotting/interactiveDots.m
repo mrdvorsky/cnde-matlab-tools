@@ -44,17 +44,20 @@ function [] = interactiveDots(xDotInitial, yDotInitial, updateFun, options)
 
 arguments
     xDotInitial(:, 1);
-    yDotInitial(:, 1);
+    yDotInitial(:, 1) {mustHaveEqualSizes(xDotInitial, yDotInitial)};
     updateFun;
 
-    options.Axis(1, 1);
+    options.Axis(1, 1) matlab.graphics.axis.Axes;
     options.DragClampFun(1, 1) {mustBeCallable(...
         options.DragClampFun, {0, 0}, "x, y")} = @(x, y) [x, y];
     options.MarkerSize(1, 1) {mustBePositive} = 20;
     options.MarkerColor(1, 1) string = "k";
 end
 
-%% Get Current Axes
+%% Check Arguments
+if isempty(xDotInitial)
+    return;
+end
 if ~isfield(options, "Axis")
     options.Axis = gca;
 end

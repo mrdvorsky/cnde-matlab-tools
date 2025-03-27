@@ -10,7 +10,7 @@ function [varargout] = getCursorLocations(options)
 % Author: Matt Dvorsky
 
 arguments
-    options.FigureHandle;
+    options.FigureHandle(1, 1) matlab.ui.Figure;
 end
 
 %% Get Cursor Locations
@@ -23,7 +23,8 @@ end
 cursorStruct = getCursorInfo(datacursormode(fig));
 coord = reshape([cursorStruct.Position], [], numel(cursorStruct));
 
-for ii = 1:max(nargout, 1)
+varargout = cell(max(nargout, 1));
+for ii = 1:numel(varargout)
     varargout{ii} = coord(ii, :).';
 end
 

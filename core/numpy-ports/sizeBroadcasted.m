@@ -6,16 +6,16 @@ function [dimSizes] = sizeBroadcasted(Arrays, options)
 % 'size(A + B + C, dims)', except no actual computation of 'A + B + C' is
 % performed.
 %
-% All inputs must have broadcastable sizes.
-%
 % Example Usage:
-%   newSize = sizeCompatible(A, B, C);
-%   newSize = sizeCompatible(A, B, C, ..., Dimension=2);
-%   newSize = sizeCompatible(A, B, C, ..., Dimension=1:5);
-%   newSize = sizeCompatible(A, B, C, ..., Dimension=[1, 7]);
+%   newSize = sizeBroadcasted(A, B, C);
+%   newSize = sizeBroadcasted(A, B, C, ..., Dimension=2);
+%   newSize = sizeBroadcasted(A, B, C, ..., Dimension=1:5);
+%   newSize = sizeBroadcasted(A, B, C, ..., Dimension=[1, 7]);
+%
 %
 % Inputs:
 %   Arrays (repeating) - Input arrays with broadcastable sizes.
+%
 % Outputs:
 %   dimSizes - Row vector containing the size of each dimension specified
 %       by the Dimension named argument.
