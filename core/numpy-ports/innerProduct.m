@@ -23,7 +23,7 @@ function [AB] = innerProduct(A, B, dims, options)
 %
 %
 % Inputs:
-%   A, B - Input arrays to be multiplied. Must have compatible sizes.
+%   A, B - Input arrays to be multiplied. Must have broadcastable sizes.
 %   dim - Dimension to sum along. Can be a positive integer vector or
 %       scalar dimension indices or can be the string "all".
 % Outputs:

@@ -1,8 +1,7 @@
 function [varargout] = showImage(x, y, ImgIn, options)
-%SHOWIMAGE Shows an xy image.
-% This function is very similar to imagesc(), except that it transposes and
-% squeezes input ImgIn, and it optionally formats a complex image for
-% display. It also sets the axis aspect ratio properly.
+%SHOWIMAGE Shows an 2D (potentially complex-valued) image.
+% This function shows a 2D image, and it optionally formats a complex
+% image for display. It also sets the axis aspect ratio properly.
 %
 % Example Usage:
 %   showImage(x, y, Img);
@@ -77,11 +76,18 @@ arguments
         {mustBeInRange(options.AnimationPeriodSeconds, 0.5, 10)} = 2;
 end
 
-%% Show Image
+%% Check Inputs
 if ~isfield(options, "Axis")
     options.Axis = gca();
 end
+if isempty(x)
+    x = 1:size(ImgIn, 1);
+end
+if isempty(y)
+    y = 1:size(ImgIn, 2);
+end
 
+%% Show Image
 maxImgAbs = max(abs(ImgIn(:)));
 [varargout{1:max(nargout, 1)}] = imagesc(options.Axis, x, y, ...
     convertImage(ImgIn.', options, maxImgAbs), ...

@@ -1,17 +1,40 @@
-function [ varargout ] = nearestIndex(X, searchX)
-%NEARESTINDEX Finds index of value closest to searchX in X
-%   X - n-dimensional values to be searched
-%   searchX - value of X to search for, can be m-dimentional
+function [varargout] = nearestIndex(xSearchSpace, x)
+%Finds index of value closest to "xSearchSpace" in "x".
+% Returns the "subscripts" of the values of the search space that are
+% closest to the value that are being searched for.
 %
-%   [x1, x2, ..., xn] - Output, each of xi is same size as searchX, and 
-%    is the index of the maximum value along the ith dimension of X
+% Essentially, if this function returns subscripts [x1, x2, ...], then the
+% element of "xSearchSpace" that is closest to "x(ii)" will be
+% "xSearchSpace(x1(ii), x2(ii), ...)".
+%
+% Example Usage:
+%   [xInd] = nearestIndex(xVecSearch, x);
+%   [row, col] = nearestIndex(xSearch2D, x);
+%   [x1, x2, ...] = nearestIndex(xSearchND, x);
+%
+%
+% Inputs:
+%   xSearchSpace - Potentially multi-dimensional array to search.
+%   x - Values of x to search for in "xSearchSpace".
+%
+% Outputs:
+%   [x1, x2, ...] - Subscripts of closest element. Each will have the same
+%       size as "x".
+%
+% Author: Matt Dvorsky
 
-xInd = zeros(size(searchX));
-for ii = 1:length(searchX(:))
-    [~, xInd(ii)] = min(abs(X(:) - searchX(ii)));
+arguments
+    xSearchSpace;
+    x;
 end
 
-[varargout{1:nargout}] = ind2sub(size(X), xInd);
+%% Calculate
+xInd = zeros_like(x);
+for ii = 1:length(x(:))
+    [~, xInd(ii)] = min(abs(xSearchSpace(:) - x(ii)));
+end
+
+[varargout{1:nargout}] = ind2sub(size(xSearchSpace), xInd);
 
 end
 
