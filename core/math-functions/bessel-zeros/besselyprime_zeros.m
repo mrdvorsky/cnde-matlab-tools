@@ -1,11 +1,12 @@
 function [ypzeros] = besselyprime_zeros(nu, n)
-%BESSELYPRIME_ZEROS Gives the first "n" zeros of the "besselyprime" function.
+%Gives the first "n" zeros of the "besselyprime" function.
 % Returns a column vector with the first n zeros (y'vn) of the
 % "besselyprime" function.
 %
 % Example Usage:
 %   ypzeros = besselyprime_zeros(nu, n);
 %   assert(all(besselyprime(nu, ypzeros) == 0));    % Almost passes.
+%
 %
 % Inputs:
 %   nu - Bessel function order. See "bessely" documentation.

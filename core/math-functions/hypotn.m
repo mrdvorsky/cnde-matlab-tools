@@ -1,5 +1,5 @@
 function [y] = hypotn(x)
-%HYPOTN Generalization of the hypot function to n arguments.
+%Generalization of the hypot function to n arguments.
 % This function behaves the same as the built-in function "hypot", but it
 % can take any number of input arguments. For example, "hypotn(x, y, z)"
 % will be equivalent to "hypot(hypot(x, y), z)".
@@ -8,6 +8,7 @@ function [y] = hypotn(x)
 %   r = hypotn(x, y);       % Identical to "hypot(x, y)".
 %   y = hypotn(x);          % Identical to "abs(x)".
 %   p = hypotn(x, y, z);    % Identical to "hypot(hypot(x, y), z)".
+%
 %
 % Inputs:
 %   x1, x2, x3, ... - Arguments for which to find root sum of squares.
@@ -25,7 +26,7 @@ if numel(x) == 0
     error("Function 'hypotn' must be called with at least one argument.");
 end
 
-if numel(x) == 1
+if isscalar(x)
     y = abs(x{1});
     return;
 end

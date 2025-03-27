@@ -1,5 +1,5 @@
 function [k, alpha, beta] = besseljy_zeros(nu, n, r1, r2)
-%BESSELJY_ZEROS Gives the first "n" *zeros* of the "besseljy" function.
+%Gives the first "n" *zeros* of the "besseljy" function.
 % This function computes the firts "n" trios (alpha, beta, and k) so that
 % "besseljy(alpha, beta, nu, k*r1)" and "besseljy(alpha, beta, nu, k*r2)"
 % are both equal to zero. Specifically, this function computes the smallest
@@ -21,6 +21,7 @@ function [k, alpha, beta] = besseljy_zeros(nu, n, r1, r2)
 %   [k, alpha, beta] = besseljy_zeros(nu, n, r1, r2);
 %   assert(all(besseljy(alpha, beta, nu, k*r1) == 0));  % Almost passes.
 %   assert(all(besseljy(alpha, beta, nu, k*r2) == 0));  % Almost passes.
+%
 %
 % Inputs:
 %   nu - Bessel function order. See "besselj" documentation.

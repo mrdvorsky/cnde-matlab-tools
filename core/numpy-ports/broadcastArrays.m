@@ -1,5 +1,5 @@
-function [varargout] = makeArraysSameSize(Arrays)
-%MAKEARRAYSSAMESIZE Make inputs the same size by duplicating along singleton dimensions.
+function [varargout] = broadcastArrays(Arrays)
+%Make inputs the same size by duplicating along singleton dimensions.
 % This functions takes in multiple nd-arrays with compatible sizes (see
 % MATLAB documentation on compatible array sizes) and returns each after
 % duplicating along any singleton dimensions such that all have the same
@@ -7,16 +7,18 @@ function [varargout] = makeArraysSameSize(Arrays)
 %
 % Example Usage:
 %   % x and y will be 5-by-5
-%   [x, y] = makeArraysSameSize(ones(5, 1), ones(1, 5));
+%   [x, y] = broadcastArrays(ones(5, 1), ones(1, 5));
 %
 %   % x and y will be 5-by-6-by-7
-%   [x, y] = makeArraysSameSize(ones(5, 6, 1), ones(5, 1, 7));
+%   [x, y] = broadcastArrays(ones(5, 6, 1), ones(5, 1, 7));
 %
 %   % Error: Dimension 2 mismatch
-%   [x, y] = makeArraysSameSize(ones(5, 6), ones(1, 5));
+%   [x, y] = broadcastArrays(ones(5, 6), ones(1, 5));
+%
 %
 % Inputs:
 %   Arrays (Repeating) - Arrays with compatible sizes.
+%
 % Outputs:
 %   ArraysOut (Repeating) - Input arrays after duplicating data.
 %

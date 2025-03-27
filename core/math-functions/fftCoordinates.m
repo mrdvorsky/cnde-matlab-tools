@@ -1,5 +1,5 @@
 function [varargout] = fftCoordinates(xVectors, options)
-%FFTCOORDINATES Returns spectral/spatial coordinates of fft output.
+%Returns spectral/spatial coordinates of fft output.
 % Given the spatial/spectral coordinates of the input to the fft/ifft
 % function, returns the spectral/spatial coordinates of the output. Works
 % for multidimensional fft/ifft.
@@ -24,9 +24,11 @@ function [varargout] = fftCoordinates(xVectors, options)
 %   [kx, ky, ...] = fftCoordinates(x, y, ..., ApplyFftShift=true);
 %   [kx, ky, ...] = fftCoordinates(x, y, ..., PositiveOutput=true);
 %
+%
 % Inputs:
 %   xVectors (Repeating) - Vector of spatial coordinates. Must be
-%       uniformly-spaced and sorted 
+%       uniformly-spaced and sorted.
+%
 % Outputs:
 %   kVectors (Repeating) - Vector of spectral coordinates. The dimension
 %       of the vector will be the same as the positional index.
@@ -42,7 +44,6 @@ function [varargout] = fftCoordinates(xVectors, options)
 arguments (Repeating)
     xVectors(:, 1) {mustBeReal, mustBeFinite};
 end
-
 arguments
     options.ApplyFftShift(1, 1) logical = false;
     options.PositiveOutput(1, 1) logical = false;

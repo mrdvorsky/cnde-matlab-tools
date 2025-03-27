@@ -1,5 +1,5 @@
 function [varargout] = importScan(filenameIn)
-%IMPORTSCAN Import a ".scan" file created by the CNDE scanner program.
+%Import a ".scan" file created by the CNDE scanner program.
 % This function imports and parses a ".scan" file. This is a custom file
 % format that is used by the CNDE scan-controller program.
 %
@@ -12,7 +12,7 @@ function [varargout] = importScan(filenameIn)
 %   filenameIn - Path to the file. If the file has no extension, ".scan"
 %       will be automatically appended.
 %
-% Output:
+% Outputs:
 %   x, y, z, ... - Vectors containing the coordinates of each scan point.
 %       If the scan is uniform, each vector will contain a unique, sorted,
 %       and uniformly increasing list of coordinates for the corresponding
@@ -64,109 +64,111 @@ if fileHandle == -1
     error("Scan file '%s' not found.", filename);
 end
 
-%% Get Version Info
-% Scan file code is an value contained in the first 8 bytes of the file.
-scanFileCode = fread(fileHandle, 1, "double");
-if scanFileCode ~= 63474328
-    fclose(fileHandle);
-    error("*.scan file type not recognized.");
-end
-
-% Currently, there is only 1 version of the scan file format.
-scanFileVersion = fread(fileHandle, 1, "double");
-if scanFileVersion ~= 1
-    fclose(fileHandle);
-    error("*.scan file version is not supported.");
-end
-
-%% Read Header Data From Scan File
-Header.header = string(fread(fileHandle, ...
-    fread(fileHandle, 1, "double"), "double=>char").');
-Header.description = string(fread(fileHandle, ...
-    fread(fileHandle, 1, "double"), "double=>char").');
-Header.deviceName = string(fread(fileHandle, ...
-    fread(fileHandle, 1, "double"), "double=>char").');
-
-isUniform = fread(fileHandle, 1, "double");
-Header.isUniform = isUniform;
-numFileDims = fread(fileHandle, 1, "double");
-dimOrder = 1 + fread(fileHandle, numFileDims, "double");
-dimSize = fread(fileHandle, numFileDims, "double");
-numChannels = fread(fileHandle, 1, "double");
-
-Header.channelNames = strings(numChannels, 1);
-for ii = 1:numChannels
-    Header.channelNames(ii) = (string(fread(...
-        fileHandle, fread(fileHandle, 1, "double"), "double=>char").'));
-end
-
-%% Read Scan Coordinates and Frequencies
-numF = fread(fileHandle, 1, "double");
-isComplex = fread(fileHandle, 1, "double");
-
-axisCoordinates = cell(numFileDims, 1);
-if isUniform
-    % In the uniform case, numSteps(n) will contain the size of the nth
-    % dimension. The file will contain numSteps(n) data points for each
-    % dimension, specifying the relative coordinates of each uniform grid.
-    % Then, the absolute coordinates are specified in the same way. The
-    % absolute coordinates are currently ignored.
-    for ii = 1:numFileDims  % Get relative location vector.
-        axisCoordinates(ii) = {fread(fileHandle, dimSize(ii), "double")};
+try
+    %% Get Version Info
+    % Scan file code is an value contained in the first 8 bytes of the file.
+    scanFileCode = fread(fileHandle, 1, "double");
+    if scanFileCode ~= 63474328
+        error("*.scan file type not recognized.");
     end
-    fread(fileHandle, sum(dimSize), "double"); % Discard absolute location.
-else
-    % In the nonuniform case, numSteps(1) will contain the total number of
-    % scan points. The file will contain numSteps(1) data points for each
-    % dimension, specifying the relative coordinates of each every scan
-    % point grid. Then, the absolute coordinates are specified in the same
-    % way. The absolute coordinates are currently ignored.
-    for ii = 1:numFileDims  % Get relative location.
-        axisCoordinates(ii) = {fread(fileHandle, dimSize(1), "double")};
+
+    % Currently, there is only 1 version of the scan file format.
+    scanFileVersion = fread(fileHandle, 1, "double");
+    if scanFileVersion ~= 1
+        error("*.scan file version is not supported.");
     end
-    fread(fileHandle, dimSize(1) .* numFileDims, "double"); % Discard absolute location.
-end
 
-% Next, the file contains the vector of frequencies in GHz
-f = fread(fileHandle, numF, "double"); % Read frequency vector
+    %% Read Header Data From Scan File
+    Header.header = string(fread(fileHandle, ...
+        fread(fileHandle, 1, "double"), "double=>char").');
+    Header.description = string(fread(fileHandle, ...
+        fread(fileHandle, 1, "double"), "double=>char").');
+    Header.deviceName = string(fread(fileHandle, ...
+        fread(fileHandle, 1, "double"), "double=>char").');
 
-% If end of file was reached, header is missing data.
-if feof(fileHandle)
-    fclose(fileHandle);
-    error("Scan file '%s' header is corrupted.", filename);
-end
+    isUniform = fread(fileHandle, 1, "double");
+    Header.isUniform = isUniform;
+    numFileDims = fread(fileHandle, 1, "double");
+    dimOrder = 1 + fread(fileHandle, numFileDims, "double");
+    dimSize = fread(fileHandle, numFileDims, "double");
+    numChannels = fread(fileHandle, 1, "double");
 
-%% Read Scan Measurement Data
-numDataPoints = numF .* numChannels .* prod(dimSize);
+    Header.channelNames = strings(numChannels, 1);
+    for ii = 1:numChannels
+        Header.channelNames(ii) = (string(fread(...
+            fileHandle, fread(fileHandle, 1, "double"), "double=>char").'));
+    end
 
-% Read data from file.
-numDataPointsToRead = numDataPoints * (1 + isComplex);
-Data = fread(fileHandle, numDataPointsToRead, "double");
+    %% Read Scan Coordinates and Frequencies
+    numF = fread(fileHandle, 1, "double");
+    isComplex = fread(fileHandle, 1, "double");
 
-% Check for missing data
-if length(Data) < numDataPointsToRead
-    warning(strcat("Scan file '%s' contains (%d) measurement points, ", ...
-        "which is less than the (%d) measurement points expected. ", ...
-        "Data will be padded with zeros."), ...
-        filename, length(Data), numDataPointsToRead);
-    
-    % Pad Missing Data With Zeros
-    Data = [Data; zeros(numDataPointsToRead - length(Data), 1)];
-end
+    axisCoordinates = cell(numFileDims, 1);
+    if isUniform
+        % In the uniform case, numSteps(n) will contain the size of the nth
+        % dimension. The file will contain numSteps(n) data points for each
+        % dimension, specifying the relative coordinates of each uniform grid.
+        % Then, the absolute coordinates are specified in the same way. The
+        % absolute coordinates are currently ignored.
+        for ii = 1:numFileDims  % Get relative location vector.
+            axisCoordinates(ii) = {fread(fileHandle, dimSize(ii), "double")};
+        end
+        fread(fileHandle, sum(dimSize), "double"); % Discard absolute location.
+    else
+        % In the nonuniform case, numSteps(1) will contain the total number of
+        % scan points. The file will contain numSteps(1) data points for each
+        % dimension, specifying the relative coordinates of each every scan
+        % point grid. Then, the absolute coordinates are specified in the same
+        % way. The absolute coordinates are currently ignored.
+        for ii = 1:numFileDims  % Get relative location.
+            axisCoordinates(ii) = {fread(fileHandle, dimSize(1), "double")};
+        end
+        fread(fileHandle, dimSize(1) .* numFileDims, "double"); % Discard absolute location.
+    end
 
-% Check for too much data
-fread(fileHandle, 1);
-if ~feof(fileHandle)
-    warning(strcat("Scan file '%s' contains more data than expected. ", ...
-        "The extra data will be ignored."), filename);
-end
+    % Next, the file contains the vector of frequencies in GHz
+    f = fread(fileHandle, numF, "double"); % Read frequency vector
 
-% Reorganize complex data.
-if isComplex
-    % Complex data is partially interleaved real imaginary. Every scan
-    % point contains all real data followed by all imaginary data.
-    Data = reshape(Data, numF .* numChannels, 2, []);
-    Data = complex(Data(:, 1, :), Data(:, 2, :));
+    % If end of file was reached, header is missing data.
+    if feof(fileHandle)
+        error("Scan file '%s' header is corrupted.", filename);
+    end
+
+    %% Read Scan Measurement Data
+    numDataPoints = numF .* numChannels .* prod(dimSize);
+
+    % Read data from file.
+    numDataPointsToRead = numDataPoints * (1 + isComplex);
+    Data = fread(fileHandle, numDataPointsToRead, "double");
+
+    % Check for missing data
+    if length(Data) < numDataPointsToRead
+        warning(strcat("Scan file '%s' contains (%d) measurement points, ", ...
+            "which is less than the (%d) measurement points expected. ", ...
+            "Data will be padded with zeros."), ...
+            filename, length(Data), numDataPointsToRead);
+
+        % Pad Missing Data With Zeros
+        Data = [Data; zeros(numDataPointsToRead - length(Data), 1)];
+    end
+
+    % Check for too much data
+    fread(fileHandle, 1);
+    if ~feof(fileHandle)
+        warning(strcat("Scan file '%s' contains more data than expected. ", ...
+            "The extra data will be ignored."), filename);
+    end
+
+    % Reorganize complex data.
+    if isComplex
+        % Complex data is partially interleaved real imaginary. Every scan
+        % point contains all real data followed by all imaginary data.
+        Data = reshape(Data, numF .* numChannels, 2, []);
+        Data = complex(Data(:, 1, :), Data(:, 2, :));
+    end
+catch ex
+    fclose(fileID);
+    rethrow(ex);
 end
 
 % Done with reading data from file.
@@ -228,10 +230,10 @@ if isUniform
             outputDimSize(outputDimOrder(ii)), []);
         Data(:, :, :, :, 2:2:end) = flip(Data(:, :, :, :, 2:2:end), 4);
     end
-    
+
     Data = reshape(Data, [numF; numChannels; ...
         outputDimSize(outputDimOrder)].');
-    
+
     % Permute so dimensions are (a1, a2, ... , f, Channel)
     Data = ipermute(Data, [length(outputDimOrder) + [1; 2]; ...
         outputDimOrder]);

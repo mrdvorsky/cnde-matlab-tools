@@ -1,6 +1,6 @@
 function [varargout] = cropArray(Arrays, coord, coordMin, coordMax, options)
-%CROPARRAY Crop multidimensional gridded data by min and max.
-% This function crops data from a multidimensional array, where the
+%Crop multidimensional gridded data by min and max.
+% This function crops data from a multi-dimensional array, where the
 % minimum and maximum coordinate values in each dimension are specified.
 %
 % Example Usage:
@@ -11,6 +11,7 @@ function [varargout] = cropArray(Arrays, coord, coordMin, coordMax, options)
 %   % Multiple arrays.
 %   [A1, A2, ..., c1, c2, ...] = cropArray({A1, A2, ...}, ...
 %                           c1, c1Min, c1Max, c2, c2Min, c2Max, ...);
+%
 %
 % Inputs:
 %   Arrays - Array or cell array of "broadcastable" arrays to be cropped.
@@ -35,13 +36,11 @@ function [varargout] = cropArray(Arrays, coord, coordMin, coordMax, options)
 arguments
     Arrays {mustBeValidArraysArgument};
 end
-
 arguments (Repeating)
     coord {mustBeVectorOrEmpty};
     coordMin {mustBeReal, mustBeScalarOrEmpty};
     coordMax {mustBeReal, mustBeScalarOrEmpty};
 end
-
 arguments
     options.RoundMinMaxToNearestCoord(1, 1) logical = false;
 end
@@ -51,11 +50,11 @@ if ~iscell(Arrays)
 end
 
 %% Check Input Size
-compatArraySize = sizeCompatible(Arrays{:});
+compatArraySize = sizeBroadcasted(Arrays{:});
 if numel(coord) < numel(compatArraySize)
     coord = [coord, cell(1, numel(compatArraySize) - numel(coord))];
 end
-compatArraySize = sizeCompatible(Arrays{:}, Dimension=1:numel(coord));
+compatArraySize = sizeBroadcasted(Arrays{:}, Dimension=1:numel(coord));
 
 %% Find Valid Range for Each Dimension
 isInRange = cell(numel(coord), 1);
@@ -127,7 +126,7 @@ function mustBeVectorOrEmpty(coord)
     end
     
     if sum(size(coord) ~= 1) > 1
-        throwAsCaller(MException("MATLAB:mustBeVectorOrEmpty", ...
+        throwAsCaller(MException("CNDE:mustBeVectorOrEmpty", ...
             "Argument must be a vector or be empty."));
     end
 end

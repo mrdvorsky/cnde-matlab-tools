@@ -1,11 +1,12 @@
 function [val] = besselj_spherical(nu, z, scale)
-%BESSELJ_SPHERICAL Spherical besselj function.
+%Spherical besselj function.
 % Use the same way as "besselj" or "bessely". Computes the spherical
 % besselj function of order "nu".
 %
 % Example Usage:
 %   val = besselj_spherical(nu, z);
 %   val = besselj_spherical(nu, z, true);  % Scaled by exp(-abs(imag(z))).
+%
 %
 % Inputs:
 %   nu - Bessel function order. Must be an integer.

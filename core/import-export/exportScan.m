@@ -1,5 +1,5 @@
 function [] = exportScan(filenameIn, axisCoordinates, f, Data, HeaderIn, options)
-%IMPORTSCAN Export a ".scan" file like that created by the CNDE scanner program.
+%Export a ".scan" file like that created by the CNDE scanner program.
 % This function exports and parses a ".scan" file. This is a custom file
 % format that is used by the CNDE scan-controller program.
 %
@@ -47,7 +47,7 @@ arguments
     f(:, 1) double {mustBePositive, mustBeFinite, mustBeNonempty};
     Data double;
     HeaderIn(1, 1) = struct();
-    
+
     options.IsUniform(1, 1) logical = 1;
 end
 
@@ -69,7 +69,7 @@ if isUniform
         error(strcat("Number of dimensions for Data should no greater than ", ...
             "(%d), but is currently (%d)."), numDims + 2, ndims(Data));
     end
-    
+
     numChannels = size(Data, numDims + 2);
 else
     if ~all(dimSize == size(Data, 1))
@@ -84,7 +84,7 @@ else
         error(strcat("Number of dimensions for Data should no greater than ", ...
             "(%d), but is currently (%d)."), 3, ndims(Data));
     end
-    
+
     dimSize(2:end) = 1;
     numChannels = size(Data, 3);
 end
@@ -142,82 +142,85 @@ else
     filename = filenameIn;
 end
 
-% Don't forget to close the fileHandle whenever returning or throwing.
 fileHandle = fopen(filename, "w");
 if fileHandle == -1
     error("Could not write to file '%s'.", filename);
 end
+try
+    %% Write Version Info
+    % Scan file code is an value contained in the first 8 bytes of the file.
+    fwrite(fileHandle, scanFileCode, "double");
+    fwrite(fileHandle, scanFileVersion, "double");
 
-%% Write Version Info
-% Scan file code is an value contained in the first 8 bytes of the file.
-fwrite(fileHandle, scanFileCode, "double");
-fwrite(fileHandle, scanFileVersion, "double");
+    %% Write Scan File Header
+    % Size and data for header, description, and deviceName
+    fwrite(fileHandle, strlength(Header.header), "double");
+    fwrite(fileHandle, char(Header.header), "double");
+    fwrite(fileHandle, strlength(Header.description), "double");
+    fwrite(fileHandle, char(Header.description), "double");
+    fwrite(fileHandle, strlength(Header.deviceName), "double");
+    fwrite(fileHandle, char(Header.deviceName), "double");
 
-%% Write Scan File Header
-% Size and data for header, description, and deviceName
-fwrite(fileHandle, strlength(Header.header), "double");
-fwrite(fileHandle, char(Header.header), "double");
-fwrite(fileHandle, strlength(Header.description), "double");
-fwrite(fileHandle, char(Header.description), "double");
-fwrite(fileHandle, strlength(Header.deviceName), "double");
-fwrite(fileHandle, char(Header.deviceName), "double");
+    % Scan data format and sizes
+    fwrite(fileHandle, isUniform, "double");
+    fwrite(fileHandle, numDims, "double");
+    fwrite(fileHandle, dimOrder - 1, "double");
+    fwrite(fileHandle, dimSize, "double");
+    fwrite(fileHandle, numChannels, "double");
 
-% Scan data format and sizes
-fwrite(fileHandle, isUniform, "double");
-fwrite(fileHandle, numDims, "double");
-fwrite(fileHandle, dimOrder - 1, "double");
-fwrite(fileHandle, dimSize, "double");
-fwrite(fileHandle, numChannels, "double");
-
-% Channel Names
-for ii = 1:numChannels
-    fwrite(fileHandle, strlength(Header.channelNames(ii)), "double");
-    fwrite(fileHandle, char(Header.channelNames(ii)), "double");
-end
-
-%% Write Scan Coordinates and Frequencies
-fwrite(fileHandle, numF, "double");
-fwrite(fileHandle, isComplex, "double");
-
-% Relative location
-for ii = 1:numDims
-    fwrite(fileHandle, axisCoordinates{ii}, "double");
-end
-% Absolute location. Same as relative location for now.
-for ii = 1:numDims
-    fwrite(fileHandle, axisCoordinates{ii}, "double");
-end
-
-% Frequency vector
-fwrite(fileHandle, f, "double");
-
-%% Write Measurement Data
-% Permute scan data dimensions to match expected format.
-if isUniform
-    % Expects (f, channel, x, y, ...)
-    Data = permute(Data, [[1; 2] + numDims; dimOrder]);
-else
-    % Expects (f, channel, coord)
-    Data = permute(Data, [2, 3, 1]);
-end
-
-% Format scan data into raster scan format if uniform.
-if isUniform
-    % Flip every other row, column, etc., to account for raster scan.
-    for ii = 1:(numDims - 1)
-        Data = reshape(Data, numF, numChannels, ...
-            prod(dimSize(dimOrder(1:ii-1))), dimSize(dimOrder(ii)), []);
-        Data(:, :, :, :, 2:2:end) = flip(Data(:, :, :, :, 2:2:end), 4);
+    % Channel Names
+    for ii = 1:numChannels
+        fwrite(fileHandle, strlength(Header.channelNames(ii)), "double");
+        fwrite(fileHandle, char(Header.channelNames(ii)), "double");
     end
-end
 
-% Separate real and imaginary if complex.
-if isComplex
-    Data = cat(2, real(Data), imag(Data));
-end
+    %% Write Scan Coordinates and Frequencies
+    fwrite(fileHandle, numF, "double");
+    fwrite(fileHandle, isComplex, "double");
 
-% Write Data to file.
-fwrite(fileHandle, Data, "double");
+    % Relative location
+    for ii = 1:numDims
+        fwrite(fileHandle, axisCoordinates{ii}, "double");
+    end
+    % Absolute location. Same as relative location for now.
+    for ii = 1:numDims
+        fwrite(fileHandle, axisCoordinates{ii}, "double");
+    end
+
+    % Frequency vector
+    fwrite(fileHandle, f, "double");
+
+    %% Write Measurement Data
+    % Permute scan data dimensions to match expected format.
+    if isUniform
+        % Expects (f, channel, x, y, ...)
+        Data = permute(Data, [[1; 2] + numDims; dimOrder]);
+    else
+        % Expects (f, channel, coord)
+        Data = permute(Data, [2, 3, 1]);
+    end
+
+    % Format scan data into raster scan format if uniform.
+    if isUniform
+        % Flip every other row, column, etc., to account for raster scan.
+        for ii = 1:(numDims - 1)
+            Data = reshape(Data, numF, numChannels, ...
+                prod(dimSize(dimOrder(1:ii-1))), dimSize(dimOrder(ii)), []);
+            Data(:, :, :, :, 2:2:end) = flip(Data(:, :, :, :, 2:2:end), 4);
+        end
+    end
+
+    % Separate real and imaginary if complex.
+    if isComplex
+        Data = cat(2, real(Data), imag(Data));
+    end
+
+    % Write Data to file.
+    fwrite(fileHandle, Data, "double");
+catch ex
+    fclose(fileHandle);
+    rethrow(ex);
+end
 
 % Close file handle.
 fclose(fileHandle);

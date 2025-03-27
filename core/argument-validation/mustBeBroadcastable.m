@@ -1,7 +1,8 @@
-function [] = mustHaveCompatibleSizes(Arrays, options)
-%MUSTHAVECOMPATIBLESIZES Validate that input arrays have compatible sizes.
-% Throws an error if the input arrays do not have compatible sizes (see
-% MATLAB documentation on compatible array sizes for more information).
+function [] = mustBeBroadcastable(Arrays, options)
+%Validate that input arrays are broadcastable.
+% Throws an error if the input arrays do not have broadcastable sizes
+% relative to each other (see MATLAB documentation on compatible array
+% sizes for more information).
 %
 % Example Usage:
 %   arguments
@@ -51,7 +52,7 @@ if any(dimMismatch(options.Dimensions))
             join(string(options.Dimensions), ", "));
     end
 
-    throwAsCaller(MException("MATLAB:mustHaveCompatibleSizes", ...
+    throwAsCaller(MException("CNDE:mustHaveCompatibleSizes", ...
         "Arguments must have compatible sizes%s (see MATLAB " + ...
         "documentation on compatible array sizes for " + ...
         "more information):%s%s%s", dimString, newline(), newline(), ...

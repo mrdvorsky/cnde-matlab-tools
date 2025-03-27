@@ -1,5 +1,5 @@
 function [] = interactiveDots(xDotInitial, yDotInitial, updateFun, options)
-%INTERACTIVEDOTS Add draggable dots to current plot with update function.
+%Add draggable dots to current plot with update function.
 % This function adds dots to the current plot. The points will
 % "draggable", meaning the user can click and drag them, and they will
 % move as expected. When any dot is dragged, the input function handle

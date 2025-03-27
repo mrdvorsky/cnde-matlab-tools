@@ -1,5 +1,5 @@
 function [S, f, Z0, commentLines] = importSnp(filenameIn, options)
-%IMPORTSNP Read the *.snp file and adjust units to GHz.
+%Read the *.snp file and adjust units to GHz.
 % Imports an *.snp file specified by filenameIn. If filenameIn does not
 % specify an extension, this function will search for files with the name
 % "{filenameIn}.s*p". The units of the output will be in GHz regardless of

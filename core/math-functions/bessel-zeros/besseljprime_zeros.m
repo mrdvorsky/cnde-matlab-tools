@@ -1,11 +1,12 @@
 function [jpzeros] = besseljprime_zeros(nu, n)
-%BESSELJPRIME_ZEROS Gives the first "n" zeros of the "besseljprime" function.
+%Gives the first "n" zeros of the "besseljprime" function.
 % Returns a column vector with the first n zeros (j'vn) of the
 % "besseljprime" function.
 %
 % Example Usage:
 %   jpzeros = besseljprime_zeros(nu, n);
 %   assert(all(besseljprime(nu, jpzeros) == 0));    % Almost passes.
+%
 %
 % Inputs:
 %   nu - Bessel function order. See "besselj" documentation.

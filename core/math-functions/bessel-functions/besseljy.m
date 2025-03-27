@@ -1,5 +1,5 @@
 function [val] = besseljy(alpha, beta, nu, z, scale)
-%BESSELJY Linear combination of "besselj" and "bessely" functions.
+%Linear combination of "besselj" and "bessely" functions.
 % Use the same way as "besselj" or "bessely". Computes the linear
 % combination of besselj and bessely function of order nu at z. The inputs
 % "alpha" and "beta" are the coefficients of "besselj" and "bessely",
@@ -8,6 +8,7 @@ function [val] = besseljy(alpha, beta, nu, z, scale)
 % Example Usage:
 %   val = besseljy(a, b, nu, z);
 %   val = besseljy(a, b, nu, z, true);  % Scaled by exp(-abs(imag(z))).
+%
 %
 % Inputs:
 %   alpha - Coefficient of besselj.

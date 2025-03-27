@@ -1,5 +1,5 @@
 function [dimSizes] = sizeBroadcasted(Arrays, options)
-%SIZEBROADCASTED Gets the size vector of the broadcasted version of input arrays.
+%Gets the size vector of the broadcasted version of input arrays.
 % The output will be a vector containing the size of all inputs after
 % using a binary operation to combine them together. For example,
 % 'sizeBroadcasted(A, B, C, Dimension=dims)' is functionally equivalent to

@@ -1,5 +1,5 @@
 function [varargout] = importSdt(filenameIn, options)
-%IMPORTSDT Imports an SDT file from InspectionWare.
+%Imports an SDT file from InspectionWare.
 % This function imports am SDT file from InspectionWare given the SDT
 % filename with or without the ".sdt" extension. Returns a cell array of
 % data sets, the x- and y- and ... dimensions in mm, and a cell array of

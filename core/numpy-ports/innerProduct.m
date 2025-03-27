@@ -1,5 +1,5 @@
 function [AB] = innerProduct(A, B, dims, options)
-%INNERPRODUCT Compute the inner product of two arrays along one dimension.
+%Compute the inner product of two arrays along one dimension.
 % Functionally equivalent* to the code 'sum(A.*B, dims)', but avoids
 % computing the intermediate product 'A.*B' directly. This avoids memory
 % overallocation issues caused by the size of 'A.*B 'being too large due to

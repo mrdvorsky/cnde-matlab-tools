@@ -1,11 +1,11 @@
-function [varargout] = unflattenGriddedData(numDims, Data, options)
-%UNFLATTENGRIDDEDDATA Convert a 2D table into a uniform nd-array with grids.
+function [varargout] = tableToArray(numDims, Data, options)
+%Convert a 2D table into a uniform nd-array with grids.
 % This functions takes in a 2D array, where each row describes a data
 % point(s) with coordinates (e.g., each row is [x, y, z, d1, d2, ...]),
 % and returns a multi-dimensional array(s) describing each data column
 % along with grid vectors describing each dimension. The 2D array
-% (obviously) must describe a full (i.e., non-sparse) uniform data set.
-% This function is the inverse of "flattenGriddedData".
+% must describe a full (i.e., non-sparse) uniform data set. This function
+% is the inverse of "arrayToTable".
 %
 % The input data can be specified as a single 2D array, or multiple 1D/2D
 % arrays with the same number of rows that will be concatenated
@@ -18,19 +18,25 @@ function [varargout] = unflattenGriddedData(numDims, Data, options)
 % described by the column with index "GridColumns(1)".
 %
 % Example Usage:
-%   [x, y, Data] = unflattenGriddedData(2, xFlat, yFlat, DataFlat);
-%   [x, y, Data] = unflattenGriddedData(2, DataFlat2D);
-%   [x, y, Data] = unflattenGriddedData(2, [xFlat, yFlat, DataFlat]);
-%   [x, y, z, Data] = unflattenGriddedData(3, xFlat, yFlat, zFlat, DataFlat);
-%   [x, y, z, Data1, Data2, ...] = unflattenGriddedData(3, ...
+%   % These two calls do the same thing.
+%   [x, y, Data] = tableToArray(2, xFlat, yFlat, DataFlat);
+%   [x, y, Data] = tableToArray(2, [xFlat, yFlat, DataFlat]);
+%
+%   % Can be done with any number of dimensions.
+%   [x, y, z, Data] = tableToArray(3, xFlat, yFlat, zFlat, DataFlat);
+%   [x, y, z, Data1, Data2, ...] = tableToArray(3, ...
 %       xFlat, yFlat, zFlat, DataFlat1, DataFlat2, ...);
 %
-%   [Data, x, y] = unflattenGriddedData(2, DataFlat, xFlat, yFlat, ...
+%   % If coordinate grid columns are not first, or if they are in the
+%   %  wrong order, then the locations can be specified using the
+%   %  "GridColumns" argument.
+%   [Data, x, y] = tableToArray(2, DataFlat, xFlat, yFlat, ...
 %       GridColumns=[2, 3]).
-%   [x, y, Data] = unflattenGriddedData(2, xFlat, yFlat, DataFlat, ...
-%       GridColumns=[2, 1]).    % Data will be length(y)-by-length(x)
+%   [x, y, Data] = tableToArray(2, xFlat, yFlat, DataFlat, ...
+%       GridColumns=[2, 1]).    % Data will be numel(y)-by-numel(x)
 %
-% The output data and coordinate vectors are all compatible with each
+%
+% The output data and coordinate vectors are all broadcastable with each
 % other and the grid vectors have the correct dimension. This means that
 % an operation like "Data = Data - x.*y;" will work as it should.
 %
@@ -39,6 +45,7 @@ function [varargout] = unflattenGriddedData(numDims, Data, options)
 %   Data (Repeating) - 1D/2D array where each column corresponds to either
 %       a grid coordinate or a data point. All arrays must have the same
 %       number of rows and will be concatenated together.
+%
 % Outputs:
 %   The position of each output parameter will match the index of the
 %       column it corresponds to. Each is either a grid coordinate or a
@@ -62,11 +69,9 @@ function [varargout] = unflattenGriddedData(numDims, Data, options)
 arguments
     numDims(1, 1) {mustBeInteger, mustBePositive};
 end
-
 arguments (Repeating)
     Data(:, :) {mustBeNonempty};
 end
-
 arguments
     options.GridColumns(1, :) {mustBeInteger, mustBePositive} = [];
 end

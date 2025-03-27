@@ -1,5 +1,5 @@
 function [val] = besselhprime(nu, kind, z, scale)
-%BESSELJPRIME Derivative of the "besselh" function.
+%Derivative of the "besselh" function.
 % Use the same way as "besselh", with the "kind" argument specifying the
 % 1st or 2nd kind. Computes the derivative of the besselh function of order
 % "nu".
@@ -7,6 +7,7 @@ function [val] = besselhprime(nu, kind, z, scale)
 % Example Usage:
 %   val = besselhprime(nu, z);
 %   val = besselhprime(nu, z, true);    % Scaled by exp(-abs(imag(z))).
+%
 %
 % Inputs:
 %   nu - Bessel function order. See "besselh" documentation.

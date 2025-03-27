@@ -1,5 +1,5 @@
-function [varargout] = flattenGriddedData(gridVectors, Data, options)
-%FLATTENGRIDDEDDATA Flatten multi-dimensional array(s) with defined grids.
+function [varargout] = arrayToTable(gridVectors, Data, options)
+%Flattens a multi-dimensional array(s) with to table form.
 % This function takes an array along with a cell array of grid vectors
 % describing each dimension of the array, and flattens it into a table
 % where each row contains one elements of the array and its coordinates
@@ -7,14 +7,17 @@ function [varargout] = flattenGriddedData(gridVectors, Data, options)
 % be provided, as long as they "broadcastable", each adding an additional
 % column to the output.
 %
-% The output is a 2D array, where each column is one of the linearized
-% input arrays (default), or each column can be a separate output.
+% The output is a 2D array, where each column is either one of the
+% linearized input arrays or a coordinate.
 % 
 % Example Usage:
-%   DataTable = flattenGriddedData({x, y, z}, Data);
-%   DataTable = flattenGriddedData({x, y, z}, Data1, Data2, ...);
-%   [xFlat, yFlat, zFlat, DataFlat1, ...] = flattenGriddedData(...
+%   DataTable = arrayToTable({x, y, z}, Data);
+%   DataTable = arrayToTable({x, y, z}, Data1, Data2, ...);
+%
+%   % Coordinates and data outputs can be separated.
+%   [xFlat, yFlat, zFlat, DataFlat1, ...] = arrayToTable(...
 %       {x, y, z}, Data1, ..., SeparateOutputs=true);
+%
 %
 % Inputs:
 %   gridVectors - Cell array of vectors defining grid coordinates for each
@@ -39,18 +42,16 @@ function [varargout] = flattenGriddedData(gridVectors, Data, options)
 arguments
     gridVectors(1, :) cell {mustBeNonempty};
 end
-
 arguments (Repeating)
     Data {mustBeNonempty};
 end
-
 arguments
     options.SeparateOutputs(1, 1) logical = true;
 end
 
 %% Check Inputs
 % Make all elements of Data be equal size.
-[Data{:}] = makeArraysSameSize(Data{:});
+[Data{:}] = broadcastArrays(Data{:});
 
 % Check for missing grid vectors.
 if numel(gridVectors) < ndims(Data{1})

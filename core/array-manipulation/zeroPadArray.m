@@ -1,5 +1,5 @@
-function [varargout] = zeroPadArray(Arrays, coord, options)
-%ZEROPADARRAY Zero-pad multidimensional gridded data.
+function [varargout] = zeropadArray(Arrays, coord, options)
+%Zero-pad multidimensional gridded data.
 % This function zero-pads data from a multidimensional array, and
 % extrapolates the uniform linear grid coordinate vectors.
 %
@@ -14,6 +14,7 @@ function [varargout] = zeroPadArray(Arrays, coord, options)
 %
 %   % Can work on multiple arrays at the same time.
 %   [Img1, Img2, ... , x, y, ...] = zeroPadArray({Img1, Img2, ...}, x, y, ...);
+%
 %
 % Inputs:
 %   Arrays - Array or cell array of compatible arrays to be cropped.
@@ -151,7 +152,7 @@ function mustBeVectorOrEmpty(coord)
     end
     
     if sum(size(coord) ~= 1) > 1
-        throwAsCaller(MException("MATLAB:mustBeVectorOrEmpty", ...
+        throwAsCaller(MException("CNDE:mustBeVectorOrEmpty", ...
             "Argument must be a vector or be empty."));
     end
 end

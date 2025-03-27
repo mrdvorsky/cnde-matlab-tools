@@ -1,5 +1,5 @@
 function [] = mustBeCallable(fun, funArgs, callArgString)
-%MUSTBECALLABLE Validate that value is callable with given arguments.
+%Validate that value is callable with given arguments.
 % Throws an error if "fun" is not able to be called with the arguments
 % given by the cell array "funArgs". In other words, the function call
 % "fun(funArgs{1}, funArgs{2}, ...)" should not throw an error. If it does
@@ -20,13 +20,13 @@ function [] = mustBeCallable(fun, funArgs, callArgString)
 
 arguments
     fun;
-    funArgs(:, 1) {mustBeA(funArgs, "cell")};
+    funArgs(:, 1) cell;
     callArgString(1, 1) string = "";
 end
 
 %% Check Argument
 if isnumeric(fun) || iscell(fun)
-    throwAsCaller(MException("MATLAB:mustBeCallable", ...
+    throwAsCaller(MException("CNDE:mustBeCallable", ...
         sprintf("Argument must be callable with (%d) arguments, " + ...
         "i.e., it should be callable as 'fun(%s)'.", ...
         numel(funArgs), callArgString)));
@@ -38,7 +38,7 @@ catch ex
     if strcmp(callArgString, "")
         callArgString = strjoin(compose("arg%d", 1:numel(funArgs)), ", ");
     end
-    throwAsCaller(MException("MATLAB:mustBeCallable", ...
+    throwAsCaller(MException("CNDE:mustBeCallable", ...
         sprintf("Argument must be callable with (%d) arguments, " + ...
         "i.e., it should be callable as 'fun(%s)'. However, " + ...
         "when called, the function threw the following error: '%s'", ...

@@ -1,11 +1,12 @@
 function [jzeros] = besselj_zeros(nu, n)
-%BESSELJ_ZEROS Gives the first "n" zeros of the "besselj" function.
+%Gives the first "n" zeros of the "besselj" function.
 % Returns a column vector with the first n zeros (jvn) of the "besselj"
 % function.
 %
 % Example Usage:
 %   jzeros = besselj_zeros(nu, n);
 %   assert(all(besselj(nu, jzeros) == 0));      % Almost passes.
+%
 %
 % Inputs:
 %   nu - Bessel function order. See "besselj" documentation.
