@@ -7,7 +7,30 @@ function [varargout] = tableToArray(numDims, Data, options)
 % must describe a full (i.e., non-sparse) uniform data set. This function
 % is the inverse of "arrayToTable".
 %
-% The input data can be specified as a single 2D array, or multiple 1D/2D
+% The typical use of this function is to convert the table on the left to
+% the dense nd-array form on the right. The example below is for a 2D
+% array, but of course this works for any number of dimensions. The
+% ordering of the table rows will not affect the output.
+%
+%       *Table Form*
+%   +-----+-----+------+
+%   |  x  |  y  | Data |
+%   +-----+-----+------+
+%   | -2  | -1  |  d1  |                            *Array Form*
+%   |  0  | -1  |  d2  |                      |-----+----------------+
+%   |  1  | -1  |  d3  |                      | x\y |  -1    0    1  |
+%   |  9  | -1  |  d4  |                      |-----+----------------+
+%   | -2  |  0  |  d5  |  -- tableToArray --> | -2  |  d1   d5   d9  |
+%   |  0  |  0  |  d6  | <-- arrayToTable --  |  0  |  d2   d6   d10 |
+%   |  1  |  0  |  d7  |                      |  1  |  d3   d7   d11 |
+%   |  9  |  0  |  d8  |                      |  9  |  d4   d8   d12 |
+%   | -2  |  1  |  d9  |                      |-----+----------------+
+%   |  0  |  1  |  d10 |
+%   |  1  |  1  |  d11 |
+%   |  9  |  1  |  d12 |
+%   +-----+-----+------+
+%
+% Note that the input data can also be specified as multiple 1D/2D
 % arrays with the same number of rows that will be concatenated
 % column-wise. The "numDims" argument specifies the expected number of
 % dimensions in the gridded data set. By default, the dimensions of the

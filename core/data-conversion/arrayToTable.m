@@ -8,7 +8,27 @@ function [varargout] = arrayToTable(gridVectors, Data, options)
 % column to the output.
 %
 % The output is a 2D array, where each column is either one of the
-% linearized input arrays or a coordinate.
+% linearized input arrays or a coordinate. See below, which shows the
+% table and array forms for a 2D example. Note that this function will
+% work for any number of dimensions.
+%
+%       *Table Form*
+%   +-----+-----+------+
+%   |  x  |  y  | Data |
+%   +-----+-----+------+
+%   | -2  | -1  |  d1  |                            *Array Form*
+%   |  0  | -1  |  d2  |                      |-----+----------------+
+%   |  1  | -1  |  d3  |                      | x\y |  -1    0    1  |
+%   |  9  | -1  |  d4  |                      |-----+----------------+
+%   | -2  |  0  |  d5  |  -- tableToArray --> | -2  |  d1   d5   d9  |
+%   |  0  |  0  |  d6  | <-- arrayToTable --  |  0  |  d2   d6   d10 |
+%   |  1  |  0  |  d7  |                      |  1  |  d3   d7   d11 |
+%   |  9  |  0  |  d8  |                      |  9  |  d4   d8   d12 |
+%   | -2  |  1  |  d9  |                      |-----+----------------+
+%   |  0  |  1  |  d10 |
+%   |  1  |  1  |  d11 |
+%   |  9  |  1  |  d12 |
+%   +-----+-----+------+
 % 
 % Example Usage:
 %   DataTable = arrayToTable({x, y, z}, Data);

@@ -30,9 +30,7 @@ function [varargout] = showImage(x, y, ImgIn, options)
 %
 % Named Arguments:
 %   DisplayFormat ("Real") - For a complex-valued image, this argument
-%       specifies which component to show. Options are "Magnitude",
-%       "dB", "Phase", "Real", "Imag", "RealAbs", "ImagAbs", "MagPhase",
-%       and "Animated".
+%       specifies which component to show.
 %   Normalize (false) - If true, normalize image before showing.
 %   NormalizeFactor (1) - If Normalize=true or DisplayFormat="MagPhase",
 %       this scaling factor is applied post-normalization.
@@ -87,6 +85,24 @@ if isempty(y)
     y = 1:size(ImgIn, 2);
 end
 
+%% Define List of Options for UI
+displayItems = [...
+    "Magnitude", ...
+    "dB", ...
+    "Real", ...
+    "Imag", ...
+    "RealAbs", ...
+    "ImagAbs", ...
+    "Phase", ...
+    "MagPhase", ...
+    "Animated" ...
+    ];
+
+interpItems = [...
+    "Nearest", ...
+    "Bilinear"
+    ];
+
 %% Show Image
 maxImgAbs = max(abs(ImgIn(:)));
 [varargout{1:max(nargout, 1)}] = imagesc(options.Axis, x, y, ...
@@ -118,100 +134,77 @@ if options.ShowColorbar
 end
 
 %% Add UI to Allow Changing Colormap
-fig = options.Axis.Parent;
-if options.ShowMenu && ~isa(fig, "matlab.ui.Figure")
-    warning("Parent object of the current axis is not a figure. " + ...
-        "Complex format menu will be disabled.");
-    options.ShowMenu = false;
-end
-
-if ~options.ShowMenu && strcmp(options.DisplayFormat, "Animated")
-    warning("The 'DisplayFormat' argument was set to 'Animated', " + ...
-        "but the 'ShowDisplayFormatMenu' argument was 'false'. " + ...
-        "The display format will be set to 'MagPhase' instead.")
-end
-
-if options.ShowMenu
-    menu = uimenu(fig, Text="Display Format");
-
-    % Complex Format
-    displayItems = [...
-        "Magnitude", ...
-        "dB", ...
-        "Real", ...
-        "Imag", ...
-        "RealAbs", ...
-        "ImagAbs", ...
-        "Phase", ...
-        "MagPhase", ...
-        "Animated" ...
-        ];
-
-    for ii = 1:numel(displayItems)
-        item = uimenu(menu, Text=displayItems(ii), ...
-            MenuSelectedFcn={@displayFormatUpdateFun, options.Axis});
-        if strcmp(displayItems(ii), options.DisplayFormat)
-            item.Checked = "on";
-        end
+fig = ancestor(options.Axis, "matlab.ui.Figure");
+if ~options.ShowMenu
+    if strcmp(options.DisplayFormat, "Animated")
+        error("The 'DisplayFormat' argument was set to 'Animated', " + ...
+            "but the 'ShowDisplayFormatMenu' argument was 'false'. " + ...
+            "This configuration is not supported.");
     end
+    return;
+end
 
-    % Normalization
-    item = uimenu(menu, Text="Normalize", Separator="on", ...
-        MenuSelectedFcn={@normalizeUpdateFunction, options.Axis});
-    if options.Normalize
+menu = uimenu(fig, Text="Display Format");
+
+% DisplayFormat
+for ii = 1:numel(displayItems)
+    item = uimenu(menu, Text=displayItems(ii), ...
+        MenuSelectedFcn={@displayFormatUpdateFun, options.Axis});
+    if strcmp(displayItems(ii), options.DisplayFormat)
         item.Checked = "on";
     end
+end
 
-    % Interpolation
-    interpItems = [...
-        "Nearest", ...
-        "Bilinear"
-        ];
+% Normalization
+item = uimenu(menu, Text="Normalize", Separator="on", ...
+    MenuSelectedFcn={@normalizeUpdateFunction, options.Axis});
+if options.Normalize
+    item.Checked = "on";
+end
 
-    for ii = 1:numel(interpItems)
-        item = uimenu(menu, Text=interpItems(ii), ...
-            MenuSelectedFcn={@interpolationUpdateFun, options.Axis});
-        if strcmp(interpItems(ii), options.Interpolation)
-            item.Checked = "on";
-        end
-        if ii == 1
-            item.Separator="on";
-        end
+% Interpolation
+for ii = 1:numel(interpItems)
+    item = uimenu(menu, Text=interpItems(ii), ...
+        MenuSelectedFcn={@interpolationUpdateFun, options.Axis});
+    if strcmp(interpItems(ii), options.Interpolation)
+        item.Checked = "on";
     end
-
-    % Axis Storage
-    dataStruct.Img = ImgIn;
-    dataStruct.PlotHandle = varargout{1};
-    dataStruct.options = options;
-    dataStruct.maxImgAbs = maxImgAbs;
-
-    % Set up animation.
-    animMapSize = 256;
-
-    animationColorMap = interp1( ...
-        linspace(-1, 1, 1024), ...
-        colormapplusminus(1024), ...
-        cosd(linspace(-180, 180, animMapSize)));
-
-    shiftCountPerUpdate = -animMapSize ...
-        ./ (options.AnimationPeriodSeconds .* options.AnimationFPS);
-    dataStruct.animationTimer = timer(...
-        Name=sprintf("Fig_%d_timer", fig.Number), ...
-        ExecutionMode="fixedRate", ...
-        Period=0.001*round(1000/options.AnimationFPS), ...
-        TimerFcn={@animationTimerFunction, ...
-        options.Axis, animationColorMap, shiftCountPerUpdate});
-
-    options.Axis.DeleteFcn = @closeRequest;
-
-    % Store data in figure.
-    options.Axis.UserData = dataStruct;
-
-    if strcmp(options.DisplayFormat, "Animated")
-        start(dataStruct.animationTimer);
+    if ii == 1
+        item.Separator="on";
     end
 end
 
+% Axis Storage
+dataStruct.Img = ImgIn;
+dataStruct.PlotHandle = varargout{1};
+dataStruct.options = options;
+dataStruct.maxImgAbs = maxImgAbs;
+
+% Set up animation.
+animMapSize = 256;
+
+animationColorMap = interp1( ...
+    linspace(-1, 1, 1024), ...
+    colormapplusminus(1024), ...
+    cosd(linspace(-180, 180, animMapSize)));
+
+shiftCountPerUpdate = -animMapSize ...
+    ./ (options.AnimationPeriodSeconds .* options.AnimationFPS);
+dataStruct.animationTimer = timer(...
+    Name=sprintf("Fig_%d_timer", fig.Number), ...
+    ExecutionMode="fixedRate", ...
+    Period=0.001*round(1000/options.AnimationFPS), ...
+    TimerFcn={@animationTimerFunction, ...
+    options.Axis, animationColorMap, shiftCountPerUpdate});
+
+options.Axis.DeleteFcn = @closeRequest;
+
+% Store data in figure.
+options.Axis.UserData = dataStruct;
+
+if strcmp(options.DisplayFormat, "Animated")
+    start(dataStruct.animationTimer);
+end
 
 
 
