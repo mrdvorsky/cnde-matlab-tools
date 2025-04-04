@@ -1,15 +1,20 @@
 function [nodes, weights, errorWeights] = trap(N, a, b)
-%TRAP Generate trapezoidal midpoint rule weights and nodes for integration.
+%Generate trapezoidal midpoint rule weights and nodes for integration.
 % This function generates the weights and nodes required to compute a
 % definite integral over a closed interval. The weights and nodes are
 % defined using the trapezoidal midpoint rules, which are only accurate if
 % used over one period of a smooth, periodic function. These do not result
 % in evalution of the function at the endpoints a and b.
 %
+% Example Usage:
+%   [nodes, weights] = trap(N, a, b);
+%   q = sum(fun(nodes) .* weights, 1);
+%   qErr = sum(fun(nodes) .* errorWeights, 1);
+%
+%
 % **Note**: Only use this function when integrating smooth, periodic
 % functions over an integer number of periods. Otherwise, the "fejer2"
-% function is often better, and can be used with arbitrary weighting
-% functions.
+% function is better, and can be used with arbitrary weighting functions.
 %
 % The function outputs "nodes" and "weights" can be used to approximate
 % the definite integral of a function f(x)dx over the interval [a,b] by
@@ -22,11 +27,6 @@ function [nodes, weights, errorWeights] = trap(N, a, b)
 % If f(x) is a trig polynomial (i.e., a product of sin and cos terms) with
 % degree less than N, the result will be exact, assuming the interval 
 % [a,b] is over exactly one period.
-%
-% Example Usage:
-%   [nodes, weights] = trap(N, a, b);
-%   q = sum(fun(nodes) .* weights, 1);
-%   qErr = sum(fun(nodes) .* errorWeights, 1);
 %
 % Inputs:
 %   N - Scalar number of nodes to calculate.

@@ -1,5 +1,5 @@
 function [] = renameMatFileFields(filename)
-%RENAMEMATFILEFIELDS Rename fields in a ".mat" file.
+%Rename fields in a ".mat" file.
 % Helper utility function to rename fields in a ".mat" file. This normally
 % involves loading the file, changing the field names, then saving. This
 % is a GUI utility to streamline this process.

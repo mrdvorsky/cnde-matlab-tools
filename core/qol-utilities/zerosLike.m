@@ -24,7 +24,7 @@ arguments
 end
 
 %% Create Output Array
-zerosArray = zeros(sizeBroadcasted(arrayIn{:}), options.Type);
+zerosArray = zeros(broadcastSize(arrayIn{:}), options.Type);
 
 end
 

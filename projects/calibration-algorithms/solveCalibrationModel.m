@@ -1,11 +1,11 @@
 function [T] = solveCalibrationModel(S, Sm)
-%SOLVECALIBRATIONMODEL Solve calibration model for n-port network analyzer.
+%Solve calibration model for n-port network analyzer from measurements.
 % The error adapter (T) for a non-ideal network analyzer is found given
 % n-port measurements (Sm) of multiple calibration standards (S). The
-% measured S-parameters (Sm) and actual S-parameters (S) are related to the
-% calibration model by the equations below. The output (T) represents the
-% four T-parameter matrices used in the following calibration equations,
-% where T(:, :, ii, ...) is the matrix T_{ii}.
+% measured S-parameters (Sm) and actual S-parameters (S) are related to
+% the calibration model by the equations below. The output (T) represents
+% the four T-parameter matrices used in the following calibration
+% equations, where T(:, :, ii, ...) is the matrix T_{ii}.
 %
 %   T1*S + T2 - Sm*T3*S - Sm*T4 = 0
 %   S = (T1 - Sm*T3)\(Sm*T4 - T2)
@@ -20,6 +20,7 @@ function [T] = solveCalibrationModel(S, Sm)
 % Example Usage:
 %   T = solveCalibrationModel(S, Sm);
 %   S_other = applyCalibration(T, Sm_other);
+%
 %
 % Inputs:
 %   S - S-parameter matrices of the calibration standards with size

@@ -1,5 +1,5 @@
 function [nodes, weights, errorWeights] = fejer2(N, a, b, options)
-%FEJER2 Generate Fejer Type II weights and nodes for closed interval integration.
+%Generate Fejer Type II weights and nodes for closed interval integration.
 % This function generates the weights and nodes required to compute a
 % definite integral over a closed interval. The weights and nodes are
 % defined using the Fejer Type II Quadrature rules. These rules are very
@@ -7,6 +7,14 @@ function [nodes, weights, errorWeights] = fejer2(N, a, b, options)
 % the funtion at the endpoints a and b. Note that a and b CAN be complex,
 % in which case the integration path will be a straight line, and will
 % follow standard complex contour integration rules.
+%
+% Example Usage:
+%   [nodes, weights] = fejer2(N, a, b);
+%   [nodes, weights, errorWeights] = fejer2(N, a, b, ...
+%                       WeightingFunction=@(x) exp(-x));
+%   q = sum(fun(nodes) .* weights, 1);
+%   qErr = sum(fun(nodes) .* errorWeights, 1);
+%
 %
 % The function outputs "nodes" and "weights" can be used to approximate
 % the definite integral of a function f(x)dx over the interval [a,b] by
@@ -35,13 +43,6 @@ function [nodes, weights, errorWeights] = fejer2(N, a, b, options)
 % can be specified directly, which is useful if these integrals are known
 % analytically. The "WeightingMoments" arguments should contain the vector
 % of moments "M_k", where "k = 1:N".
-%
-% Example Usage:
-%   [nodes, weights] = fejer2(N, a, b);
-%   [nodes, weights, errorWeights] = fejer2(N, a, b, ...
-%                       WeightingFunction=@(x) exp(-x));
-%   q = sum(fun(nodes) .* weights, 1);
-%   qErr = sum(fun(nodes) .* errorWeights, 1);
 %
 % Inputs:
 %   N - Scalar number of nodes to calculate.

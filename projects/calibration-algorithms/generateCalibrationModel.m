@@ -1,5 +1,5 @@
 function [T] = generateCalibrationModel(numPorts, numFreqs, options)
-%RANDOMCALIBRATIONMODEL Generates a random n-port calibration adapter.
+%Generates a random n-port calibration adapter.
 % Generates a T-parameter calibration adapter for an n-port network
 % analyzer. The output T represents the four T-parameter matrices used in
 % the following calibration equations, where T(:, :, ii, ...) is the matrix
@@ -15,15 +15,20 @@ function [T] = generateCalibrationModel(numPorts, numFreqs, options)
 %   S = applyCalibration(T, Sm);
 %   Sm = applyInverseCalibration(T, S);
 %
+%
 % Inputs:
 %   numPorts - Number of network analyzer ports.
-%   numFrequencies (1) - Number of frequencies. A calibration adapter will
+%   numFreqs (1) - Number of frequencies. A calibration adapter will
 %       be generated for each frequency.
+%
 % Outputs:
 %   T - Calibration adapter of size (numPorts, numPorts, 4, numFreqs).
 %
 % Named Arguments:
-%   Type - 
+%   IsReciprocal (false) - If true, the resulting network will be
+%       reciprocal.
+%   IsLeaky (false) - If true, the coupling terms between ports will be
+%       non-zero.
 %
 % Author: Matt Dvorsky
 

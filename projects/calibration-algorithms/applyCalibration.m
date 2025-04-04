@@ -1,5 +1,5 @@
 function [S] = applyCalibration(T, Sm)
-%APPLYCALIBRATION Calibrate measurements from n-port non-ideal network analyzer.
+%Calibrate measurements from n-port non-ideal network analyzer.
 % The error adapter (T) for a non-ideal network analyzer is removed from
 % the measured S-parameters (Sm) to give the actual S-parameters (S).
 % The input T represents the four T-parameter matrices used in the

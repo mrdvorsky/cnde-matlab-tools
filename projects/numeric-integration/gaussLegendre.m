@@ -1,8 +1,13 @@
 function [nodes, weights] = gaussLegendre(N, a, b)
-%GAUSSLEGENDRE Generate Gauss-Legendre weights and nodes for closed interval integration.
+%Generate Gauss-Legendre weights and nodes for closed interval integration.
 % This function generates the weights and nodes required to compute a
 % definite integral over a closed interval. The weights and nodes are
 % defined using the Gauss-Legendre Quadrature rules.
+%
+% Example Usage:
+%   [nodes, weights] = gaussLegendre(N, a, b);
+%   q = sum(fun(nodes) .* weights, 1);
+%
 %
 % **Note**: Only use this function when integrating polynomials. Otherwise,
 % the "fejer2" function is often better and is more general (e.g., it
@@ -30,14 +35,11 @@ function [nodes, weights] = gaussLegendre(N, a, b)
 % weights by using the three-term recursion formula for the Legendre
 % polynomials. Each step requires O(n) memory and O(n^2) time.
 %
-% Example Usage:
-%   [nodes, weights] = gaussLegendre(N, a, b);
-%   q = sum(fun(nodes) .* weights, 1);
-%
 % Inputs:
 %   N - Scalar number of nodes to calculate.
 %   a - Scalar integration lower bound. Must be real and finite.
 %   b - Scalar integration upper bound. Must be real and finite.
+%
 % Outputs:
 %   nodes - Column vector of coordinates at which to evaluate function.
 %   weights - Column vector of weights to perform weighted sum.

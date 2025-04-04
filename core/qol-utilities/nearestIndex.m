@@ -29,7 +29,7 @@ arguments
 end
 
 %% Calculate
-xInd = zeros_like(x);
+xInd = zerosLike(x);
 for ii = 1:length(x(:))
     [~, xInd(ii)] = min(abs(xSearchSpace(:) - x(ii)));
 end

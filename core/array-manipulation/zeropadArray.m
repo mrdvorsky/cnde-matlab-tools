@@ -77,7 +77,7 @@ if (isfield(options, "ZeroPadPercent") ...
 end
 
 %% Calculate Padding Sizes
-compatArraySize = sizeCompatible(Arrays{:}, Dimension=1:numel(coord));
+compatArraySize = broadcastSize(Arrays{:}, Dimension=1:numel(coord));
 
 if isfield(options, "ZeroPadPercent")
     options.ZeroPadCount = (0.01 * options.ZeroPadPercent) ...

@@ -1,5 +1,5 @@
 function [Sm] = applyInverseCalibration(T, S)
-%APPLYINVERSECALIBRATION Invert the calibration for n-port non-ideal network analyzer.
+%Invert the calibration for n-port non-ideal network analyzer.
 % The error adapter (T) for a non-ideal network analyzer is added to
 % the actual S-parameters (S) to give the measured S-parameters (Sm).
 % The input T represents the four T-parameter matrices used in the
@@ -12,6 +12,7 @@ function [Sm] = applyInverseCalibration(T, S)
 %
 % Example Usage:
 %   Sm = applyInverseCalibration(T, S);
+%
 %
 % Inputs:
 %   T - Calibration adapter with size (nPorts, nPorts, 4, ...).

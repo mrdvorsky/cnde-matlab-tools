@@ -1,5 +1,5 @@
 function [nodes, weights, varargout] = fejer2_halfOpen(N, L, a, options)
-%FEJER2_HALFOPEN Generate Fejer Type II weights and nodes for half-open [a,inf) integration interval.
+%Generate Fejer Type II weights and nodes for half-open [a,inf) integration interval.
 % This function generates the weights and nodes required to compute a
 % definite integral over a half-open interval (i.e., [a,inf)). The weights
 % and nodes are defined using the Fejer Type II Quadrature rules. These
@@ -16,6 +16,14 @@ function [nodes, weights, varargout] = fejer2_halfOpen(N, L, a, options)
 % N resulting in a better approximation. The error in q can be estimated
 % using the output parameter errorWeights using the formula
 % "qErr = sum(errorWeights .* f(nodes))".
+%
+% Example Usage:
+%   [nodes, weights] = fejer2_halfOpen(N, L);   % a = 0;
+%   [nodes, weights, errorWeights] = fejer2_halfOpen(N, L, a, ...
+%                       WeightingFunction=@(x) exp(-x));
+%   q = sum(fun(nodes) .* weights, 1);
+%   qErr = sum(fun(nodes) .* errorWeights, 1);
+%
 %
 % A weighting function w(x) ("WeightingFunction") can be optionally
 % supplied such that the integral "q = sum(weights .* f(nodes))"
@@ -43,13 +51,6 @@ function [nodes, weights, varargout] = fejer2_halfOpen(N, L, a, options)
 % can be specified directly, which is useful if these integrals are known
 % analytically. The "WeightingMoments" arguments should contain the vector
 % of moments "M_k", where "k = 1:N".
-%
-% Example Usage:
-%   [nodes, weights] = fejer2_halfOpen(N, L);   % a = 0;
-%   [nodes, weights, errorWeights] = fejer2_halfOpen(N, L, a, ...
-%                       WeightingFunction=@(x) exp(-x));
-%   q = sum(fun(nodes) .* weights, 1);
-%   qErr = sum(fun(nodes) .* errorWeights, 1);
 %
 % Inputs:
 %   N - Scalar number of nodes to calculate.
