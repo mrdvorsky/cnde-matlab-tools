@@ -1,6 +1,6 @@
 function [T] = solveCalibrationModel(S, Sm)
-%Solve calibration model for n-port network analyzer from measurements.
-% The error adapter (T) for a non-ideal network analyzer is found given
+%Solve calibration model for n-port network analyzer from calibration measurements.
+% The 'error adapter' (T) for a non-ideal network analyzer is found given
 % n-port measurements (Sm) of multiple calibration standards (S). The
 % measured S-parameters (Sm) and actual S-parameters (S) are related to
 % the calibration model by the equations below. The output (T) represents
@@ -59,7 +59,7 @@ T3 = permute(Sm    .* S,     [2, 3, 1, 4, 5, 6]);
 T4 = permute(Sm    .* eyeN2, [2, 3, 1, 4, 5, 6]);
 
 % Reshape into final matrix equation Ax=0.
-[T1, T2, T3, T4] = makeArraysSameSize(T1, T2, T3, T4);
+[T1, T2, T3, T4] = broadcastArrays(T1, T2, T3, T4);
 A = reshape(permute(cat(4, T1, T2, T3, T4), [1, 2, 6, 3, 4, 5]), ...
     [], 4*nPorts.^2, nFreqs);
 

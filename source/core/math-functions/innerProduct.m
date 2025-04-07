@@ -4,7 +4,7 @@ function [AB] = innerProduct(A, B, dims, options)
 % computing the intermediate product 'A.*B' directly. This avoids memory
 % overallocation issues caused by the size of 'A.*B 'being too large due to
 % singleton dimension expansion. It is also much more efficient for large
-% inputs. The 'SummationMode' argument can also be set to "Mean", in which
+% inputs. The 'SummationMode' argument can also be set to "mean", in which
 % case the output will be equavalent to 'mean(A.*B, dims)'.
 %
 % *Note that if 'dims' is an empty array, this function will do nothing,
@@ -44,7 +44,7 @@ arguments
 end
 
 %% Check Inputs
-AB_size = sizeBroadcasted(A, B);
+AB_size = broadcastSize(A, B);
 maxDims = numel(AB_size);
 
 dims = dims(dims <= maxDims);
@@ -86,7 +86,7 @@ AB = reshape(pagemtimes(...
     reshape(B, [], 1, B_remainingSize{:})), ...
     outputSize);
 
-if strcmp(options.SummationMode, "Mean")
+if strcmp(options.SummationMode, "mean")
     AB = AB .* (prod(outputSize) ./ prod(AB_size));
 end
 

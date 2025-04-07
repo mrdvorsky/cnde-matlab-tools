@@ -40,7 +40,7 @@ for ii = 1:numTrials
     sum2_time = toc;
 
     tic;
-    mean2_AB = innerProduct(A, B, dim, SummationMode="Mean");
+    mean2_AB = innerProduct(A, B, dim, SummationMode="mean");
     mean2_time = toc;
 
     sum_err = abs(mean(sum1_AB - sum2_AB, "all"));

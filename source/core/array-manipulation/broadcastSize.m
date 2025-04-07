@@ -1,4 +1,4 @@
-function [dimSizes] = sizeBroadcasted(Arrays, options)
+function [dimSizes] = broadcastSize(Arrays, options)
 %Gets the size vector of the broadcasted version of input arrays.
 % The output will be a vector containing the size of all inputs after
 % using a binary operation to combine them together. For example,

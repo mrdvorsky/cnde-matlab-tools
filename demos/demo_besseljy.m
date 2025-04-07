@@ -19,7 +19,7 @@ ylim([-1.5, 1.5]);
 
 %% Interactive
 hold on;
-interactivePlot(r12, 0*r12, ...
+interactiveDots(r12, 0*r12, ...
     {@updateFunction, linePlot, ax, besselOrder, numZeros});
 
 

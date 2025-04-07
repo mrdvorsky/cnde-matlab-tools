@@ -1,5 +1,5 @@
 function [S] = createSarData3d(x, y, f, x0, y0, z0, a0, options)
-%CREATESARDATA3D Create uniform 3D SAR data from point source specificication.
+%Simulate a uniform 2D array with point targets.
 % This function returns uniform SAR measurement data that would have
 % occured measuring point targets located at x0(ii), y0(ii), z0(ii)
 % with scattering coefficients a0(ii).
@@ -60,11 +60,12 @@ arguments
     y0 {mustBeReal};
     z0 {mustBeReal};
     a0 = 1;
+    
     options.UseRangeForAmplitude logical = true;
     options.SpeedOfLight(1, 1) {mustBePositive} = 299.792458;
     options.ThetaBeamwidthX(1, 1) {mustBePositive} = inf;
     options.ThetaBeamwidthY(1, 1) {mustBePositive} = inf;
-    options.Er(:, 1) {mustBeGreaterThanOrEqual(options.Er, 1)} = 1;
+    options.Er(:, 1) {mustBePositive} = 1;
     options.Thk(:, 1) {mustBePositive} = inf;
     options.DispersionTableSize(1, 1) {mustBeInteger, mustBePositive} = 101;
     options.BistaticSeparationX(1, 1) {mustBeReal} = 0;
@@ -72,7 +73,7 @@ arguments
 end
 
 %% Check for Argument Size Mismatch
-[x0, y0, z0, a0] = makeArraysSameSize(x0, y0, z0, a0);
+[x0, y0, z0, a0] = broadcastArrays(x0, y0, z0, a0);
 
 if numel(options.Er) ~= numel(options.Thk)
     error("Er and Thk must have the same length.");

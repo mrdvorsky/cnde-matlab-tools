@@ -8,7 +8,7 @@ z(1, :) =  -(0:0.1:80);
 
 k = 2*pi;
 
-xAnt(1, :) = linspace(-20, 20, 2);
+xAnt(1, :) = linspace(-20, 20, 21);
  
 % numLayers
 % thk = (1:numel(er)).^(0.5);
@@ -75,7 +75,7 @@ for ii = 1:numel(thk) - 1
     plot(xlim(), [0, 0] - zLayerEnd(ii), "y:", LineWidth=0.1);
 end
 
-interactivePlot(x0, z0, ...
+interactiveDots(x0, z0, ...
     {@updateFun, rayHandles, imgHandle, xAnt, psiInterp, ior, thk}, ...
     MarkerSize=20);
 

@@ -1,6 +1,6 @@
 clc;
 clear;
-% close all;
+close all;
 
 %% Inputs
 % S(1, 1, 1, :) = -exp(0.2j * (0:3));
@@ -32,7 +32,7 @@ handle_r = plot(rPlot, "r", LineWidth=0.5);
 hold on;
 handle_phi = plot(phiPlot, "b", LineWidth=0.5);
 zplane([]);
-interactivePlot(real(Sm), imag(Sm), ...
+interactiveDots(real(Sm), imag(Sm), ...
     {@updatePlot, S, handle_r, handle_phi, rOrig, phiOrig}, ...
     MarkerSize=20, ...
     DragClampFun=@(x, y) [x, y] ./ max(hypot(x, y), 1));
@@ -43,10 +43,11 @@ interactivePlot(real(Sm), imag(Sm), ...
 
 
 %% Helper Function
-function updatePlot(x, y, S, handle_r, handle_phi, rOrig, phiOrig)
+function [x, y] = updatePlot(x, y, ind, S, handle_r, handle_phi, rOrig, phiOrig)
     arguments
         x(1, 1, 1, :);
         y(1, 1, 1, :);
+        ind;
         S(1, 1, 1, :);
         handle_r;
         handle_phi;

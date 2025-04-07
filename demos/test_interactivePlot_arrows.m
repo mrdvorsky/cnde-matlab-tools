@@ -5,8 +5,8 @@ clear;
 %% Inputs
 % S = -exp(0.2j * (0:3));
 % S = -exp(0.5j * (0:2));
-S = [-1, exp(0.0j), 0j, 1j, -1j];
-% S = -exp(1j * 2*pi/3 * (0:2));
+% S = [-1, exp(0.0j), 0j, 1j, -1j];
+S = -exp(1j * 2*pi/3 * (0:2));
 % S = -exp(1j * 2*pi/6 * (0:5));
 
 
@@ -26,7 +26,7 @@ figure;
 handle_q = quiver(real(pOrig), imag(pOrig), real(pOff), imag(pOff), 0);
 hold on;
 zplane([]);
-interactivePlot(real(Sm), imag(Sm), ...
+interactiveDots(real(Sm), imag(Sm), ...
     {@updatePlot, S, handle_q, pOrig}, ...
     MarkerSize=20, ...
     DragClampFun=@(x, y) [x, y] ./ max(hypot(x, y), 1));
@@ -37,10 +37,11 @@ interactivePlot(real(Sm), imag(Sm), ...
 
 
 %% Helper Function
-function updatePlot(x, y, S, handle_q, pOrig)
+function [x, y] = updatePlot(x, y, ind, S, handle_q, pOrig)
     arguments
         x(1, 1, 1, :);
         y(1, 1, 1, :);
+        ind;
         S(1, 1, 1, :);
         handle_q;
         pOrig;
