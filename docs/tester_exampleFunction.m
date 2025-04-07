@@ -4,11 +4,13 @@ classdef tester_exampleFunction < matlab.unittest.TestCase
     % This class should serve as an example for how to format unit tests
     % for your custom functions.
     %
-    % Please use the naming conventions used here:
+    % Please use the naming conventions used here. Please prefer the use
+    % of descriptive test names rather than comments.
     %   test_{someGeneralTest}
     %   testError_{someTestThatShouldThrowAnError}
     %   testWarning_{someTestThatShouldThrowWarning}
     %   testEdge_{someEdgeCaseTest}
+    %
     %
     % Useful links:
     %   https://www.mathworks.com/help/matlab/matlab_prog/types-of-qualifications.html
@@ -26,7 +28,7 @@ classdef tester_exampleFunction < matlab.unittest.TestCase
     end
 
     methods (Test)
-        % Basic functionality tests
+        %% Basic Functionality Tests
         function test_boolTrueWithNamedArgs(testCase)
             [out1, out2] = exampleFunction("hello", [true, true], 5, ...
                 PositiveOddInt=7);
@@ -41,7 +43,6 @@ classdef tester_exampleFunction < matlab.unittest.TestCase
             testCase.verifyEqual(out1, 3.14);
         end
 
-        % Named argument tests
         function test_stringArrayAssignment(testCase)
             [~, out2] = exampleFunction("a", true, ...
                 StringArray=["1", "2"; "3", "4"]);
@@ -55,7 +56,7 @@ classdef tester_exampleFunction < matlab.unittest.TestCase
             testCase.verifyEqual(out2, "");
         end
 
-        % Error condition tests
+        %% Error Condition Tests
         function testError_nonScalarStringInput(testCase)
             testCase.verifyError(...
                 @() exampleFunction(["multi", "word"], true), ...
@@ -68,7 +69,7 @@ classdef tester_exampleFunction < matlab.unittest.TestCase
                 "CNDE:mustBePositiveOddInteger");
         end
 
-        % Edge case tests
+        %% Edge Case Tests
         function testEdge_minimalPositiveOddInt(testCase)
             [~, out2] = exampleFunction("x", true, PositiveOddInt=1);
             testCase.verifyEqual(out2, 1);

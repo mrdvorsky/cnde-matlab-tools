@@ -16,6 +16,7 @@ function [] = mustBeValidDimension(dim, options)
 
 arguments
     dim;
+
     options.AllowVector(1, 1) logical = true;
 end
 
