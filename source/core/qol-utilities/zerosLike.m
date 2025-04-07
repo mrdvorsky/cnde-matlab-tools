@@ -1,4 +1,4 @@
-function [zerosArray] = zeros_like(arrayIn, options)
+function [zerosArray] = zerosLike(arrayIn, options)
 %Creates an array of zeros with the same size as argument.
 % Essentially, this is just a shorthand for "zeros(size(arrayIn))", if a
 % single input is passed in. If multiple arrays are passed, the
@@ -6,10 +6,10 @@ function [zerosArray] = zeros_like(arrayIn, options)
 %
 % Example Usage:
 %   % The output "zerosArray" has the same size as "existingArray".
-%   [zerosArray] = zeros_like(existingArray);
+%   [zerosArray] = zerosLike(existingArray);
 %
 %   % The output "zerosArray" has the "broadcasted" size of all inputs.
-%   [zerosArray] = zeros_like(arr1, arr2, arr3, ...);
+%   [zerosArray] = zerosLike(arr1, arr2, arr3, ...);
 %
 %
 % Author: Matt Dvorsky
