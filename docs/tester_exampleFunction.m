@@ -8,7 +8,7 @@ classdef tester_exampleFunction < matlab.unittest.TestCase
     %   test_{someGeneralTest}
     %   testError_{someTestThatShouldThrowAnError}
     %   testWarning_{someTestThatShouldThrowWarning}
-    %   testEdge_{someEdgeCase}
+    %   testEdge_{someEdgeCaseTest}
     %
     % Useful links:
     %   https://www.mathworks.com/help/matlab/matlab_prog/types-of-qualifications.html

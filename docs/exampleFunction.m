@@ -8,9 +8,10 @@ function [out1, out2] = exampleFunction(stringIn, boolIn, optIn, options)
 %   [out1] = exampleFunction("test1", true);
 %   [out1, out2] = exampleFunction('test2', [0, true], 2, PositiveOddInt=1);
 %   [out1, out2] = exampleFunction("a", false, StringArray=["1", "12"]);
-%   [out1, out2] = exampleFunction("test3", 0, PositiveOddInt=-1); % Error
-%   [out1, out2] = exampleFunction(0, 0);                       % Error
-%   [out1, out2] = exampleFunction("a", "b");                   % Error
+%   [out1, out2] = exampleFunction("test3", 0, PositiveOddInt=-1);  % Error
+%   [out1, out2] = exampleFunction("test3", 0, PositiveOddInt=4);   % Error
+%   [out1, out2] = exampleFunction(0, 0);                           % Error
+%   [out1, out2] = exampleFunction("a", "b");                       % Error
 %
 %
 % Include additional documentation here.
