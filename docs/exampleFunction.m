@@ -1,30 +1,30 @@
 function [out1, out2] = exampleFunction(stringIn, boolIn, optIn, options)
 %Example function showing documentation standards.
 % Use this function as an example of how to document and use argument
-% validation in your own functions.
+% validation in your own functions. This function in particular checks that
+% the first argument,
 %
 % Example Usage:
-%   out1 = exampleFunction("test1", true);
-%   [out1, out2] = exampleFunction('test2', [0, true], 2, PositiveInt=1);
+%   [out1] = exampleFunction("test1", true);
+%   [out1, out2] = exampleFunction('test2', [0, true], 2, PositiveOddInt=1);
 %   [out1, out2] = exampleFunction("a", false, StringArray=["1", "12"]);
-%   [out1, out2] = exampleFunction("test3", 0, PositiveInt=-1); % Error
+%   [out1, out2] = exampleFunction("test3", 0, PositiveOddInt=-1); % Error
 %   [out1, out2] = exampleFunction(0, 0);                       % Error
 %   [out1, out2] = exampleFunction("a", "b");                   % Error
-%   [out1, out2] = exampleFunction("a", false, StringArray=[]); % Error
 %
 %
 % Include additional documentation here.
 %
 % Inputs:
 %   stringIn - Scalar string input. List requirements here.
-%   boolIn - Boolean input.
+%   boolIn - Vector of boolean inputs.
 %   optIn (1) - Optional numeric input. List defaults in parentheses.
 %
 % Outputs:
 %   out1 - First output argument. If all of boolIn are true, out1 is equal
 %       to stringIn. Otherwise, it is equal to optIn.
-%   out2 - Second output argument. If PositiveInt was assigned, out2 is
-%       equal to PositiveInt. Otherwise, equal to StringArray.
+%   out2 - Second output argument. If PositiveOddInt was assigned, out2 is
+%       equal to PositiveOddInt. Otherwise, equal to StringArray.
 %
 % Named Arguments: (Always capitalize first letter for named arguments)
 %   PositiveOddInt - Positive odd integer optional named argument. No default.
@@ -45,13 +45,13 @@ end
 
 %% Assign Output Values
 if all(boolIn)
-    out1 = optIn;
-else
     out1 = stringIn;
+else
+    out1 = optIn;
 end
 
-if isfield(options, "PositiveInt")
-    out2 = options.PositiveInt;
+if isfield(options, "PositiveOddInt")
+    out2 = options.PositiveOddInt;
 else
     out2 = options.StringArray;
 end
