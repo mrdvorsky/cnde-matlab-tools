@@ -12,8 +12,9 @@ function [varargout] = zeropadArray(Arrays, coord, options)
 %   % Works with any number of dimensions.
 %   [Array, x, y, z, ...] = zeroPadArray(Array, x, y, z, ...);
 %
-%   % Can work on multiple arrays at the same time.
-%   [Img1, Img2, ... , x, y, ...] = zeroPadArray({Img1, Img2, ...}, x, y, ...);
+%   % Can work on multiple broadcastable arrays at the same time.
+%   [ImgAll, x, y, ...] = zeroPadArray({Img1, Img2, ...}, x, y, ...);
+%   [Img1, Img2, ...] = ImgAll{:};
 %
 %
 % Inputs:
@@ -37,18 +38,25 @@ function [varargout] = zeropadArray(Arrays, coord, options)
 %
 % Author: Matt Dvorsky
 
-arguments
+arguments (Input)
     Arrays {mustBeValidArraysArgument};
 end
-arguments (Repeating)
+arguments (Input, Repeating)
     coord {mustBeVectorOrEmpty};
 end
-arguments
+arguments (Input)
     options.ZeroPadPercent(1, :) {mustBeNonnegative};
     options.ZeroPadCount(1, :) {mustBeNonnegative} = 0;
     options.Direction(1, :) string {mustBeMember(options.Direction, ...
         ["both", "pre", "post"])} = "both";
 end
+
+% arguments (Output)
+%     ArraysOut;
+% end
+% arguments (Output, Repeating)
+%     coordOut;
+% end
 
 if ~iscell(Arrays)
     Arrays = {Arrays};

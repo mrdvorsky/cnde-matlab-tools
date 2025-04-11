@@ -1,5 +1,5 @@
 classdef tester_mustBeCallable < matlab.unittest.TestCase
-    % Unit tests for the mustBeCallable function.
+    % Unit tests for the "mustBeCallable" function.
     %
     % Author: Matt Dvorsky
 

@@ -1,80 +1,99 @@
 classdef tester_mustBeBroadcastable < matlab.unittest.TestCase
-    % Unit tests for mustBeBroadcastable function.
+    % Unit tests for "mustBeBroadcastable" function.
     %
     % Author: Matt Dvorsky
 
     methods (Test)
         %% Basic Functionality Tests
         function test_sameSize(testCase)
-            a = ones(2, 3);
-            b = ones(2, 3);
-            testCase.verifyWarningFree(@() mustBeBroadcastable(a, b));
+            A = ones(2, 3);
+            B = ones(2, 3);
+            testCase.verifyWarningFree(@() mustBeBroadcastable(A, B));
         end
 
         function test_singletonExpansion(testCase)
-            a = ones(3, 1);
-            b = ones(1, 4);
-            testCase.verifyWarningFree(@() mustBeBroadcastable(a, b));
+            A = ones(3, 1);
+            B = ones(1, 4);
+            testCase.verifyWarningFree(@() mustBeBroadcastable(A, B));
         end
 
         function test_higherDimensions(testCase)
-            a = ones(2, 3, 4);
-            b = ones(2, 1, 4);
-            testCase.verifyWarningFree(@() mustBeBroadcastable(a, b));
+            A = ones(2, 3, 4);
+            B = ones(2, 1, 4);
+            testCase.verifyWarningFree(@() mustBeBroadcastable(A, B));
+        end
+
+        function test_manyArgs(testCase)
+            A = ones(2, 3, 4);
+            B = ones(2, 1, 4);
+            C = ones(1, 1, 1);
+            testCase.verifyWarningFree(@() mustBeBroadcastable(A, B, C));
         end
 
         function test_specifiedDimensionsValid(testCase)
-            a = ones(2, 2);
-            b = ones(1, 3);
-            testCase.verifyWarningFree(@() mustBeBroadcastable(a, b, Dimensions=1));
+            A = ones(2, 2);
+            B = ones(1, 3);
+            testCase.verifyWarningFree(@() mustBeBroadcastable(A, B, Dimensions=1));
         end
 
         function test_excludeDimensions(testCase)
-            a = ones(2, 3);
-            b = ones(2, 4);
-            testCase.verifyWarningFree(@() mustBeBroadcastable(a, b, ExcludeDimensions=2));
+            A = ones(2, 3);
+            B = ones(2, 4);
+            testCase.verifyWarningFree(@() mustBeBroadcastable(A, B, ExcludeDimensions=2));
         end
 
         %% Error Condition Tests
         function testError_incompatibleSizes(testCase)
-            a = ones(2, 3);
-            b = ones(3, 2);
-            testCase.verifyError(@() mustBeBroadcastable(a, b), ...
+            A = ones(2, 3);
+            B = ones(3, 2);
+            testCase.verifyError(@() mustBeBroadcastable(A, B), ...
                 "CNDE:mustBeBroadcastable");
         end
 
-        function testError_specifiedDimensionsInvalid(testCase)
-            a = ones(2, 3);
-            b = ones(3, 2);
-            testCase.verifyError(@() mustBeBroadcastable(a, b, Dimensions=2), ...
+        function testError_incompatibleSizes_manyArgs(testCase)
+            A = ones(2, 3);
+            B = ones(1, 3);
+            C = ones(3, 1);
+            testCase.verifyError(@() mustBeBroadcastable(A, B, C), ...
+                "CNDE:mustBeBroadcastable");
+        end
+
+        function testError_specifiedDimensionsWithConflict(testCase)
+            A = ones(2, 3);
+            B = ones(1, 4);
+            testCase.verifyError(@() mustBeBroadcastable(A, B, Dimensions=2), ...
                 "CNDE:mustBeBroadcastable");
         end
 
         function testError_excludeDimensionsWithConflict(testCase)
-            a = ones(2, 3);
-            b = ones(3, 4);
-            testCase.verifyError(@() mustBeBroadcastable(a, b, ExcludeDimensions=2), ...
+            A = ones(2, 3);
+            B = ones(3, 4);
+            testCase.verifyError(@() mustBeBroadcastable(A, B, ExcludeDimensions=2), ...
                 "CNDE:mustBeBroadcastable");
         end
 
         %% Edge Case Tests
         function testError_zeroDimensions(testCase)
-            a = zeros(0, 5);
-            b = zeros(5, 0);
-            testCase.verifyError(@() mustBeBroadcastable(a, b), ...
+            A = zeros(0, 5);
+            B = zeros(5, 0);
+            testCase.verifyError(@() mustBeBroadcastable(A, B), ...
                 "CNDE:mustBeBroadcastable");
         end
 
         function testEdge_scalar(testCase)
-            a = 5;
-            b = ones(2, 3);
-            testCase.verifyWarningFree(@() mustBeBroadcastable(a, b));
+            A = 5;
+            B = ones(2, 3);
+            testCase.verifyWarningFree(@() mustBeBroadcastable(A, B));
         end
 
         function testEdge_emptyWithSingleton(testCase)
-            a = zeros(0, 1);
-            b = zeros(1, 0);
-            testCase.verifyWarningFree(@() mustBeBroadcastable(a, b));
+            A = zeros(0, 1);
+            B = zeros(1, 0);
+            testCase.verifyWarningFree(@() mustBeBroadcastable(A, B));
+        end
+
+        function testEdge_singleArg(testCase)
+            testCase.verifyWarningFree(@() mustBeBroadcastable([]));
         end
     end
 end

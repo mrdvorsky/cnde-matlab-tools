@@ -25,6 +25,10 @@ arguments
     options.ExcludeDimensions(1, :) {mustBeValidDimension} = [];
 end
 
+if isempty(Arrays)
+    return;
+end
+
 %% Check Sizes
 maxInputDim = max(cellfun(@(x) ndims(x), Arrays));
 if strcmp(options.Dimensions, "all")

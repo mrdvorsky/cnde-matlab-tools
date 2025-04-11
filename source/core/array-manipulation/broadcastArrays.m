@@ -1,4 +1,4 @@
-function [varargout] = broadcastArrays(Arrays)
+function [ArraysOut] = broadcastArrays(Arrays)
 %Make inputs the same size by duplicating along singleton dimensions.
 % This functions takes in multiple nd-arrays with broadcastable sizes (see
 % MATLAB documentation on compatible array sizes) and returns each after
@@ -24,20 +24,33 @@ function [varargout] = broadcastArrays(Arrays)
 %
 % Author: Matt Dvorsky
 
-arguments (Repeating)
+arguments (Input, Repeating)
     Arrays;
 end
-mustBeBroadcastable(Arrays{:});
+arguments (Output, Repeating)
+    ArraysOut;
+end
+
+if isempty(Arrays)
+    return;
+end
 
 %% Format Output
 maxInputDim = max(cellfun(@(x) ndims(x), Arrays));
 inputDims = cell2mat(...
     cellfun(@(x) size(x, 1:maxInputDim).', Arrays, UniformOutput=false)).';
-outputDims = max(inputDims, [], 1);
+outputDims = broadcastSize(Arrays{:}, Dimension=1:maxInputDim);
 
-varargout = cell(size(Arrays));
+ArraysOut = cell(size(Arrays));
+if any(outputDims == 0)
+    for ii = 1:numel(Arrays)
+        ArraysOut{ii} = ones(outputDims, class(Arrays{ii}));
+    end
+    return;
+end
+
 for ii = 1:numel(Arrays)
-    varargout{ii} = repmat(Arrays{ii}, outputDims ./ inputDims(ii, :));
+    ArraysOut{ii} = repmat(Arrays{ii}, outputDims ./ inputDims(ii, :));
 end
 
 end

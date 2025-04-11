@@ -8,6 +8,10 @@ function [vec] = vectorize(arrayIn, dim)
 %   [vec] = vectorize(arr, 2);      % Equivalent to vec(1, :) = arr(:);
 %   [vec] = vectorize(arr, 3);      % Equivalent to vec(1, 1, :) = arr(:);
 %
+% If the input array is empty, the output will have size 0 along the
+% specified dimension. For example, vectorize([], 3) will have size
+% 1-by-1-by-0.
+%
 % Author: Matt Dvorsky
 
 arguments

@@ -21,10 +21,7 @@ function [y] = hypotn(x)
 arguments (Repeating)
     x;
 end
-
-if numel(x) == 0
-    error("Function 'hypotn' must be called with at least one argument.");
-end
+mustBeNonemptyRepeatingArg(x);
 
 if isscalar(x)
     y = abs(x{1});

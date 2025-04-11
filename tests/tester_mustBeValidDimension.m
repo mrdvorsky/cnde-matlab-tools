@@ -1,5 +1,5 @@
 classdef tester_mustBeValidDimension < matlab.unittest.TestCase
-    % Unit tests for mustBeValidDimension function.
+    % Unit tests for "mustBeValidDimension" function.
     %
     % Author: Matt Dvorsky
 

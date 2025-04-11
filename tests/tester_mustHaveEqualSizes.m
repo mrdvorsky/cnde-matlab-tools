@@ -1,5 +1,5 @@
 classdef tester_mustHaveEqualSizes < matlab.unittest.TestCase
-    % Unit tests for mustHaveEqualSizes function.
+    % Unit tests for "mustHaveEqualSizes" function.
     %
     % Author: Matt Dvorsky
     
