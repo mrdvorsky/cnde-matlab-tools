@@ -127,17 +127,6 @@ end
 
 
 %% Argument Validation Functions
-function mustBeVectorOrEmpty(coord)
-    if isempty(coord)
-        return;
-    end
-    
-    if sum(size(coord) ~= 1) > 1
-        throwAsCaller(MException("CNDE:mustBeVectorOrEmpty", ...
-            "Argument must be a vector or be empty."));
-    end
-end
-
 function mustBeValidPadSpec(padSpec, coords)
     if any(numel(padSpec) == [1, numel(coords)])
         return;
