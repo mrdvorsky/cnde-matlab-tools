@@ -11,8 +11,8 @@ function [ArrayOut, coordsOut] = cropArray(Array, coord, coordMin, coordMax, opt
 %
 % Inputs:
 %   Arrays - Array to be cropped.
-%   coord (Repeating) - Coordinate vector of each dimension. If empty, this
-%       dimension will be ignored.
+%   coord (Repeating) - Coordinate vector of each dimension. If empty,
+%       this dimension will be ignored.
 %   coordMin (Repeating) - Min value of coord to remain in cropped array.
 %       If empty, will be equal to "min(coord)".
 %   coordMax (Repeating) - Max value of coord to remain in cropped array.
@@ -32,7 +32,7 @@ arguments (Input)
     Array;
 end
 arguments (Input, Repeating)
-    coord {mustBeVectorOrEmpty};
+    coord(:, 1);
     coordMin {mustBeReal, mustBeScalarOrEmpty};
     coordMax {mustBeReal, mustBeScalarOrEmpty};
 end
@@ -47,6 +47,8 @@ arguments (Output, Repeating)
     coordsOut;
 end
 
+mustHaveValidCoordinateVectors(Array, coord, AllowEmptyCoord=true);
+
 %% Check Input Size
 arraySize = size(Array, 1:max([ndims(Array), numel(coord), nargout - 1]));
 if numel(coord) < numel(arraySize)
@@ -55,44 +57,48 @@ if numel(coord) < numel(arraySize)
     coord = [coord, cell(1, numel(arraySize) - numel(coord))];
 end
 
-%% Find Valid Range for Each Dimension
-isInRange = cell(numel(coord), 1);
-for ii = 1:numel(isInRange)
-    if isempty(coord{ii})
-        if (~isempty(coordMin{ii}) || ~isempty(coordMax{ii})) ...
-                && (arraySize(ii) > 0)
+%% Update Empty Min and Max
+for dd = 1:numel(coord)
+    if isempty(coord{dd})
+        if (~isempty(coordMin{dd}) || ~isempty(coordMax{dd})) ...
+                && arraySize(dd) ~= 0
             error("CNDE:cropArrayEmptyCoordWithMinMaxSpecified", ...
                 "Coordinate vector for dimension (%d) is empty, " + ...
-                "but a min or max value was specified.", ii);
+                "but a min or max value was specified.", dd);
         end
-
-        isInRange{ii} = true(arraySize(ii), 1);
         continue;
-    elseif (numel(coord{ii}) ~= arraySize(ii)) && (arraySize(ii) ~= 1)
-        error("CNDE:cropArrayCoordSizeMismatch", ...
-            "Coordinate vector for dimension (%d) is not " + ...
-            "compatible with input array size.", ii);
     end
 
-    cMin = coordMin{ii};
-    if isempty(cMin)
-        cMin = min(coord{ii});
+    if isempty(coordMin{dd})
+        coordMin{dd} = min(coord{dd});
     end
 
-    cMax = coordMax{ii};
-    if isempty(cMax)
-        cMax = max(coord{ii});
+    if isempty(coordMax{dd})
+        coordMax{dd} = max(coord{dd});
     end
+end
+
+
+%% Find Valid Range for Each Dimension
+isInRange = cell(numel(coord), 1);
+for dd = 1:numel(coord)
+    if isempty(coord{dd})
+        isInRange{dd} = true(arraySize(dd), 1);
+        continue;
+    end
+
+    cMin = coordMin{dd};
+    cMax = coordMax{dd};
 
     if options.RoundMinMaxToNearestCoord
-        [~, minInd] = min(abs(coord{ii} - cMin));
-        cMin = coord{ii}(minInd);
+        [~, minInd] = min(abs(coord{dd} - cMin));
+        cMin = coord{dd}(minInd);
 
-        [~, maxInd] = min(abs(coord{ii} - cMax));
-        cMax = coord{ii}(maxInd);
+        [~, maxInd] = min(abs(coord{dd} - cMax));
+        cMax = coord{dd}(maxInd);
     end
 
-    isInRange{ii} = (coord{ii}(:) >= cMin) & (coord{ii}(:) <= cMax);
+    isInRange{dd} = (coord{dd}(:) >= cMin) & (coord{dd}(:) <= cMax);
 end
 
 %% Crop Output Array
@@ -100,27 +106,15 @@ ArrayOut = Array(isInRange{:});
 
 %% Crop Output Coordinate Vectors
 coordsOut = cell(numel(coord), 1);
-for ii = 1:numel(coord)
-    if isempty(coord{ii})
-        coordsOut{ii} = [];
+for dd = 1:numel(coord)
+    if isempty(coord{dd})
+        coordsOut{dd} = [];
         continue;
     end
     
-    coordsOut{ii} = vectorize(coord{ii}(isInRange{ii}), ii);
+    coordsOut{dd} = vectorize(coord{dd}(isInRange{dd}), dd);
 end
 
 end
 
-
-%% Argument Validation Functions
-function mustBeVectorOrEmpty(coord)
-    if isempty(coord)
-        return;
-    end
-    
-    if sum(size(coord) ~= 1) > 1
-        throwAsCaller(MException("CNDE:mustBeVectorOrEmpty", ...
-            "Argument must be a vector or be empty."));
-    end
-end
 

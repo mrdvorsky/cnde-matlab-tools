@@ -1,31 +1,27 @@
-function [varargout] = zeropadArray(Arrays, coord, options)
+function [ArrayPadded, coordsPadded] = zeropadArray(Array, coords, options)
 %Zero-pad multidimensional gridded data.
 % This function zero-pads data from a multidimensional array, and
 % extrapolates the uniform linear grid coordinate vectors.
 %
 % Example Usage:
-%   [Img, x, y] = zeroPadArray(Img, x, y, ZeroPadPercent=100);      % Double dim sizes
-%   [Img, x, y] = zeroPadArray(Img, x, y, ZeroPadPercent=[100, 0]); % Only pad x
-%   [Img, x, ~] = zeroPadArray(Img, x, [], ZeroPadPercent=100);     % Only pad x
-%   [Img, ~, y] = zeroPadArray(Img, [], y, ZeroPadCount=20);        % Pad 20 elements each
+%   [Img, x, y] = padArray(Img, x, y, ZeroPadPercent=100);      % Double the size of each dim
+%   [Img, ~, ~] = padArray(Img, [], [], ZeroPadPercent=100);    % Same as above 
+%   [Img, x, y] = padArray(Img, x, y, ZeroPadPercent=[100, 0]); % Only pad x
+%   [Img, x, y] = padArray(Img, x, y, ZeroPadCount=20);         % Pad 20 elements each
 %   
 %   % Works with any number of dimensions.
-%   [Array, x, y, z, ...] = zeroPadArray(Array, x, y, z, ...);
-%
-%   % Can work on multiple broadcastable arrays at the same time.
-%   [ImgAll, x, y, ...] = zeroPadArray({Img1, Img2, ...}, x, y, ...);
-%   [Img1, Img2, ...] = ImgAll{:};
+%   [Array, x, y, z, ...] = padArray(Array, x, y, z, ...);
 %
 %
 % Inputs:
-%   Arrays - Array or cell array of compatible arrays to be cropped.
-%   coord (Repeating) - Coordinate vector of each dimension. If empty, this
-%       dimension will be ignored.
+%   Array - Array to be padded.
+%   coords (Repeating) - Coordinate vector of each dimension. If empty,
+%       the corresponding dimension will be ignored.
 %
 % Outputs:
-%   ArraysCropped (Repeating) - Padded input array or arrays (if cell
-%       array input).
-%   coordCropped (Repeating) - Padded coordinate vector of each dimension.
+%   ArrayPadded (Repeating) - Padded input array.
+%   coordsPadded (Repeating) - Coordinate vector of each dimension,
+%       linearly extrapolated to match the "ArrayPadded" size.
 %
 % Named Arguments:
 %   ZeroPadPercent (0) - Percent size increase, either a scalar or an array
@@ -39,106 +35,90 @@ function [varargout] = zeropadArray(Arrays, coord, options)
 % Author: Matt Dvorsky
 
 arguments (Input)
-    Arrays {mustBeValidArraysArgument};
+    Array;
 end
 arguments (Input, Repeating)
-    coord {mustBeVectorOrEmpty};
+    coords(:, 1);
 end
 arguments (Input)
-    options.ZeroPadPercent(1, :) {mustBeNonnegative};
-    options.ZeroPadCount(1, :) {mustBeNonnegative} = 0;
+    options.PadPercent(1, :) {mustBeNonnegative, ...
+        mustBeValidPadSpec(options.PadPercent, coords)};
+    options.PadCount(1, :) {mustBeNonnegative, ...
+        mustBeValidPadSpec(options.PadCount, coords)} = 0;
     options.Direction(1, :) string {mustBeMember(options.Direction, ...
-        ["both", "pre", "post"])} = "both";
+        ["both", "pre", "post"]), ...
+        mustBeValidPadSpec(options.Direction, coords)} = "both";
 end
 
-% arguments (Output)
-%     ArraysOut;
-% end
-% arguments (Output, Repeating)
-%     coordOut;
-% end
-
-if ~iscell(Arrays)
-    Arrays = {Arrays};
+arguments (Output)
+    ArrayPadded;
 end
+arguments (Output, Repeating)
+    coordsPadded;
+end
+
+mustHaveValidCoordinateVectors(Array, coords, AllowEmptyCoord=true);
 
 %% Check Inputs
-if isfield(options, "ZeroPadPercent") && isscalar(options.ZeroPadPercent)
-    options.ZeroPadPercent = repmat(options.ZeroPadPercent, 1, numel(coord));
+if isfield(options, "PadPercent") && isscalar(options.PadPercent)
+    options.PadPercent = repmat(options.PadPercent, 1, numel(coords));
 end
 
-if isscalar(options.ZeroPadCount)
-    options.ZeroPadCount = repmat(options.ZeroPadCount, 1, numel(coord));
+if isscalar(options.PadCount)
+    options.PadCount = repmat(options.PadCount, 1, numel(coords));
 end
 
 if isscalar(options.Direction)
-    options.Direction = repmat(options.Direction, 1, numel(coord));
-end
-
-if (isfield(options, "ZeroPadPercent") ...
-        && numel(options.ZeroPadPercent) ~= numel(coord)) ...
-        || numel(options.ZeroPadCount) ~= numel(coord) ...
-        || numel(options.Direction) ~= numel(coord)
-    error("'ZeroPadPercent', 'ZeroPadCount', and 'Direction' must be " + ...
-        "scalars or vectors with size matching the number of " + ...
-        "grid coordinates.");
+    options.Direction = repmat(options.Direction, 1, numel(coords));
 end
 
 %% Calculate Padding Sizes
-compatArraySize = broadcastSize(Arrays{:}, Dimension=1:numel(coord));
+arraySize = size(Array, 1:numel(coords));
 
-if isfield(options, "ZeroPadPercent")
-    options.ZeroPadCount = (0.01 * options.ZeroPadPercent) ...
-        .* compatArraySize;
+if isfield(options, "PadPercent")
+    options.PadCount = (0.01 * options.PadPercent) ...
+        .* arraySize;
 end
 
 %% Pad Output Arrays
-padCounts = ceil(options.ZeroPadCount);
-varargout = cell(numel(Arrays) + numel(coord), 1);
-for ii = 1:numel(Arrays)
-    for dd = 1:numel(coord)
-        if isempty(coord{dd}) || (padCounts(dd) == 0)
-            continue;
-        end
-        if size(Arrays{ii}, dd) ~= numel(coord{dd})
-            if size(Arrays{ii}, dd) == 1
-                continue;
-            end
-            error("Grid coordinate vectors must match the array size(s).");
-        end
+padCounts = ceil(options.PadCount);
 
-        zeroArray = zeros([size(Arrays{ii}, 1:dd - 1), padCounts(dd), ...
-            size(Arrays{ii}, dd + 1:ndims(Arrays{ii}))]);
-        if strcmp(options.Direction(dd), "pre")
-            Arrays{ii} = cat(dd, zeroArray, Arrays{ii});
-        else
-            Arrays{ii} = cat(dd, Arrays{ii}, zeroArray);
-            if strcmp(options.Direction(dd), "both")
-                Arrays{ii} = circshift(Arrays{ii}, round(0.5 * padCounts(dd)), dd);
-            end
-        end
+for dd = 1:numel(coords)
+    if padCounts(dd) == 0
+        continue;
     end
 
-    varargout{ii} = Arrays{ii};
+    zeroArray = zeros([size(Array, 1:dd - 1), padCounts(dd), ...
+        size(Array, dd + 1:ndims(Array))]);
+    if strcmp(options.Direction(dd), "pre")
+        Array = cat(dd, zeroArray, Array);
+    else
+        Array = cat(dd, Array, zeroArray);
+        if strcmp(options.Direction(dd), "both")
+            Array = circshift(Array, round(0.5 * padCounts(dd)), dd);
+        end
+    end
 end
 
+ArrayPadded = Array;
+
 %% Crop Output Coordinate Vectors
-coordOffset = numel(Arrays);
-for dd = 1:numel(coord)
-    if isempty(coord{dd})
-        varargout{dd + coordOffset} = [];
+coordsPadded = cell(numel(coords), 1);
+for dd = 1:numel(coords)
+    if isempty(coords{dd})
+        coordsPadded{dd} = [];
         continue;
     end
     
-    outputInds = 1:(numel(coord{dd}) + padCounts(dd));
+    outputInds = 1:(numel(coords{dd}) + padCounts(dd));
     if strcmp(options.Direction(dd), "pre")
         outputInds = outputInds - padCounts(dd);
     elseif strcmp(options.Direction(dd), "both")
         outputInds = outputInds - round(0.5 * padCounts(dd));
     end
 
-    varargout{dd + coordOffset} = reshape(...
-        interp1(coord{dd}(:), outputInds, "linear", "extrap"), ...
+    coordsPadded{dd} = reshape(...
+        interp1(coords{dd}(:), outputInds, "linear", "extrap"), ...
         [ones(1, dd - 1), numel(outputInds), 1]);
 end
 
@@ -147,13 +127,6 @@ end
 
 
 %% Argument Validation Functions
-function mustBeValidArraysArgument(Arrays)
-    if iscell(Arrays)
-        mustHaveCompatibleSizes(Arrays{:});
-        return;
-    end
-end
-
 function mustBeVectorOrEmpty(coord)
     if isempty(coord)
         return;
@@ -163,5 +136,14 @@ function mustBeVectorOrEmpty(coord)
         throwAsCaller(MException("CNDE:mustBeVectorOrEmpty", ...
             "Argument must be a vector or be empty."));
     end
+end
+
+function mustBeValidPadSpec(padSpec, coords)
+    if any(numel(padSpec) == [1, numel(coords)])
+        return;
+    end
+    throwAsCaller(MException("CNDE:cropArrayMustBeValidPadSpec", ...
+        "Value must be scalars or vectors with size matching " + ...
+        "the number of grid coordinates."));
 end
 
