@@ -1,4 +1,4 @@
-function [ArrayPadded, coordsPadded] = zeropadArray(Array, coords, options)
+function [ArrayPadded, coordsPadded] = padArray(Array, coords, options)
 %Zero-pad multidimensional gridded data.
 % This function zero-pads data from a multidimensional array, and
 % extrapolates the uniform linear grid coordinate vectors.
