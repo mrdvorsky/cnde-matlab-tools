@@ -1,4 +1,4 @@
-function [] = mustBeValidDimension(dim, options)
+function mustBeValidDimension(dim, options)
 %Validate that value is a valid dimension index.
 % Throws an error if dim is not a positive integer vector (or scalar) or
 % the string "all" or 'all'. If AllowVector is set to false (default is

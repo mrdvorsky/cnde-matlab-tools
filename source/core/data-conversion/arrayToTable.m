@@ -1,5 +1,5 @@
-function [varargout] = arrayToTable(gridVectors, Data, options)
-%Flattens a multi-dimensional array(s) with to table form.
+function [DataTable] = arrayToTable(Data, coords)
+%Flattens a multi-dimensional array(s) with coordinates to table form.
 % This function takes an array along with a cell array of grid vectors
 % describing each dimension of the array, and flattens it into a table
 % where each row contains one elements of the array and its coordinates
@@ -7,10 +7,13 @@ function [varargout] = arrayToTable(gridVectors, Data, options)
 % be provided, as long as they "broadcastable", each adding an additional
 % column to the output.
 %
-% The output is a 2D array, where each column is either one of the
-% linearized input arrays or a coordinate. See below, which shows the
-% table and array forms for a 2D example. Note that this function will
-% work for any number of dimensions.
+% ** Note that the inputs can be any type (e.g., strings), and the output
+% table columns will preserve the type.
+%
+% The output is a table, where each column is either one of the
+% linearized input arrays or a coordinate, with the type matching the
+% input. See below, which shows the table and array forms for a 2D
+% example. Note that this function will work for any number of dimensions.
 %
 %       *Table Form*
 %   +-----+-----+------+
@@ -31,80 +34,68 @@ function [varargout] = arrayToTable(gridVectors, Data, options)
 %   +-----+-----+------+
 % 
 % Example Usage:
-%   DataTable = arrayToTable({x, y, z}, Data);
-%   DataTable = arrayToTable({x, y, z}, Data1, Data2, ...);
+%   DataTable = arrayToTable(Data, x, y, z, ...);
 %
-%   % Coordinates and data outputs can be separated.
-%   [xFlat, yFlat, zFlat, DataFlat1, ...] = arrayToTable(...
-%       {x, y, z}, Data1, ..., SeparateOutputs=true);
+%   % Each data element will add an additional column to the table.
+%   DataTable = arrayToTable({Data1, Data2, ...}, x, y, z);
 %
 %
 % Inputs:
-%   gridVectors - Cell array of vectors defining grid coordinates for each
-%       dimension of the array input(s).
-%   Data (Repeating) - Arrays of arbitrary size. All elements must have
-%       compatible sizes.
+%   Data - Nd-array of arbitrary size. Can be a cell array containg
+%       multiple nd-arrays of broadcastable sizes.
+%   coords (Repeating) - Vectors defining grid coordinates for each
+%       dimension of the array input(s). The length of each vector must
+%       match the size of the corresponding "Data" dimension.
 %
 % Outputs:
-%   DataTable - 2D array, where each column is the linearized column vector
-%       corresponding to either the grid coordinates or the array value(s).
-%   DataFlat (Repeating) - If SeparateOutputs is true, each output
-%       parameter will be a 1D column vector corresponding to the column
-%       of the DataTable output above.
-%       
-% Named Arguments:
-%   SeparateOutputs (false) - If true, each output parameter will be a 1D
-%       column vector corresponding to each input. If false, the output
-%       will be a 2D array made up of these column vectors.
+%   DataTable - Matlab Table, where each column is the linearized column
+%       vector corresponding to either the grid coordinates (which will be
+%       first) or the nd-array value(s).
 %
 % Author: Matt Dvorsky
 
 arguments
-    gridVectors(1, :) cell {mustBeNonempty};
+    Data;
 end
 arguments (Repeating)
-    Data {mustBeNonempty};
+    coords(1, :);
 end
-arguments
-    options.SeparateOutputs(1, 1) logical = true;
+
+if ~iscell(Data)
+    Data = {Data};
 end
+mustHaveValidCoordinateVectors(Data, coords, AllowBroadcasting=true);
 
 %% Check Inputs
 % Make all elements of Data be equal size.
 [Data{:}] = broadcastArrays(Data{:});
 
 % Check for missing grid vectors.
-if numel(gridVectors) < ndims(Data{1})
-    warning("Number of grids (%d) is less than the number of " + ...
-        "dimensions of Data (%d). Extra grids will be added.", ...
-        numel(gridVectors), ndims(Data{1}));
-    gridVectors = [gridVectors, arrayfun(@(x) 1:x, ...
-        size(Data{1}, numel(gridVectors) + 1:ndims(Data{1})), ...
+if numel(coords) < ndims(Data{1})
+    warning("CNDE:arrayToTableMissingGridVectors", ...
+        "Number of grids (%d) is less than the number of " + ...
+        "dimensions of Data (%d). Extra grids will be added. " + ...
+        "It is recommended to have grid vectors for each " + ...
+        "non-singleton dimension", ...
+        numel(coords), ndims(Data{1}));
+    coords = [coords, arrayfun(@(x) 1:x, ...
+        size(Data{1}, numel(coords) + 1:ndims(Data{1})), ...
         UniformOutput=false)];
 end
 
-% Make sure grid vector sizes match Data dimension sizes.
-for ii = 1:numel(gridVectors)
-    if size(Data{1}, ii) ~= numel(gridVectors{ii}) && ...
-            size(Data{1}, ii) ~= 1 && numel(gridVectors{ii}) ~= 1
-        error("Size mismatch in dimension (%d). The size of Data " + ...
-            "along this dimension (%d) and the number of elements " + ...
-            "in the corresponding grid vector (%d) must either be " + ...
-            "the same or one must be singleton.", ...
-            ii, size(Data{1}, ii), numel(gridVectors{ii}));
-    end
-end
-
 %% Set Outputs
-% Reshape each grid vector so that it has the correct vector dimension.
-for ii = 1:numel(gridVectors)
-    gridVectors{ii} = reshape(gridVectors{ii}, ...
-        [ones(1, ii - 1), numel(gridVectors{ii}), 1]);
-end
+[coords{1:numel(coords)}] = ndgrid(coords{:});
 
-% Use flattenArrays to do the work.
-[varargout{1:nargout}] = flattenArrays(gridVectors{:}, Data{:}, ...
-    SeparateOutputs=options.SeparateOutputs);
+[coordAndData{1:(numel(coords) + numel(Data))}] = ...
+    broadcastArrays(coords{:}, Data{:});
+
+tableCell = cellfun(@(arr) arr(:), coordAndData, UniformOutput=false);
+colNames = [compose("x%d", 1:numel(coords)), ...
+    compose("data%d", 1:numel(Data))];
+
+%% Arrange into Matlab Table
+DataTable = table(tableCell{:}, ...
+    VariableNames=colNames);
 
 end
 

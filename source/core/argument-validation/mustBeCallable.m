@@ -1,4 +1,4 @@
-function [] = mustBeCallable(fun, funArgs, callArgString)
+function mustBeCallable(fun, funArgs, callArgString)
 %Validate that value is callable with given arguments.
 % Throws an error if "fun" is not able to be called with the arguments
 % given by the cell array "funArgs". In other words, the function call

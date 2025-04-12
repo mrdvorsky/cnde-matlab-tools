@@ -47,7 +47,7 @@ arguments (Output, Repeating)
     coordsOut;
 end
 
-mustHaveValidCoordinateVectors(Array, coord, AllowEmptyCoord=true);
+mustHaveValidCoordinateVectors({Array}, coord, AllowEmptyCoord=true);
 
 %% Check Input Size
 arraySize = size(Array, 1:max([ndims(Array), numel(coord), nargout - 1]));

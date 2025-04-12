@@ -1,4 +1,4 @@
-function [] = mustBeNonemptyRepeatingArgs(Arrays)
+function mustBeNonemptyRepeatingArgs(Arrays)
 %Validate that the input cell array (for Repeating input) is nonempty.
 % Throws an error if the input cell array is empty. Due to the error
 % message, this validator is suitable for when you have a repeating

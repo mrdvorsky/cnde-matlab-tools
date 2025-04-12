@@ -1,4 +1,4 @@
-function [] = mustHaveEqualSizes(Arrays, options)
+function mustHaveEqualSizes(Arrays, options)
 %Validate that input arrays have equal sizes.
 % Throws an error if the input arrays do not have equal sizes. Optionally,
 % only checks specified dimensions for equality.

@@ -1,4 +1,4 @@
-function [] = mustBeBroadcastable(Arrays, options)
+function mustBeBroadcastable(Arrays, options)
 %Validate that input arrays are broadcastable.
 % Throws an error if the input arrays do not have broadcastable sizes
 % relative to each other (see MATLAB documentation on compatible array

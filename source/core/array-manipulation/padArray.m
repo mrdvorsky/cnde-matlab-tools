@@ -59,7 +59,7 @@ arguments (Output, Repeating)
     coordsPadded;
 end
 
-mustHaveValidCoordinateVectors(Array, coords, AllowEmptyCoord=true);
+mustHaveValidCoordinateVectors({Array}, coords, AllowEmptyCoord=true);
 
 %% Check Inputs
 if isfield(options, "PadPercent") && isscalar(options.PadPercent)

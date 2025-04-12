@@ -86,8 +86,7 @@ classdef tester_cropArray < matlab.unittest.TestCase
             testCase.verifyEqual(ImgCrop, Img(5:9, :, 1:5));
             testCase.verifyEqual(xCrop, (-2:2:7).');
             testCase.verifyEqual(yCrop, y);
-            testCase.verifySize(zCrop, [1, 1, 5]);
-            testCase.verifyEqual(zCrop(:), (-1:3).');
+            testCase.verifyEqual(zCrop, reshape(-1:3, 1, 1, []));
         end
 
         %% Error Condition Tests
@@ -196,8 +195,7 @@ classdef tester_cropArray < matlab.unittest.TestCase
             testCase.verifySize(ImgCrop, [11, 0, 3]);
             testCase.verifyEqual(xCrop, x(:));
             testCase.verifyEmpty(yCrop);
-            testCase.verifySize(zCrop, [1, 1, 3]);
-            testCase.verifyEqual(zCrop(:), (2:2:6).');
+            testCase.verifyEqual(zCrop, reshape(2:2:6, 1, 1, []));
         end
     end
 end

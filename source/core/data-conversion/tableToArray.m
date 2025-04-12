@@ -1,6 +1,6 @@
-function [varargout] = tableToArray(numDims, Data, options)
-%Convert a 2D table into a uniform nd-array with grids.
-% This functions takes in a 2D array, where each row describes a data
+function [Data, coords] = tableToArray(numDims, DataTable, options)
+%Convert a table into a uniform nd-array with grids.
+% This functions takes in a Matlab Table, where each row describes a data
 % point(s) with coordinates (e.g., each row is [x, y, z, d1, d2, ...]),
 % and returns a multi-dimensional array(s) describing each data column
 % along with grid vectors describing each dimension. The 2D array
@@ -30,33 +30,34 @@ function [varargout] = tableToArray(numDims, Data, options)
 %   |  9  |  1  |  d12 |
 %   +-----+-----+------+
 %
-% Note that the input data can also be specified as multiple 1D/2D
-% arrays with the same number of rows that will be concatenated
-% column-wise. The "numDims" argument specifies the expected number of
-% dimensions in the gridded data set. By default, the dimensions of the
-% data set will be determined using columns 1:numDims in order, although
-% this can be changed using the "GridColumns" argument. The order of the
-% "GridColumns" argument changes which grid dimension corresponds to each
-% column. For example, the first dimension of the output array(s) will be
-% described by the column with index "GridColumns(1)".
+% Note that the "numDims" argument specifies the expected number of
+% dimensions in the gridded data set. By default, the coordinate vectors
+% of the data set will be determined using columns 1:numDims in order,
+% although this can be changed using the "GridColumns" argument. The order
+% of the "GridColumns" argument changes which grid dimension corresponds
+% to each column. For example, the nth dimension of the output array(s)
+% will be described by the column with index "GridColumns(n)".
 %
 % Example Usage:
-%   % These two calls do the same thing.
-%   [x, y, Data] = tableToArray(2, xFlat, yFlat, DataFlat);
-%   [x, y, Data] = tableToArray(2, [xFlat, yFlat, DataFlat]);
+%   % Both use cases below will result in the same output.
+%   [Data, x, y] = tableToArray(2, [xCol, yCol, DataCol]);
+%   [Data, x, y] = tableToArray(2, table(xCol, yCol, DataCol));
 %
 %   % Can be done with any number of dimensions.
-%   [x, y, z, Data] = tableToArray(3, xFlat, yFlat, zFlat, DataFlat);
-%   [x, y, z, Data1, Data2, ...] = tableToArray(3, ...
-%       xFlat, yFlat, zFlat, DataFlat1, DataFlat2, ...);
+%   [Data, x, y, z] = tableToArray(3, [xCol, yCol, zCol, DataCol]);
+%
+%   % Multiple data columns will result in a cell array output.
+%   [DataAll, x, y, z] = tableToArray(3, ...
+%       [xCol, yCol, zCol, DataCol1, DataCol2, ...]);
+%   [Data1, Data2, ...] = DataAll{:};
 %
 %   % If coordinate grid columns are not first, or if they are in the
-%   %  wrong order, then the locations can be specified using the
-%   %  "GridColumns" argument.
-%   [Data, x, y] = tableToArray(2, DataFlat, xFlat, yFlat, ...
+%   % wrong order, then the locations can be specified using the
+%   % "GridColumns" argument.
+%   [Data, x, y] = tableToArray(2, [DataCol, xCol, yCol], ...
 %       GridColumns=[2, 3]).
-%   [x, y, Data] = tableToArray(2, xFlat, yFlat, DataFlat, ...
-%       GridColumns=[2, 1]).    % Data will be numel(y)-by-numel(x)
+%   [Data, x, y] = tableToArray(2, [yCol, xCol, DataCol], ...
+%       GridColumns=[2, 1]).
 %
 %
 % The output data and coordinate vectors are all broadcastable with each
@@ -65,80 +66,84 @@ function [varargout] = tableToArray(numDims, Data, options)
 %
 % Inputs:
 %   numDims - Number of dimensions described by the input data.
-%   Data (Repeating) - 1D/2D array where each column corresponds to either
-%       a grid coordinate or a data point. All arrays must have the same
-%       number of rows and will be concatenated together.
+%   Data - Table where each column corresponds to either a grid
+%       coordinate or a data point. As described above, the first
+%       "numDims" columns should be the n-dimensional coordinates,
+%       although this can be changed using the "GridColumns" argument.
 %
 % Outputs:
-%   The position of each output parameter will match the index of the
-%       column it corresponds to. Each is either a grid coordinate or a
-%       data array, depending on which columns were specified by the
-%       "GridColumns" argument.
-%   [x, y, z, ...] - Grid coordinate vectors. The dimension of each vector
-%       will match the dimension it describes. By default, this means x
-%       is nx-by-1, y is 1-by-ny, z is 1-by-1-by-nz, and so on.
-%   [Data1, Data2, ...] - The data for each data column organized into an
-%       nd-array. Permuting the "GridColumns" argument corresponds to
-%       permuting the dimensions of the array.
+%   Data - An nd-array containing the data in the data column. If there
+%       are multiple data columns, this argument will be a cell array
+%       corresponding to each data column, in the order they appear.
+%   [x, y, z, ...] - Grid coordinate vectors, infered from the coordinate
+%       vector columns. The dimension of each vector will match the
+%       dimension it describes. This means "x" is nx-by-1, "y" is 1-by-ny,
+%       "z" is 1-by-1-by-nz, and so on.
 %
 % Named Arguments:
 %   GridColumns (1:numDims) - Array of unique column indices describing
 %       which columns of the input are grid coordinates. Specify this if
 %       the first columns of the input data are not the grid coordinates or
-%       if you want to reorder the dimensions of the output.
+%       if they are in the wrong order.
 %
 % Author: Matt Dvorsky
 
-arguments
+arguments (Input)
     numDims(1, 1) {mustBeInteger, mustBePositive};
+    DataTable(:, :) {mustBeNonempty};
+
+    options.GridColumns(1, :) {mustBeValidGridColumns(...
+        options.GridColumns, numDims, DataTable)} = 1:numDims;
 end
-arguments (Repeating)
-    Data(:, :) {mustBeNonempty};
+
+arguments (Output)
+    Data;
 end
-arguments
-    options.GridColumns(1, :) {mustBeInteger, mustBePositive} = [];
+arguments (Output, Repeating)
+    coords;
 end
 
 %% Check Inputs
-% Concatenate Data cell array into one 2D table.
-Data = cat(2, Data{:});
+numColumns = size(DataTable, 2);
 
-% Get number of columns.
-numColumns = size(Data, 2);
-
-if isempty(options.GridColumns)
-    options.GridColumns = 1:numDims;
-end
-if ~all(options.GridColumns >= 1 & options.GridColumns <= numColumns) ...
-        || numel(unique(options.GridColumns)) ~= numDims
-    error("'GridColumns' arguments must contain (%d) unique and " + ...
-        "valid column indices.", numDims);
+if numColumns <= numel(options.GridColumns)
+    error("CNDE:tableToArrayTooFewColumns", ...
+        "Not enough columns in table.");
 end
 
 %% Determine Grid Vectors
-varargout = cell(numColumns, 1);
+coords = cell(numDims, 1);
 gridDimensions = cell(1, numDims);
-Data = sortrows(Data, flip(options.GridColumns), ...
-    ComparisonMethod="real");
+try
+    DataTable = sortrows(DataTable, flip(options.GridColumns));
+catch ex
+    throw(addCause(ex, MException(...
+        "CNDE:tableToArrayNonScalarTableElement", ...
+        "The provided table likely has non-scalar elements.")));
+end
 
 % Loop over input columns to find grid vectors
 currentStep = 1;
-for ii = 1:numel(options.GridColumns)
-    columnInd = options.GridColumns(ii);
+for dd = 1:numel(options.GridColumns)
+    columnInd = options.GridColumns(dd);
 
-    gridCoords = reshape(Data(:, columnInd), currentStep, []);
+    DataCol = DataTable(:, columnInd);
+    if istable(DataTable)
+        DataCol = table2array(DataCol);
+    end
+    gridCoords = reshape(DataCol, currentStep, []);
     [gridValCounts, gridVals] = groupcounts(gridCoords(1, :).');
 
     % Check that the grid values are repeating with the proper period and
     % that the multiplicities of each value are equal.
     if all(gridCoords(1, :) == gridCoords, "all") ...
             && all(gridValCounts(1) == gridValCounts)
-        varargout{columnInd} = reshape(gridVals, ...
-            [ones(1, columnInd - 1), numel(gridVals), 1]);
+        coords{dd} = vectorize(gridVals, dd);
         currentStep = currentStep * numel(gridVals);
-        gridDimensions{ii} = numel(gridVals);
+        gridDimensions{dd} = numel(gridVals);
     else
-        error("Column (%d) of input cannot be arranged into a " + ...
+        error("CNDE:tableToArrayNonuniformData", ...
+            "Column (%d) of input cannot be arranged into a " + ...
             "uniform grid. Check that the first (%d) columns of " + ...
             "the input are grid coordinates or specify these " + ...
             "columns using the 'GridColumns' argument.", columnInd, numDims);
@@ -146,24 +151,48 @@ for ii = 1:numel(options.GridColumns)
 end
 
 %% Check for Extra Data
-extraDimSize = size(Data, 1) ./ prod(cell2mat(gridDimensions));
+extraDimSize = size(DataTable, 1) ./ prod(cell2mat(gridDimensions));
 if extraDimSize > 1     %#ok<BDSCI>
-    warning("Extra dimensions found in input data. An additional " + ...
-        "dimenion (%d) will be added to the output to accommodate " + ...
-        "extra data.", numDims + 1);
-    
-    % Reorganize extra dimension so it is last.
-    Data = reshape(pagetranspose(reshape(Data, extraDimSize, [], numColumns)), ...
-        [], numColumns);
+    warning("CNDE:tableToArrayExtraDataWarning", ...
+        "Extra dimensions found in input data. An additional " + ...
+        "dimension (%d) will be added to the output to accommodate " + ...
+        "extra data. This is potentially not an issue if " + ...
+        "the row order of the input table is consistent, since the " + ...
+        "row sorting methods are stable.", numDims + 1);
 end
 
 %% Assign Output
-for cc = 1:numColumns
-    if isempty(varargout{cc})
-        varargout{cc} = reshape(Data(:, cc), gridDimensions{:}, []);
+dataColumns = setdiff(1:numColumns, options.GridColumns);
+Data = cell(numel(dataColumns), 1);
+for cc = 1:numel(dataColumns)
+    DataCol = DataTable(:, dataColumns(cc));
+    if istable(DataTable)
+        DataCol = table2array(DataCol);
     end
+    Data{cc} = shiftdim(...
+        reshape(DataCol, extraDimSize, gridDimensions{:}, []), ...
+        1);
 end
 
+if isscalar(Data)
+    Data = Data{1};
+end
+
+end
+
+
+%% Argument Validation Function
+function mustBeValidGridColumns(gridCol, numDims, DataTable)
+    mustBeInteger(gridCol);
+    mustBePositive(gridCol);
+    
+    if numel(unique(gridCol)) ~= numel(gridCol) ...
+            || numel(gridCol) ~= numDims ...
+            || max(gridCol) > size(DataTable, 2)
+        throwAsCaller(MException("CNDE:tableToArrayInvalidGridColumn", ...
+            "'GridColumns' arguments must contain (%d) unique and " + ...
+            "valid column indices.", numDims));
+    end
 end
 
 
