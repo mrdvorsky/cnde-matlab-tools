@@ -67,6 +67,7 @@ classdef tester_tableToArray < matlab.unittest.TestCase
             testCase.verifyEqual(yOut, y(:).');
         end
 
+        %% Grid Column Tests
         function test_gridColumnsOption(testCase)
             x = 1:2;
             y = 3:5;
@@ -155,7 +156,7 @@ classdef tester_tableToArray < matlab.unittest.TestCase
             DataTable = table(X(:), Y(:), D(:));
 
             testCase.verifyError(@() tableToArray(3, DataTable), ...
-                "CNDE:tableToArrayTooFewColumns");
+                "tableToArray:tooFewColumns");
         end
 
         function testError_InvalidGridColumns(testCase)
@@ -169,13 +170,13 @@ classdef tester_tableToArray < matlab.unittest.TestCase
             % Invalid GridColumns specification
             testCase.verifyError(...
                 @() tableToArray(2, DataTable, GridColumns=[1, 1]), ...
-                "CNDE:tableToArrayInvalidGridColumn");
+                "tableToArray:invalidGridColumn");
             testCase.verifyError...
                 (@() tableToArray(2, DataTable, GridColumns=[1, 4]), ...
-                "CNDE:tableToArrayInvalidGridColumn");
+                "tableToArray:invalidGridColumn");
             testCase.verifyError(...
                 @() tableToArray(2, DataTable, GridColumns=[1]), ...
-                "CNDE:tableToArrayInvalidGridColumn");
+                "tableToArray:invalidGridColumn");
         end
 
         function testError_nonuniformData1(testCase)
@@ -186,7 +187,7 @@ classdef tester_tableToArray < matlab.unittest.TestCase
             DataTable = table(x, y, D);
 
             testCase.verifyError(@() tableToArray(2, DataTable), ...
-                "CNDE:tableToArrayNonuniformData");
+                "tableToArray:nonuniformData");
         end
 
         function testError_nonuniformData2(testCase)
@@ -197,7 +198,7 @@ classdef tester_tableToArray < matlab.unittest.TestCase
             DataTable = table(x, y, D);
 
             testCase.verifyError(@() tableToArray(2, DataTable), ...
-                "CNDE:tableToArrayNonuniformData");
+                "tableToArray:nonuniformData");
         end
 
         function testError_nonuniformData3(testCase)
@@ -208,7 +209,7 @@ classdef tester_tableToArray < matlab.unittest.TestCase
             DataTable = table(x, y, D);
 
             testCase.verifyError(@() tableToArray(2, DataTable), ...
-                "CNDE:tableToArrayNonuniformData");
+                "tableToArray:nonuniformData");
         end
 
         function testError_nonScalarTableElements(testCase)
@@ -240,7 +241,7 @@ classdef tester_tableToArray < matlab.unittest.TestCase
             % Verify warning is issued
             [DataOut, xOut, yOut] = testCase.verifyWarning(...
                 @() tableToArray(2, DataTable), ...
-                "CNDE:tableToArrayExtraDataWarning");
+                "tableToArray:extraDataWarning");
 
             % Verify output is still correct
             testCase.verifyEqual(DataOut, D);

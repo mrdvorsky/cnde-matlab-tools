@@ -1,4 +1,4 @@
-function mustBeNonemptyRepeatingArgs(Arrays)
+function mustHaveAtLeastOneRepeatingArg(Arrays)
 %Validate that the input cell array (for Repeating input) is nonempty.
 % Throws an error if the input cell array is empty. Due to the error
 % message, this validator is suitable for when you have a repeating
@@ -8,7 +8,7 @@ function mustBeNonemptyRepeatingArgs(Arrays)
 %   arguments (Repeating)
 %       Arrays;
 %   end
-%   mustBeNonemptyRepeatingArgs(Arrays);     % Throws error if no input arguments.
+%   mustHaveAtLeastOneRepeatingArg(Arrays);     % Throws error if no input arguments.
 %
 % Author: Matt Dvorsky
 
@@ -20,8 +20,8 @@ end
 if ~isempty(Arrays)
     return;
 end
-throwAsCaller(MException("CNDE:mustBeNonemptyRepeatingArgs", ...
-    "Not enough input arguments."));
+throwAsCaller(MException("validators:mustHaveAtLeastOneRepeatingArg", ...
+    "Must have at least one argument."));
 
 end
 

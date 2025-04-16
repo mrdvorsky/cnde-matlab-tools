@@ -6,33 +6,27 @@ classdef tester_vectorize < matlab.unittest.TestCase
     methods (Test)
         %% Basic Functionality Tests
         function test_defaultDim(testCase)
-            arr = [...
-                1, 2; ...
-                3, 4];
+            arr = rand(4, 5, 2);
             vec = vectorize(arr);
-            testCase.verifyEqual(vec, [1; 3; 2; 4]);
+            testCase.verifyEqual(vec, arr(:));
         end
 
         function test_dim1(testCase)
-            arr = [...
-                1, 2; ...
-                3, 4];
+            arr = rand(4, 5, 2);
             vec = vectorize(arr, 1);
-            testCase.verifyEqual(vec, [1; 3; 2; 4]);
+            testCase.verifyEqual(vec, arr(:));
         end
 
         function test_dim2(testCase)
-            arr = [...
-                1, 2; ...
-                3, 4];
+            arr = rand(4, 5);
             vec = vectorize(arr, 2);
-            testCase.verifyEqual(vec, [1, 3, 2, 4]);
+            testCase.verifyEqual(vec, arr(:).');
         end
 
         function test_dim3(testCase)
-            arr = rand(2, 2, 2);
+            arr = compose("%g", rand(2, 2, 2));
             vec = vectorize(arr, 3);
-            testCase.verifyEqual(size(vec), [1, 1, 8]);
+            testCase.verifyEqual(vec, reshape(arr(:), 1, 1, []));
         end
 
         %% Edge Case Tests
@@ -58,12 +52,12 @@ classdef tester_vectorize < matlab.unittest.TestCase
 
         %% Error Condition Tests
         function testError_nonIntegerDim(testCase)
-            testCase.verifyError(@() vectorize([1, 2], 1.5), ...
+            testCase.verifyError(@() vectorize(1:10, 1.5), ...
                 'MATLAB:validators:mustBeInteger');
         end
 
         function testError_nonPositiveDim(testCase)
-            testCase.verifyError(@() vectorize([1, 2], 0), ...
+            testCase.verifyError(@() vectorize(1:10, 0), ...
                 'MATLAB:validators:mustBePositive');
         end
     end

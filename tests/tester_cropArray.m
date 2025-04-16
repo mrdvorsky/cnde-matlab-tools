@@ -111,7 +111,7 @@ classdef tester_cropArray < matlab.unittest.TestCase
                 @() cropArray(Img, ...
                 x, 1, 5, ...
                 [], 1, 5), ...
-                "CNDE:cropArrayEmptyCoordWithMinMaxSpecified");
+                "cropArray:emptyCoordWithMinMaxSpecified");
         end
 
         %% Edge Case Tests
@@ -132,14 +132,14 @@ classdef tester_cropArray < matlab.unittest.TestCase
         function testEdge_roundToNearest(testCase)
             x = -10:2:10;
             y = 0:2:20;
-            Img = ones(numel(x), numel(y));
+            Img = rand(numel(x), numel(y));
 
             [ImgCrop, xCrop, yCrop] = cropArray(Img, ...
                 x, [], [], ...
                 y, 3.1, 3.1, ...
                 RoundMinMaxToNearestCoord=true);
 
-            testCase.verifySize(ImgCrop, [11, 1]);
+            testCase.verifyEqual(ImgCrop, Img(:, 3));
             testCase.verifyEqual(xCrop, x(:));
             testCase.verifyEqual(yCrop, 4);
         end

@@ -1,4 +1,4 @@
-function [varargout] = fftCoordinates(xVectors, options)
+function [kxVectors] = fftCoordinates(xVectors, options)
 %Returns spectral/spatial coordinates of fft output.
 % Given the spatial/spectral coordinates of the input to the fft/ifft
 % function, returns the spectral/spatial coordinates of the output. Works
@@ -41,37 +41,41 @@ function [varargout] = fftCoordinates(xVectors, options)
 %
 % Author: Matt Dvorsky
 
-arguments (Repeating)
+arguments (Input, Repeating)
     xVectors(:, 1) {mustBeReal, mustBeFinite};
 end
-arguments
+arguments (Input)
     options.ApplyFftShift(1, 1) logical = false;
     options.PositiveOutput(1, 1) logical = false;
 end
 
+arguments (Output, Repeating)
+    kxVectors;
+end
+mustBeNonemptyRepeatingArgs(xVectors);
+
 %% Compute Spectral Coordinates
-varargout = cell(min(numel(xVectors), max(1, nargout)), 1);
-for ii = 1:numel(varargout)
-    N = numel(xVectors{ii});
+kxVectors = cell(min(numel(xVectors), max(1, nargout)), 1);
+for dd = 1:numel(kxVectors)
+    N = numel(xVectors{dd});
 
     if N < 2
-        varargout{ii} = zeros(N, 1);
+        kxVectors{dd} = zeros([ones(1, dd - 1), N, 1]);
     else
-        dx = abs(xVectors{ii}(2) - xVectors{ii}(1));
+        dx = abs(xVectors{dd}(2) - xVectors{dd}(1));
         ix = 0:2:(2*N - 1);
         if ~options.PositiveOutput
             ix(ix >= N) = ix(ix >= N) - 2*N;
         end
         
-        varargout{ii} = reshape(pi * ix ./ (N * dx), ...
-            [ones(1, ii - 1), N, 1]);
+        kxVectors{dd} = vectorize(pi * ix ./ (N * dx), dd);
     end
 end
 
 %% Apply FFTshift
 if options.ApplyFftShift
-    for ii = 1:numel(varargout)
-        varargout{ii} = fftshift(varargout{ii});
+    for dd = 1:numel(kxVectors)
+        kxVectors{dd} = fftshift(kxVectors{dd});
     end
 end
 

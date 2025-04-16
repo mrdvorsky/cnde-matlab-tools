@@ -8,7 +8,7 @@ classdef tester_arrayToTable < matlab.unittest.TestCase
         function test_basic2D(testCase)
             x = compose("%d", 1:2);
             y = uint8(3:5);
-            D = rand(2, 3);
+            D = rand(numel(x), numel(y));
 
             DataTable = arrayToTable(D, x, y);
 
@@ -71,15 +71,17 @@ classdef tester_arrayToTable < matlab.unittest.TestCase
 
         function test_highDimensionalInput(testCase)
             dims = {1:2, 1:3, 1:4, 1:5, 1:6};
-            D = rand(2, 3, 4, 5, 6);
+            D1 = rand(2, 3, 4, 5, 6);
+            D2 = compose("%g", rand(2, 1, 4, 1, 6));
 
-            DataTable = arrayToTable(D, dims{:});
+            DataTable = arrayToTable({D1, D2}, dims{:});
 
             % Create expected table using ndgrid
             grid = cell(1, numel(dims));
             [grid{:}] = ndgrid(dims{:});
             grid = cellfun(@(x) x(:), grid, UniformOutput=false);
-            Table_exp = table(grid{:}, D(:), ...
+            D2 = repmat(D2, [1, 3, 1, 5, 1]);
+            Table_exp = table(grid{:}, D1(:), D2(:), ...
                 VariableNames=DataTable.Properties.VariableNames);
 
             testCase.verifyEqual(DataTable, Table_exp);

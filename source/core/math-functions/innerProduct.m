@@ -19,7 +19,7 @@ function [AB] = innerProduct(A, B, dims, options)
 % Example Usage:
 %   [AB] = innerProduct(A, B, 1);
 %   [AB] = innerProduct(A, B, "all");
-%   [AB] = innerProduct(A, B, [1, 4], SummationMode="Mean");
+%   [AB] = innerProduct(A, B, [1, 4], SummationMode="mean");
 %
 %
 % Inputs:
@@ -30,8 +30,8 @@ function [AB] = innerProduct(A, B, dims, options)
 %   AB - Calculated inner product. Equivalent to 'sum(A.*B, dims)'.
 %
 % Named Arguments:
-%   SummationMode ("Sum") - Which mode to use for summation. Must be 
-%       either "Sum" or "Mean".
+%   SummationMode ("sum") - Which mode to use for summation. Must be 
+%       either "sum" or "mean".
 %
 % Author: Matt Dvorsky
 
@@ -39,6 +39,7 @@ arguments
     A;
     B {mustBeBroadcastable(A, B)};
     dims(1, :) {mustBeValidDimension};
+    
     options.SummationMode(1, 1)  string ...
         {mustBeMember(options.SummationMode, ["sum", "mean"])} = "sum";
 end
