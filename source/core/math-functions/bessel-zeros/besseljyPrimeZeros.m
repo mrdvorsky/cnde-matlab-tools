@@ -1,5 +1,5 @@
-function [k, alpha, beta] = besseljyprime_zeros(nu, n, r1, r2)
-%Gives the first "n" *zeros* of the "besseljyprime" function.
+function [k, alpha, beta] = besseljyPrimeZeros(nu, n, r1, r2)
+%Gives the first "n" *zeros* of the "besseljyPrime" function.
 % This function computes the firts "n" trios (alpha, beta, and k) so that
 % "besseljyprime(alpha, beta, nu, k*r1)" and "besseljyprime(alpha, beta, nu, k*r2)"
 % are both equal to zero. Specifically, this function computes the smallest
@@ -18,9 +18,9 @@ function [k, alpha, beta] = besseljyprime_zeros(nu, n, r1, r2)
 % value of besseljy at k*r1 is positive.
 %
 % Example Usage:
-%   [k, alpha, beta] = besseljyprime_zeros(nu, n, r1, r2);
-%   assert(all(besseljyprime(alpha, beta, nu, k*r1) == 0));     % Almost passes.
-%   assert(all(besseljyprime(alpha, beta, nu, k*r2) == 0));     % Almost passes.
+%   [k, alpha, beta] = besseljyPrimeZeros(nu, n, r1, r2);
+%   assert(all(besseljyPrime(alpha, beta, nu, k*r1) == 0));     % Almost passes.
+%   assert(all(besseljyPrime(alpha, beta, nu, k*r2) == 0));     % Almost passes.
 %
 %
 % Inputs:
@@ -31,13 +31,13 @@ function [k, alpha, beta] = besseljyprime_zeros(nu, n, r1, r2)
 %
 % Outputs:
 %   k - First "n" scale factors corresponding to zeros. See above.
-%   alpha - First "n" besseljprime coefficients. See above.
-%   beta - First "n" besselyprime coefficients. See above.
+%   alpha - First "n" besseljPrime coefficients. See above.
+%   beta - First "n" besselyPrime coefficients. See above.
 %
 % Author: Matt Dvorsky
 
 arguments
-    nu(1, 1);
+    nu(1, 1) {mustBeNonnegative, mustBeFinite};
     n(1, 1) {mustBePositive, mustBeInteger};
     r1(1, 1) {mustBePositive};
     r2(1, 1) {mustBePositive, mustBeGreaterThan(r2, r1)};

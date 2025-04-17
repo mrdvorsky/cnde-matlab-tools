@@ -1,6 +1,6 @@
 [
   {
-    "FunctionString": "@(n, z) besseljprime(n, z)",
+    "FunctionString": "@(n, z) besseljPrime(n, z)",
     "n0": [
       -1000,
       -1,
@@ -518,7 +518,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besseljprime(n, z, true)",
+    "FunctionString": "@(n, z) besseljPrime(n, z, true)",
     "n0": [
       -1000,
       -1,
@@ -1036,7 +1036,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besselyprime(n, z)",
+    "FunctionString": "@(n, z) besselyPrime(n, z)",
     "n0": [
       -1000,
       -1,
@@ -1554,7 +1554,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besselyprime(n, z, true)",
+    "FunctionString": "@(n, z) besselyPrime(n, z, true)",
     "n0": [
       -1000,
       -1,
@@ -2072,7 +2072,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besselhprime(n, 1, z)",
+    "FunctionString": "@(n, z) besselhPrime(n, 1, z)",
     "n0": [
       -1000,
       -1,
@@ -2590,7 +2590,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besselhprime(n, 1, z, true)",
+    "FunctionString": "@(n, z) besselhPrime(n, 1, z, true)",
     "n0": [
       -1000,
       -1,
@@ -3108,7 +3108,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besselhprime(n, 2, z)",
+    "FunctionString": "@(n, z) besselhPrime(n, 2, z)",
     "n0": [
       -1000,
       -1,
@@ -3626,7 +3626,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besselhprime(n, 2, z, true)",
+    "FunctionString": "@(n, z) besselhPrime(n, 2, z, true)",
     "n0": [
       -1000,
       -1,
@@ -7252,7 +7252,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besseljyprime(0, 1, n, z)",
+    "FunctionString": "@(n, z) besseljyPrime(0, 1, n, z)",
     "n0": [
       -1000,
       -1,
@@ -7770,7 +7770,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besseljyprime(0, 1, n, z, true)",
+    "FunctionString": "@(n, z) besseljyPrime(0, 1, n, z, true)",
     "n0": [
       -1000,
       -1,
@@ -8288,7 +8288,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besseljyprime(1, 0, n, z)",
+    "FunctionString": "@(n, z) besseljyPrime(1, 0, n, z)",
     "n0": [
       -1000,
       -1,
@@ -8806,7 +8806,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besseljyprime(1, 0, n, z, true)",
+    "FunctionString": "@(n, z) besseljyPrime(1, 0, n, z, true)",
     "n0": [
       -1000,
       -1,
@@ -9324,7 +9324,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besseljyprime(-0.5, 0.5, n, z)",
+    "FunctionString": "@(n, z) besseljyPrime(-0.5, 0.5, n, z)",
     "n0": [
       -1000,
       -1,
@@ -9842,7 +9842,7 @@
     ]
   },
   {
-    "FunctionString": "@(n, z) besseljyprime(-0.5, 0.5, n, z, true)",
+    "FunctionString": "@(n, z) besseljyPrime(-0.5, 0.5, n, z, true)",
     "n0": [
       -1000,
       -1,

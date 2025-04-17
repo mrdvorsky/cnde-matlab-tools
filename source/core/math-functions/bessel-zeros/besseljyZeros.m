@@ -1,4 +1,4 @@
-function [k, alpha, beta] = besseljy_zeros(nu, n, r1, r2)
+function [k, alpha, beta] = besseljyZeros(nu, n, r1, r2)
 %Gives the first "n" *zeros* of the "besseljy" function.
 % This function computes the firts "n" trios (alpha, beta, and k) so that
 % "besseljy(alpha, beta, nu, k*r1)" and "besseljy(alpha, beta, nu, k*r2)"
@@ -18,7 +18,7 @@ function [k, alpha, beta] = besseljy_zeros(nu, n, r1, r2)
 % derivative at k*r2 is positive.
 %
 % Example Usage:
-%   [k, alpha, beta] = besseljy_zeros(nu, n, r1, r2);
+%   [k, alpha, beta] = besseljyZeros(nu, n, r1, r2);
 %   assert(all(besseljy(alpha, beta, nu, k*r1) == 0));  % Almost passes.
 %   assert(all(besseljy(alpha, beta, nu, k*r2) == 0));  % Almost passes.
 %
@@ -37,7 +37,7 @@ function [k, alpha, beta] = besseljy_zeros(nu, n, r1, r2)
 % Author: Matt Dvorsky
 
 arguments
-    nu(1, 1);
+    nu(1, 1) {mustBeNonnegative, mustBeFinite};
     n(1, 1) {mustBePositive, mustBeInteger};
     r1(1, 1) {mustBePositive};
     r2(1, 1) {mustBePositive, mustBeGreaterThan(r2, r1)};
