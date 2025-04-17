@@ -1,11 +1,11 @@
-function [val] = besseljprime(nu, z, scale)
+function [val] = besseljPrime(nu, z, scale)
 %Derivative of the "besselj" function.
 % Use the same way as "besselj". Computes the derivative of the "besselj"
 % function of order nu at z.
 %
 % Example Usage:
-%   val = besseljprime(nu, z);
-%   val = besseljprime(nu, z, true);    % Scaled by exp(-abs(imag(z))).
+%   val = besseljPrime(nu, z);
+%   val = besseljPrime(nu, z, true);    % Scaled by exp(-abs(imag(z))).
 %
 %
 % Inputs:
