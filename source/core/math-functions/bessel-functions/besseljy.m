@@ -28,7 +28,7 @@ arguments
     beta;
     nu;
     z;
-    scale(1, 1) = 0;
+    scale(1, 1) double = 0;
 end
 
 val = alpha .* besselj(nu, z, scale) + beta .* bessely(nu, z, scale);

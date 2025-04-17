@@ -25,7 +25,7 @@ arguments
     beta;
     nu;
     z;
-    scale(1, 1) = 0;
+    scale(1, 1) double = 0;
 end
 
 val = 0.5 * (besseljy(alpha, beta, nu - 1, z, scale) ...

@@ -104,6 +104,29 @@ classdef tester_hypotn < matlab.unittest.TestCase
             testCase.verifyEqual(result, expected);
         end
 
+        %% Data Type Tests
+        function test_differentDataTypes1(testCase)
+            x = single(3 + 4i);
+            y = 5 - 2i;
+            z = 5;
+
+            result = hypotn(x, y, z);
+            expected = hypot(hypot(x, y), z);
+
+            testCase.verifyEqual(result, expected);
+        end
+
+        function test_differentDataTypes2(testCase)
+            x = 3 + 4i;
+            y = 5 - 2i;
+            z = single(5);
+
+            result = hypotn(x, y, z);
+            expected = hypot(hypot(x, y), z);
+
+            testCase.verifyEqual(result, expected);
+        end
+
         %% Edge Case Tests
         function testEdge_zeroInputs(testCase)
             result = hypotn(0, 0, 0);
@@ -145,7 +168,7 @@ classdef tester_hypotn < matlab.unittest.TestCase
         %% Error Condition Tests
         function testError_noInputs(testCase)
             testCase.verifyError(@() hypotn(), ...
-                "CNDE:mustBeNonemptyRepeatingArgs");
+                "validators:mustHaveAtLeastOneRepeatingArg");
         end
 
         function testError_incompatibleInputs(testCase)

@@ -69,7 +69,7 @@ classdef tester_mustHaveValidCoordinateVectors < matlab.unittest.TestCase
             y = 1:10;
             testCase.verifyError(...
                 @() mustHaveValidCoordinateVectors({A}, {x, y}), ...
-                "CNDE:mustHaveValidCoordinateVectors");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_emptyCoordinatesWithoutOption(testCase)
@@ -78,7 +78,7 @@ classdef tester_mustHaveValidCoordinateVectors < matlab.unittest.TestCase
             y = 1:10;
             testCase.verifyError(...
                 @() mustHaveValidCoordinateVectors({A}, {x, y}), ...
-                "CNDE:mustHaveValidCoordinateVectors");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_multipleArraysMismatchedSizes(testCase)
@@ -88,7 +88,7 @@ classdef tester_mustHaveValidCoordinateVectors < matlab.unittest.TestCase
             y = 1:10;
             testCase.verifyError(...
                 @() mustHaveValidCoordinateVectors({A, B}, {x, y}), ...
-                "CNDE:mustHaveEqualSizes");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_invalidBroadcasting(testCase)
@@ -99,7 +99,7 @@ classdef tester_mustHaveValidCoordinateVectors < matlab.unittest.TestCase
             testCase.verifyError(...
                 @() mustHaveValidCoordinateVectors({A, B}, {x, y}, ...
                 AllowBroadcasting=true), ...
-                "CNDE:mustBeBroadcastable");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_4D(testCase)
@@ -110,7 +110,7 @@ classdef tester_mustHaveValidCoordinateVectors < matlab.unittest.TestCase
             w = 1:5;
             testCase.verifyError(...
                 @() mustHaveValidCoordinateVectors({A}, {x, y, z, w}), ...
-                "CNDE:mustHaveValidCoordinateVectors");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         %% Edge Case Tests

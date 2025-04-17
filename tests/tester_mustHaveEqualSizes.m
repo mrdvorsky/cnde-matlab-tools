@@ -51,7 +51,7 @@ classdef tester_mustHaveEqualSizes < matlab.unittest.TestCase
             A = rand(2, 3);
             B = rand(3, 2);
             testCase.verifyError(@() mustHaveEqualSizes(A, B), ...
-                "CNDE:mustHaveEqualSizes");
+                "MATLAB:sizeDimensionsMustMatch");
         end
         
         function testError_unequalSizes_specificDimension(testCase)
@@ -59,7 +59,7 @@ classdef tester_mustHaveEqualSizes < matlab.unittest.TestCase
             B = rand(2, 4, 4);
             testCase.verifyError(...
                 @() mustHaveEqualSizes(A, B, Dimensions=2), ...
-                "CNDE:mustHaveEqualSizes");
+                "MATLAB:sizeDimensionsMustMatch");
         end
         
         %% Edge Case Tests
@@ -73,7 +73,7 @@ classdef tester_mustHaveEqualSizes < matlab.unittest.TestCase
             A = rand(1, 3);
             B = rand(2, 3);
             testCase.verifyError(@() mustHaveEqualSizes(A, B), ...
-                "CNDE:mustHaveEqualSizes");
+                "MATLAB:sizeDimensionsMustMatch");
         end
         
         function testEdge_scalarInputs(testCase)

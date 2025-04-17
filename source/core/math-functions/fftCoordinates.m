@@ -52,7 +52,7 @@ end
 arguments (Output, Repeating)
     kxVectors;
 end
-mustBeNonemptyRepeatingArgs(xVectors);
+mustHaveAtLeastOneRepeatingArg(xVectors);
 
 %% Compute Spectral Coordinates
 kxVectors = cell(min(numel(xVectors), max(1, nargout)), 1);

@@ -4,7 +4,7 @@ classdef tester_fftCoordinates < matlab.unittest.TestCase
     % Author: Matt Dvorsky
 
     properties
-        tolVal = 1e-13;
+        tolVal = 1e-14;
     end
 
     methods (Test)
@@ -96,6 +96,12 @@ classdef tester_fftCoordinates < matlab.unittest.TestCase
         end
 
         %% Error Condition Tests
+        function testError_noArgs(testCase)
+            [~, ~, ~] = testCase.verifyError(...
+                @() fftCoordinates(), ...
+                "validators:mustHaveAtLeastOneRepeatingArg");
+        end
+
         function testError_moreOutputsThanInputs(testCase)
             x = 1:10;
             y = 1:5;

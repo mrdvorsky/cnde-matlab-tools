@@ -44,12 +44,12 @@ classdef tester_broadcastArrays < matlab.unittest.TestCase
         %% Error Condition Tests
         function testError_incompatibleSizes(testCase)
             testCase.verifyError(@() broadcastArrays(ones(5, 6), ones(1, 5)), ...
-                "CNDE:mustBeBroadcastable");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_incompatibleSizes_manyArgs(testCase)
             testCase.verifyError(@() broadcastArrays(ones(5, 6), ones(1, 6), ones(2, 1)), ...
-                "CNDE:mustBeBroadcastable");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_moreOutputsThanInputs1(testCase)

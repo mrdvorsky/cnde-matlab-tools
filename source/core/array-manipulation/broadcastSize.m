@@ -33,7 +33,7 @@ end
 arguments
     options.Dimensions(1, :) {mustBeValidDimension} = "all";
 end
-mustBeNonemptyRepeatingArgs(Arrays);
+mustHaveAtLeastOneRepeatingArg(Arrays);
 mustBeBroadcastable(Arrays{:});
 
 %% Calculate Size

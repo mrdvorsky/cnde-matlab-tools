@@ -22,7 +22,7 @@ function [val] = besseljprime(nu, z, scale)
 arguments
     nu;
     z;
-    scale(1, 1) = 0;
+    scale(1, 1) double = 0;
 end
 
 val = 0.5 * (besselj(nu - 1, z, scale) - besselj(nu + 1, z, scale));

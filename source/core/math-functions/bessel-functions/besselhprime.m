@@ -26,7 +26,7 @@ arguments
     nu;
     kind(1, 1) {mustBeMember(kind, [1, 2])};
     z;
-    scale(1, 1) = 0;
+    scale(1, 1) double = 0;
 end
 
 val = 0.5 * (besselh(nu - 1, kind, z, scale) ...

@@ -47,7 +47,7 @@ classdef tester_mustBeBroadcastable < matlab.unittest.TestCase
             A = ones(2, 3);
             B = ones(3, 2);
             testCase.verifyError(@() mustBeBroadcastable(A, B), ...
-                "CNDE:mustBeBroadcastable");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_incompatibleSizes_manyArgs(testCase)
@@ -55,21 +55,21 @@ classdef tester_mustBeBroadcastable < matlab.unittest.TestCase
             B = ones(1, 3);
             C = ones(3, 1);
             testCase.verifyError(@() mustBeBroadcastable(A, B, C), ...
-                "CNDE:mustBeBroadcastable");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_specifiedDimensionsWithConflict(testCase)
             A = ones(2, 3);
             B = ones(1, 4);
             testCase.verifyError(@() mustBeBroadcastable(A, B, Dimensions=2), ...
-                "CNDE:mustBeBroadcastable");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_excludeDimensionsWithConflict(testCase)
             A = ones(2, 3);
             B = ones(3, 4);
             testCase.verifyError(@() mustBeBroadcastable(A, B, ExcludeDimensions=2), ...
-                "CNDE:mustBeBroadcastable");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         %% Edge Case Tests
@@ -77,7 +77,7 @@ classdef tester_mustBeBroadcastable < matlab.unittest.TestCase
             A = zeros(0, 5);
             B = zeros(5, 0);
             testCase.verifyError(@() mustBeBroadcastable(A, B), ...
-                "CNDE:mustBeBroadcastable");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testEdge_scalar(testCase)

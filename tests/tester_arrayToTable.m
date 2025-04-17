@@ -94,7 +94,7 @@ classdef tester_arrayToTable < matlab.unittest.TestCase
             D = rand(2, 4); % Wrong size in first dimension
 
             testCase.verifyError(@() arrayToTable(D, x, y), ...
-                "CNDE:mustHaveValidCoordinateVectors");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_nonBroadcastableData(testCase)
@@ -104,7 +104,7 @@ classdef tester_arrayToTable < matlab.unittest.TestCase
             D2 = rand(2, 4); % Incompatible size
 
             testCase.verifyError(@() arrayToTable({D1, D2}, x, y), ...
-                "CNDE:mustBeBroadcastable");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_nonVectorCoordinates(testCase)
@@ -125,7 +125,7 @@ classdef tester_arrayToTable < matlab.unittest.TestCase
             % Verify warning is issued
             DataTable = testCase.verifyWarning(...
                 @() arrayToTable(D, x, y), ...
-                "CNDE:arrayToTableMissingGridVectors");
+                "arrayToTable:missingGridVectors");
 
             % Verify the function still works correctly
             [x_exp, y_exp, z_exp] = ndgrid(x, y, 1:size(D, 3));

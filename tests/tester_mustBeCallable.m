@@ -21,25 +21,25 @@ classdef tester_mustBeCallable < matlab.unittest.TestCase
         function testError_nonFunctionNumeric(testCase)
             testCase.verifyError(...
                 @() mustBeCallable(42, {1}, "x"), ...
-                "CNDE:mustBeCallable");
+                "validators:mustBeCallable");
         end
 
         function testError_nonFunctionCell(testCase)
             testCase.verifyError(...
                 @() mustBeCallable({1, 2, 3}, {1}, "x"), ...
-                "CNDE:mustBeCallable");
+                "validators:mustBeCallable");
         end
 
         function testError_wrongNumberOfArgs(testCase)
             testCase.verifyError(...
                 @() mustBeCallable(@sin, {1, 2}, "x, y"), ...
-                "CNDE:mustBeCallable");
+                "validators:mustBeCallable");
         end
 
         function testError_wrongArgTypes(testCase)
             testCase.verifyError(...
                 @() mustBeCallable(@abs, {"not_a_number"}, "str"), ...
-                "CNDE:mustBeCallable");
+                "validators:mustBeCallable");
         end
 
         %% Edge Case Tests

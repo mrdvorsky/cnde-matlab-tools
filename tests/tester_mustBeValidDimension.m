@@ -23,26 +23,26 @@ classdef tester_mustBeValidDimension < matlab.unittest.TestCase
         %% Error Condition Tests
         function testError_nonIntegerInput(testCase)
             testCase.verifyError(@() mustBeValidDimension(1.5), ...
-                "CNDE:mustBeValidDimension");
+                "validators:mustBeValidDimension");
             testCase.verifyError(@() mustBeValidDimension(inf), ...
-                "CNDE:mustBeValidDimension");
+                "validators:mustBeValidDimension");
         end
 
         function testError_nonPositiveInput(testCase)
             testCase.verifyError(@() mustBeValidDimension(0), ...
-                "CNDE:mustBeValidDimension");
+                "validators:mustBeValidDimension");
             testCase.verifyError(@() mustBeValidDimension(-1), ...
-                "CNDE:mustBeValidDimension");
+                "validators:mustBeValidDimension");
         end
 
         function testError_nonUniqueInput(testCase)
             testCase.verifyError(@() mustBeValidDimension([1, 2, 1]), ...
-                "CNDE:mustBeValidDimension");
+                "validators:mustBeValidDimension");
         end
 
         function testError_invalidStringInput(testCase)
             testCase.verifyError(@() mustBeValidDimension("invalid"), ...
-                "CNDE:mustBeValidDimension");
+                "validators:mustBeValidDimension");
         end
 
         %% Allow Vector Option Tests
@@ -54,7 +54,7 @@ classdef tester_mustBeValidDimension < matlab.unittest.TestCase
         function testError_allowVectorOption_false(testCase)
             testCase.verifyError(...
                 @() mustBeValidDimension([1, 2], AllowVector=false), ...
-                "CNDE:mustBeValidDimension");
+                "validators:mustBeValidDimension");
         end
 
         %% Edge Case Tests
@@ -68,7 +68,7 @@ classdef tester_mustBeValidDimension < matlab.unittest.TestCase
 
         function testEdge_emptyInput(testCase)
             testCase.verifyWarningFree(@() mustBeValidDimension([]), ...
-                "CNDE:mustBeValidDimension");
+                "validators:mustBeValidDimension");
         end
     end
 end

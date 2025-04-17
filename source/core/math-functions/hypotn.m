@@ -21,7 +21,7 @@ function [y] = hypotn(x)
 arguments (Repeating)
     x;
 end
-mustBeNonemptyRepeatingArgs(x);
+mustHaveAtLeastOneRepeatingArg(x);
 
 if isscalar(x)
     y = abs(x{1});

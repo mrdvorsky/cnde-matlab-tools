@@ -113,7 +113,7 @@ classdef tester_padArray < matlab.unittest.TestCase
 
             testCase.verifyError(...
                 @() padArray(A, x), ...
-                "CNDE:mustHaveValidCoordinateVectors");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_invalidPadSpec(testCase)
@@ -123,7 +123,7 @@ classdef tester_padArray < matlab.unittest.TestCase
 
             testCase.verifyError(...
                 @() padArray(A, x, y, PadCount=[1, 2, 3]), ...
-                "CNDE:padArrayMustBeValidPadSpec");
+                "padArray:mustBeValidPadSpec");
         end
 
         function testError_tooManyOutputs(testCase)
@@ -137,7 +137,7 @@ classdef tester_padArray < matlab.unittest.TestCase
 
         function testError_tooManyInputCoords(testCase)
             testCase.verifyError(@() padArray(zeros(2), [], [], [], 1:2, PadCount=2), ...
-                "CNDE:mustHaveValidCoordinateVectors")
+                "MATLAB:sizeDimensionsMustMatch")
         end
 
         %% Edge Case Tests

@@ -48,9 +48,11 @@ end
 AB_size = broadcastSize(A, B);
 maxDims = numel(AB_size);
 
-dims = dims(dims <= maxDims);
+
 if strcmp(dims, "all")
     dims = 1:maxDims;
+else
+    dims = dims(dims <= maxDims);
 end
 
 outputSize = AB_size;

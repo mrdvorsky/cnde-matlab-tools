@@ -37,27 +37,27 @@ classdef tester_broadcastSize < matlab.unittest.TestCase
         %% Error Condition Tests
         function testError_incompatibleSizes(testCase)
             testCase.verifyError(@() broadcastSize(ones(3, 2), ones(4, 1)), ...
-                "CNDE:mustBeBroadcastable");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_incompatibleSizes_manyArgs(testCase)
             testCase.verifyError(@() broadcastSize(ones(3, 2), ones(3, 1), ones(1, 3)), ...
-                "CNDE:mustBeBroadcastable");
+                "MATLAB:sizeDimensionsMustMatch");
         end
 
         function testError_invalidDimension(testCase)
             testCase.verifyError(@() broadcastSize(ones(2, 2), Dimensions=0), ...
-                "CNDE:mustBeValidDimension");
+                "validators:mustBeValidDimension");
         end
 
         function testError_noArgs(testCase)
             testCase.verifyError(@() broadcastSize(), ...
-                "CNDE:mustBeNonemptyRepeatingArgs");
+                "validators:mustHaveAtLeastOneRepeatingArg");
         end
 
         function testError_noArgsWithDimensionSpec(testCase)
             testCase.verifyError(@() broadcastSize(Dimensions=1), ...
-                "CNDE:mustBeNonemptyRepeatingArgs");
+                "validators:mustHaveAtLeastOneRepeatingArg");
         end
 
         %% Edge Case Tests
