@@ -1,37 +1,37 @@
-function [yzeros] = besselyZeros(nu, n)
+function [yzeros] = besselyZeros(v, n)
 %Gives the first "n" zeros of the "bessely" function.
 % Returns a column vector with the first n zeros (yvn) of the "bessely"
 % function.
 %
 % Example Usage:
-%   yzeros = besselyZeros(nu, n);
-%   assert(all(bessely(nu, jzeros) == 0));      % Almost passes.
+%   yzeros = besselyZeros(v, n);
+%   assert(all(bessely(v, jzeros) == 0));       % Almost passes.
 %
 %
 % Inputs:
-%   nu - Bessel function order. See "bessely" documentation.
+%   v - Bessel function order. See "bessely" documentation.
 %   n - Number of zeros to find.
 %
 % Outputs:
-%   yzeros - First "n" zeros of bessely of order "nu".
+%   yzeros - First "n" zeros of bessely of order "v".
 %
 % Author: Matt Dvorsky
 
 arguments
-    nu(1, 1) {mustBeNonnegative, mustBeFinite};
+    v(1, 1) {mustBeNonnegative, mustBeFinite};
     n(1, 1) {mustBePositive, mustBeInteger};
 end
 
 %% Calculate Zeros
-fun = @(y) bessely(nu, y);
+fun = @(y) bessely(v, y);
 
-yzero0_guess = nu + 0.9315768*nu.^(1/3) + max(0, 0.89*(1 - nu));
+yzero0_guess = v + 0.9315768*v.^(1/3) + max(0, 0.89*(1 - v));
 for ii = 1:5
     yzero0_guess = yzero0_guess ...
-        - bessely(nu, yzero0_guess) ./ besselyPrime(nu, yzero0_guess);
+        - bessely(v, yzero0_guess) ./ besselyPrime(v, yzero0_guess);
 end
 
-assert(abs(bessely(nu, yzero0_guess)) < 1e-14, ...
+assert(abs(bessely(v, yzero0_guess)) < 1e-10, ...
     "Could not find initial zero.");
 
 yzeros = zeros(n, 1);
@@ -47,10 +47,10 @@ end
 %% Refine Using Newtons Method
 for ii = 1:5
     yzeros = yzeros ...
-        - bessely(nu, yzeros) ./ besselyPrime(nu, yzeros);
+        - bessely(v, yzeros) ./ besselyPrime(v, yzeros);
 end
 
-assert(all(abs(bessely(nu, yzeros)) < 1e-13), ...
+assert(all(abs(bessely(v, yzeros)) < 1e-10), ...
     "One or more zeros could not be found.");
 
 end

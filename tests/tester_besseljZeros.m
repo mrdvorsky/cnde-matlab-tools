@@ -6,8 +6,8 @@ classdef tester_besseljZeros < matlab.unittest.TestCase
     properties
         tolVal = 1e-14;
 
-        nu = [0, 1, 2, 10, 0.5, 1000, 10000];
-        jzero = [...
+        v0 = [0, 1, 2, 10, 0.5, 1000, 10000];
+        jzero0 = [...
             2.404825557695773, ...
             3.831705970207512, ...
             5.135622301840684, ...
@@ -21,113 +21,113 @@ classdef tester_besseljZeros < matlab.unittest.TestCase
     methods (Test)
         %% Basic Functionality Tests
         function test_firstZero(testCase)
-            n = testCase.nu(:);
-            z0Actual = arrayfun(@(n) besseljZeros(n, 1), n);
-            z0Exp = testCase.jzero(:);
+            v = testCase.v0(:);
+            z0Actual = arrayfun(@(n) besseljZeros(n, 1), v);
+            z0Exp = testCase.jzero0(:);
 
-            tableActual = table(n(:), z0Actual(:), besselj(n(:), z0Actual(:)), ...
-                VariableNames=["nu", "z0", "f(z0)"]);
+            tableActual = table(v(:), z0Actual(:), besselj(v(:), z0Actual(:)), ...
+                VariableNames=["v", "z0", "f(z0)"]);
 
-            tableExp = table(n(:), z0Exp, 0*z0Exp(:), ...
-                VariableNames=["nu", "z0", "f(z0)"]);
+            tableExp = table(v(:), z0Exp, 0*z0Exp(:), ...
+                VariableNames=["v", "z0", "f(z0)"]);
 
             testCase.verifyEqual(tableActual, tableExp, ...
                 RelTol=testCase.tolVal, AbsTol=testCase.tolVal);
         end
 
-        %% Compare Orderings of all Bessel Function Zeros
-        function test_compare_jpvm_yvm_ypvm_jvm_nu1(testCase)
-            n = 1;
+        %% Compare Orderings of all Bessel(j,y,j',y') Function Zeros
+        function test_compare_jpvm_yvm_ypvm_jvm_v1(testCase)
+            v = 1;
             nZeros = 1000;
 
-            jpvm = besseljPrimeZeros(n, nZeros);
-            yvm = besselyZeros(n, nZeros);
-            ypvm = besselyPrimeZeros(n, nZeros);
-            jvm = besseljZeros(n, nZeros);
+            jpvm = besseljPrimeZeros(v, nZeros);
+            yvm = besselyZeros(v, nZeros);
+            ypvm = besselyPrimeZeros(v, nZeros);
+            jvm = besseljZeros(v, nZeros);
 
             zerosInOrder = reshape([jpvm, yvm, ypvm, jvm].', [], 1);
             testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
                 "Bessel function zeros must be in order relative to each other.");
         end
 
-        function test_compare_jpvm_yvm_ypvm_jvm_nu2(testCase)
-            n = 2;
+        function test_compare_jpvm_yvm_ypvm_jvm_v2(testCase)
+            v = 2;
             nZeros = 1000;
 
-            jpvm = besseljPrimeZeros(n, nZeros);
-            yvm = besselyZeros(n, nZeros);
-            ypvm = besselyPrimeZeros(n, nZeros);
-            jvm = besseljZeros(n, nZeros);
+            jpvm = besseljPrimeZeros(v, nZeros);
+            yvm = besselyZeros(v, nZeros);
+            ypvm = besselyPrimeZeros(v, nZeros);
+            jvm = besseljZeros(v, nZeros);
 
             zerosInOrder = reshape([jpvm, yvm, ypvm, jvm].', [], 1);
             testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
                 "Bessel function zeros must be in order relative to each other.");
         end
 
-        function test_compare_jpvm_yvm_ypvm_jvm_nu10(testCase)
-            n = 10;
+        function test_compare_jpvm_yvm_ypvm_jvm_v10(testCase)
+            v = 10;
             nZeros = 1000;
 
-            jpvm = besseljPrimeZeros(n, nZeros);
-            yvm = besselyZeros(n, nZeros);
-            ypvm = besselyPrimeZeros(n, nZeros);
-            jvm = besseljZeros(n, nZeros);
+            jpvm = besseljPrimeZeros(v, nZeros);
+            yvm = besselyZeros(v, nZeros);
+            ypvm = besselyPrimeZeros(v, nZeros);
+            jvm = besseljZeros(v, nZeros);
 
             zerosInOrder = reshape([jpvm, yvm, ypvm, jvm].', [], 1);
             testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
                 "Bessel function zeros must be in order relative to each other.");
         end
 
-        function test_compare_jpvm_yvm_ypvm_jvm_nu10000(testCase)
-            n = 10000;
+        function test_compare_jpvm_yvm_ypvm_jvm_v10000(testCase)
+            v = 10000;
             nZeros = 1000;
 
-            jpvm = besseljPrimeZeros(n, nZeros);
-            yvm = besselyZeros(n, nZeros);
-            ypvm = besselyPrimeZeros(n, nZeros);
-            jvm = besseljZeros(n, nZeros);
+            jpvm = besseljPrimeZeros(v, nZeros);
+            yvm = besselyZeros(v, nZeros);
+            ypvm = besselyPrimeZeros(v, nZeros);
+            jvm = besseljZeros(v, nZeros);
 
             zerosInOrder = reshape([jpvm, yvm, ypvm, jvm].', [], 1);
             testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
                 "Bessel function zeros must be in order relative to each other.");
         end
 
-        function test_compare_jpvm_yvm_ypvm_jvm_nuOneHalf(testCase)
-            n = 0.5;
+        function test_compare_jpvm_yvm_ypvm_jvm_vOneHalf(testCase)
+            v = 0.5;
             nZeros = 1000;
 
-            jpvm = besseljPrimeZeros(n, nZeros);
-            yvm = besselyZeros(n, nZeros);
-            ypvm = besselyPrimeZeros(n, nZeros);
-            jvm = besseljZeros(n, nZeros);
+            jpvm = besseljPrimeZeros(v, nZeros);
+            yvm = besselyZeros(v, nZeros);
+            ypvm = besselyPrimeZeros(v, nZeros);
+            jvm = besseljZeros(v, nZeros);
 
             zerosInOrder = reshape([jpvm, yvm, ypvm, jvm].', [], 1);
             testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
                 "Bessel function zeros must be in order relative to each other.");
         end
 
-        function test_compare_jpvm_yvm_ypvm_jvm_nuSmall(testCase)
-            n = 0.1;
+        function test_compare_jpvm_yvm_ypvm_jvm_vSmall(testCase)
+            v = 0.1;
             nZeros = 1000;
 
-            jpvm = besseljPrimeZeros(n, nZeros);
-            yvm = besselyZeros(n, nZeros);
-            ypvm = besselyPrimeZeros(n, nZeros);
-            jvm = besseljZeros(n, nZeros);
+            jpvm = besseljPrimeZeros(v, nZeros);
+            yvm = besselyZeros(v, nZeros);
+            ypvm = besselyPrimeZeros(v, nZeros);
+            jvm = besseljZeros(v, nZeros);
 
             zerosInOrder = reshape([jpvm, yvm, ypvm, jvm].', [], 1);
             testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
                 "Bessel function zeros must be in order relative to each other.");
         end
 
-        function test_compare_jpvm_yvm_ypvm_jvm_nu0(testCase)
-            n = 0;
+        function test_compare_jpvm_yvm_ypvm_jvm_v0(testCase)
+            v = 0;
             nZeros = 1000;
 
-            jpvm = besseljPrimeZeros(n, nZeros);
-            yvm = besselyZeros(n, nZeros);
-            ypvm = besselyPrimeZeros(n, nZeros);
-            jvm = besseljZeros(n, nZeros);
+            jpvm = besseljPrimeZeros(v, nZeros);
+            yvm = besselyZeros(v, nZeros);
+            ypvm = besselyPrimeZeros(v, nZeros);
+            jvm = besseljZeros(v, nZeros);
 
             % For zero order, jpvm should be larger, due to the convention
             % of having the first zero of J0'(x) be non-zero.
@@ -136,39 +136,116 @@ classdef tester_besseljZeros < matlab.unittest.TestCase
                 "Bessel function zeros must be in order relative to each other.");
         end
 
-        %% Edge Case Tests
-        function testEdge_decreasingSpacing_nuGreaterThanOneHalf(testCase)
-            n = 0.51;
+        function test_compare_jpvm_yvm_ypvm_jvm_vVariable(testCase)
+            for v = 0.5:0.5:100
+                nZeros = 20;
+
+                jpvm = besseljPrimeZeros(v, nZeros);
+                yvm = besselyZeros(v, nZeros);
+                ypvm = besselyPrimeZeros(v, nZeros);
+                jvm = besseljZeros(v, nZeros);
+
+                zerosInOrder = reshape([jpvm, yvm, ypvm, jvm].', [], 1);
+                testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                    "Bessel function zeros must be in order relative to each other.");
+            end
+        end
+
+        %% Assert Interleaving Property of Bessel Function Zeros
+        function test_compare_jvm_interleaving_v0(testCase)
+            v = 0;
             nZeros = 1000;
 
-            jzeros = besseljZeros(n, nZeros);
+            jvm = besseljZeros(v, nZeros);
+            jvplus1m = besseljZeros(v + 1, nZeros);
+
+            zerosInOrder = reshape([jvm, jvplus1m].', [], 1);
+            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                "Bessel function zeros must interlace properly.");
+        end
+
+        function test_compare_jvm_interleaving_v1(testCase)
+            v = 1;
+            nZeros = 1000;
+
+            jvm = besseljZeros(v, nZeros);
+            jvplus1m = besseljZeros(v + 1, nZeros);
+
+            zerosInOrder = reshape([jvm, jvplus1m].', [], 1);
+            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                "Bessel function zeros must interlace properly.");
+        end
+
+        function test_compare_jvm_interleaving_vOneHalf(testCase)
+            v = 0.5;
+            nZeros = 1000;
+
+            jvm = besseljZeros(v, nZeros);
+            jvplus1m = besseljZeros(v + 1, nZeros);
+
+            zerosInOrder = reshape([jvm, jvplus1m].', [], 1);
+            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                "Bessel function zeros must interlace properly.");
+        end
+
+        function test_compare_jvm_interleaving_v10000(testCase)
+            v = 10000;
+            nZeros = 1000;
+
+            jvm = besseljZeros(v, nZeros);
+            jvplus1m = besseljZeros(v + 1, nZeros);
+
+            zerosInOrder = reshape([jvm, jvplus1m].', [], 1);
+            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                "Bessel function zeros must interlace properly.");
+        end
+
+        function test_compare_jvm_interleaving_vVariable(testCase)
+            for v = 0.5:0.5:100
+                nZeros = 20;
+
+                jvm = besseljZeros(v, nZeros);
+                jvplus1m = besseljZeros(v + 1, nZeros);
+
+                zerosInOrder = reshape([jvm, jvplus1m].', [], 1);
+                testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                    "Bessel function zeros must interlace properly.");
+            end
+        end
+
+        %% Edge Case Tests
+        function testEdge_decreasingSpacing_vGreaterThanOneHalf(testCase)
+            v = 0.51;
+            nZeros = 1000;
+
+            jzeros = besseljZeros(v, nZeros);
             testCase.verifyLessThanOrEqual(diff(jzeros, 2), 0, ...
                 "Spacing of zeros must be monotonically decreasing.");
         end
 
-        function testEdge_increasingSpacing_nuLessThanOneHalf(testCase)
-            n = 0.49;
+        function testEdge_increasingSpacing_vLessThanOneHalf(testCase)
+            v = 0.49;
             nZeros = 1000;
 
-            jzeros = besseljZeros(n, nZeros);
+            jzeros = besseljZeros(v, nZeros);
             testCase.verifyGreaterThanOrEqual(diff(jzeros, 2), 0, ...
                 "Spacing of zeros must be monotonically increasing.");
         end
 
-        function testEdge_decreasingSpacing_nuLarge(testCase)
-            n = 1000;
+        function testEdge_decreasingSpacing_vLarge(testCase)
+            v = 1000;
             nZeros = 1000;
 
-            jzeros = besseljZeros(n, nZeros);
+            jzeros = besseljZeros(v, nZeros);
             testCase.verifyLessThanOrEqual(diff(jzeros, 2), 0, ...
                 "Spacing of zeros must be monotonically decreasing.");
         end
 
-        function testEdge_increasingSpacing_nuZero(testCase)
-            n = 0;
+        function testEdge_increasingSpacing_vZero(testCase)
+            v = 0;
             nZeros = 1000;
 
-            jzeros = besseljZeros(n, nZeros);
+            jzeros = besseljZeros(v, nZeros);
             testCase.verifyGreaterThanOrEqual(diff(jzeros, 2), 0, ...
                 "Spacing of zeros must be monotonically increasing.");
         end

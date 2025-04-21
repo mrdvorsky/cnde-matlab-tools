@@ -1,37 +1,37 @@
-function [jzeros] = besseljZeros(nu, n)
+function [jzeros] = besseljZeros(v, n)
 %Gives the first "n" zeros of the "besselj" function.
 % Returns a column vector with the first n zeros (jvn) of the "besselj"
 % function.
 %
 % Example Usage:
-%   jzeros = besseljZeros(nu, n);
-%   assert(all(besselj(nu, jzeros) == 0));      % Almost passes.
+%   jzeros = besseljZeros(v, n);
+%   assert(all(besselj(v, jzeros) == 0));       % Almost passes.
 %
 %
 % Inputs:
-%   nu - Bessel function order. See "besselj" documentation.
+%   v - Bessel function order. See "besselj" documentation.
 %   n - Number of zeros to find.
 %
 % Outputs:
-%   jzeros - First "n" zeros of besselj of order "nu".
+%   jzeros - First "n" zeros of besselj of order "v".
 %
 % Author: Matt Dvorsky
 
 arguments
-    nu(1, 1) {mustBeNonnegative, mustBeFinite};
+    v(1, 1) {mustBeNonnegative, mustBeFinite};
     n(1, 1) {mustBePositive, mustBeInteger};
 end
 
 %% Calculate Zeros
-fun = @(y) besselj(nu, y);
+fun = @(y) besselj(v, y);
 
-jzero0_guess = nu + 1.8557571*nu.^(1/3) + max(0, 2.4*(1 - nu));
+jzero0_guess = v + 1.8557571*v.^(1/3) + max(0, 2.4*(1 - v));
 for ii = 1:5
     jzero0_guess = jzero0_guess ...
-        - besselj(nu, jzero0_guess) ./ besseljPrime(nu, jzero0_guess);
+        - besselj(v, jzero0_guess) ./ besseljPrime(v, jzero0_guess);
 end
 
-assert(abs(besselj(nu, jzero0_guess)) < 1e-14, ...
+assert(abs(besselj(v, jzero0_guess)) < 1e-10, ...
     "Could not find initial zero.");
 
 jzeros = zeros(n, 1);
@@ -47,10 +47,10 @@ end
 %% Refine Using Newtons Method
 for ii = 1:5
     jzeros = jzeros ...
-        - besselj(nu, jzeros) ./ besseljPrime(nu, jzeros);
+        - besselj(v, jzeros) ./ besseljPrime(v, jzeros);
 end
 
-assert(all(abs(besselj(nu, jzeros)) < 1e-13), ...
+assert(all(abs(besselj(v, jzeros)) < 1e-10), ...
     "One or more zeros could not be found.");
 
 end

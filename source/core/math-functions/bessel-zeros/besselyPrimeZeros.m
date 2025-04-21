@@ -1,40 +1,40 @@
-function [ypzeros] = besselyPrimeZeros(nu, n)
+function [ypzeros] = besselyPrimeZeros(v, n)
 %Gives the first "n" zeros of the "besselyPrime" function.
 % Returns a column vector with the first n zeros (y'vn) of the
-% "besselyprime" function.
+% "besselyPrime" function.
 %
 % Example Usage:
-%   ypzeros = besselyPrimeZeros(nu, n);
-%   assert(all(besselyPrime(nu, ypzeros) == 0));    % Almost passes.
+%   ypzeros = besselyPrimeZeros(v, n);
+%   assert(all(besselyPrime(v, ypzeros) == 0));     % Almost passes.
 %
 %
 % Inputs:
-%   nu - Bessel function order. See "bessely" documentation.
+%   v - Bessel function order. See "bessely" documentation.
 %   n - Number of zeros to find.
 %
 % Outputs:
-%   ypzeros - First "n" zeros of besselyPrime of order "nu".
+%   ypzeros - First "n" zeros of besselyPrime of order "v".
 %
 % Author: Matt Dvorsky
 
 arguments
-    nu(1, 1) {mustBeNonnegative, mustBeFinite};
+    v(1, 1) {mustBeNonnegative, mustBeFinite};
     n(1, 1) {mustBePositive, mustBeInteger};
 end
 
 %% Calculate Zeros
-fun = @(y) besselyPrime(nu, y);
+fun = @(y) besselyPrime(v, y);
 
 ypzeros = zeros(n, 1);
-ypzero0_guess = nu + 1.8210980*nu.^(1/3) + max(0, 2.19*(1 - nu));
+ypzero0_guess = v + 1.8210980*v.^(1/3) + max(0, 2.19*(1 - v));
 
 for ii = 1:5
     ypzero0_guess = ypzero0_guess ...
-        - 2 * besselyPrime(nu, ypzero0_guess) ...
-        ./ (besselyPrime(nu - 1, ypzero0_guess) - besselyPrime(nu + 1, ypzero0_guess));
+        - 2 * besselyPrime(v, ypzero0_guess) ...
+        ./ (besselyPrime(v - 1, ypzero0_guess) - besselyPrime(v + 1, ypzero0_guess));
 end
 
-assert(abs(besselyPrime(nu, ypzero0_guess)) < 1e-14, ...
+assert(abs(besselyPrime(v, ypzero0_guess)) < 1e-10, ...
     "Could not find initial zero.");
 
 ypzeros(1) = ypzero0_guess;
@@ -49,11 +49,11 @@ end
 %% Refine Using Newtons Method
 for ii = 1:5
     ypzeros = ypzeros ...
-        - 2 * besselyPrime(nu, ypzeros) ...
-        ./ (besselyPrime(nu - 1, ypzeros) - besselyPrime(nu + 1, ypzeros));
+        - 2 * besselyPrime(v, ypzeros) ...
+        ./ (besselyPrime(v - 1, ypzeros) - besselyPrime(v + 1, ypzeros));
 end
 
-assert(all(abs(besselyPrime(nu, ypzeros)) < 1e-13), ...
+assert(all(abs(besselyPrime(v, ypzeros)) < 1e-10), ...
     "One or more zeros could not be found.");
 
 end

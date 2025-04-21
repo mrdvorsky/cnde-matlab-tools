@@ -6,8 +6,8 @@ classdef tester_besselyZeros < matlab.unittest.TestCase
     properties
         tolVal = 1e-14;
 
-        nu = [0, 1, 2, 10, 0.5, 1000, 10000];
-        jzero = [...
+        v0 = [0, 1, 2, 10, 0.5, 1000, 10000];
+        jzero0 = [...
             0.8935769662791675, ...
             2.197141326031017, ...
             3.384241767149593, ...
@@ -21,53 +21,115 @@ classdef tester_besselyZeros < matlab.unittest.TestCase
     methods (Test)
         %% Basic Functionality Tests
         function test_firstZero(testCase)
-            n = testCase.nu(:);
-            z0Actual = arrayfun(@(n) besselyZeros(n, 1), n);
-            z0Exp = testCase.jzero(:);
+            v = testCase.v0(:);
+            z0Actual = arrayfun(@(n) besselyZeros(n, 1), v);
+            z0Exp = testCase.jzero0(:);
 
-            tableActual = table(n(:), z0Actual(:), bessely(n(:), z0Actual(:)), ...
-                VariableNames=["nu", "z0", "f(z0)"]);
+            tableActual = table(v(:), z0Actual(:), bessely(v(:), z0Actual(:)), ...
+                VariableNames=["v", "z0", "f(z0)"]);
 
-            tableExp = table(n(:), z0Exp, 0*z0Exp(:), ...
-                VariableNames=["nu", "z0", "f(z0)"]);
+            tableExp = table(v(:), z0Exp, 0*z0Exp(:), ...
+                VariableNames=["v", "z0", "f(z0)"]);
 
             testCase.verifyEqual(tableActual, tableExp, ...
                 RelTol=testCase.tolVal, AbsTol=testCase.tolVal);
         end
 
-        %% Edge Case Tests
-        function testEdge_decreasingSpacing_nuGreaterThanOneHalf(testCase)
-            n = 0.51;
+        %% Assert Interleaving Property of Bessel Function Zeros
+        function test_compare_jvm_interleaving_v0(testCase)
+            v = 0;
             nZeros = 1000;
 
-            jzeros = besselyZeros(n, nZeros);
+            yvm = besselyZeros(v, nZeros);
+            yvplus1m = besselyZeros(v + 1, nZeros);
+
+            zerosInOrder = reshape([yvm, yvplus1m].', [], 1);
+            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                "Bessel function zeros must interlace properly.");
+        end
+
+        function test_compare_jvm_interleaving_v1(testCase)
+            v = 1;
+            nZeros = 1000;
+
+            yvm = besselyZeros(v, nZeros);
+            yvplus1m = besselyZeros(v + 1, nZeros);
+
+            zerosInOrder = reshape([yvm, yvplus1m].', [], 1);
+            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                "Bessel function zeros must interlace properly.");
+        end
+
+        function test_compare_jvm_interleaving_vOneHalf(testCase)
+            v = 0.5;
+            nZeros = 1000;
+
+            yvm = besselyZeros(v, nZeros);
+            yvplus1m = besselyZeros(v + 1, nZeros);
+
+            zerosInOrder = reshape([yvm, yvplus1m].', [], 1);
+            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                "Bessel function zeros must interlace properly.");
+        end
+
+        function test_compare_jvm_interleaving_v10000(testCase)
+            v = 10000;
+            nZeros = 1000;
+
+            yvm = besselyZeros(v, nZeros);
+            yvplus1m = besselyZeros(v + 1, nZeros);
+
+            zerosInOrder = reshape([yvm, yvplus1m].', [], 1);
+            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                "Bessel function zeros must interlace properly.");
+        end
+
+        function test_compare_yvm_interleaving_vVariable(testCase)
+            for v = 0.5:0.5:100
+                nZeros = 20;
+
+                yvm = besselyZeros(v, nZeros);
+                yvplus1m = besselyZeros(v + 1, nZeros);
+
+                zerosInOrder = reshape([yvm, yvplus1m].', [], 1);
+                testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                    "Bessel function zeros must interlace properly.");
+            end
+        end
+
+        %% Edge Case Tests
+        function testEdge_decreasingSpacing_vGreaterThanOneHalf(testCase)
+            v = 0.51;
+            nZeros = 1000;
+
+            jzeros = besselyZeros(v, nZeros);
             testCase.verifyLessThanOrEqual(diff(jzeros, 2), 0, ...
                 "Spacing of zeros must be monotonically decreasing.");
         end
 
-        function testEdge_increasingSpacing_nuLessThanOneHalf(testCase)
-            n = 0.49;
+        function testEdge_increasingSpacing_vLessThanOneHalf(testCase)
+            v = 0.49;
             nZeros = 1000;
 
-            jzeros = besselyZeros(n, nZeros);
+            jzeros = besselyZeros(v, nZeros);
             testCase.verifyGreaterThanOrEqual(diff(jzeros, 2), 0, ...
                 "Spacing of zeros must be monotonically increasing.");
         end
 
-        function testEdge_decreasingSpacing_nuLarge(testCase)
-            n = 1000;
+        function testEdge_decreasingSpacing_vLarge(testCase)
+            v = 1000;
             nZeros = 1000;
 
-            jzeros = besselyZeros(n, nZeros);
+            jzeros = besselyZeros(v, nZeros);
             testCase.verifyLessThanOrEqual(diff(jzeros, 2), 0, ...
                 "Spacing of zeros must be monotonically decreasing.");
         end
 
-        function testEdge_increasingSpacing_nuZero(testCase)
-            n = 0;
+        function testEdge_increasingSpacing_vZero(testCase)
+            v = 0;
             nZeros = 1000;
 
-            jzeros = besselyZeros(n, nZeros);
+            jzeros = besselyZeros(v, nZeros);
             testCase.verifyGreaterThanOrEqual(diff(jzeros, 2), 0, ...
                 "Spacing of zeros must be monotonically increasing.");
         end
