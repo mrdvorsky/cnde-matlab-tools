@@ -7,7 +7,7 @@ r12 = [1, 4];
 
 rPlot(:, 1) = linspace(0, 5, 10000);
 
-besselOrder = 0;
+besselOrder = 0.0;
 numZeros = 3;
 
 %% Plot
@@ -19,21 +19,21 @@ ylim([-1.5, 1.5]);
 
 %% Interactive
 hold on;
-interactivePlot(r12, 0*r12, ...
+interactiveDots(r12, 0*r12, ...
     {@updateFunction, linePlot, ax, besselOrder, numZeros});
 
 
 %% Update Function
 function [x, y] = updateFunction(x, y, ind, linePlot, axes, besselOrder, numZeros)
     y = 0*y;
-    [kc, alpha, beta] = besseljyprime_zeros(besselOrder, numZeros, min(x), max(x));
+    [k, t] = besselCrossPrimeZeros(besselOrder, max(x)./min(x), 1:numZeros);
 
     for ii = 1:numel(linePlot)
-        linePlot(ii).YData = besseljy(...
-            alpha(ii), beta(ii), besselOrder, kc(ii).*linePlot(ii).XData);
+        linePlot(ii).YData = besselCylinderPrime(...
+            besselOrder, t(ii), k(ii).*linePlot(ii).XData ./ min(x));
     end
 
-    legend(axes, compose("kc = %.2f", kc));
+    legend(axes, compose("kc = %.2f", k));
 end
 
 

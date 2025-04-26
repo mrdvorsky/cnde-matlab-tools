@@ -3,6 +3,10 @@ classdef tester_hypotn < matlab.unittest.TestCase
     %
     % Author: Matt Dvorsky
 
+    properties
+        tolVal = 1e-14;
+    end
+
     methods (Test)
         %% Basic Functionality Tests
         function test_singleInput(testCase)
@@ -38,7 +42,8 @@ classdef tester_hypotn < matlab.unittest.TestCase
             result = hypotn(2, 3, 6, 7);
             expected = sqrt(2^2 + 3^2 + 6^2 + 7^2);
 
-            testCase.verifyEqual(result, expected, "AbsTol", 1e-14);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         %% Vector/Matrix Input Tests

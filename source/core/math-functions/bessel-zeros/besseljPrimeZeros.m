@@ -1,59 +1,47 @@
-function [jpzeros] = besseljPrimeZeros(v, n)
-%Gives the first "n" zeros of the "besseljprime" function.
-% Returns a column vector with the first n zeros (j'vn) of the
-% "besseljPrime" function.
+function [jpvm] = besseljPrimeZeros(v, n)
+%Calculates the "n"th zero(s) of the "besseljPrime" function.
+% Returns the nth (1-indexed) zero of the "besseljPrime" function.
+%
+% *** Note that for J0'(x) (i.e., when v=0), the first zero is
+% approximately 3.83, rather than 0, due to convention. Since the first
+% zero of J1'(x) is approximately 1.84, there must be some discontinuity
+% between v=0 and v=1. This is chosen here to be at v>0. This means that
+% for very small orders (e.g., v=1e-6), the first zero may be innaccurate.
 %
 % Example Usage:
-%   jpzeros = besseljPrimeZeros(v, n);
-%   assert(all(besseljPrime(v, jpzeros) == 0));     % Almost passes.
+%   jpvm = besseljPrimeZeros(v, n);
+%   assert(all(besseljPrime(v, jpvm) == 0));      % Almost passes.
 %
 %
 % Inputs:
-%   v - Bessel function order. See "besselj" documentation.
-%   n - Number of zeros to find.
+%   v - Bessel function order(s).
+%   n - Which zeros to find, indexed starting at 1.
 %
 % Outputs:
-%   jpzeros - First "n" zeros of besseljPrime of order "v".
+%   jpvn - The "n"th zeros of besseljPrime of order "v".
 %
 % Author: Matt Dvorsky
 
 arguments
-    v(1, 1) {mustBeNonnegative, mustBeFinite};
-    n(1, 1) {mustBePositive, mustBeInteger};
+    v {mustBeNonnegative, mustBeFinite};
+    n {mustBePositive, mustBeInteger, ...
+        mustBeBroadcastable(v, n)};
 end
+
+%% Broadcast "v" and "n"
+% This is only necessary because MATLAB's bessel function implementation
+% does not support broadcasting properly.
+[v, n] = broadcastArrays(v, n);
 
 %% Calculate Zeros
-fun = @(y) besseljPrime(v, y);
+jpvm_desiredUnwrappedPhase = pi*n - 0.5*pi + pi*(v == 0);
+jpvm = jpvm_desiredUnwrappedPhase ...
+    + v + 0.8086165*v.^(1/3) - 0.5*pi;
+for nn = 1:5
+    [ph, ph_der] = besselhPrimePhaseUnwrapped(v, jpvm);
 
-jpzero0_guess = v + 0.8086165*v.^(1/3) + 3.83*(v == 0);
-for ii = 1:5
-    jpzero0_guess = jpzero0_guess ...
-        - 2 * besseljPrime(v, jpzero0_guess) ...
-        ./ (besseljPrime(v - 1, jpzero0_guess) - besseljPrime(v + 1, jpzero0_guess));
+    % Update using Newton's method
+    jpvm = jpvm - (ph - jpvm_desiredUnwrappedPhase)./ph_der;
 end
 
-assert(abs(besseljPrime(v, jpzero0_guess)) < 1e-10, ...
-    "Could not find initial zero.");
-
-jpzeros = zeros(n, 1);
-jpzeros(1) = jpzero0_guess;
-for ii = 2:n
-    jp_guess = jpzeros(ii - 1) + pi*[0.9, 1.1];
-    while sum(sign(fun(jp_guess))) ~= 0
-        jp_guess(2) = 1.1*jp_guess(2) - 0.1*jpzeros(ii - 1);
-    end
-    jpzeros(ii) = fzero(fun, jp_guess);
 end
-
-%% Refine Using Newtons Method
-for ii = 1:5
-    jpzeros = jpzeros ...
-        - 2 * besseljPrime(v, jpzeros) ...
-        ./ (besseljPrime(v - 1, jpzeros) - besseljPrime(v + 1, jpzeros));
-end
-
-assert(all(abs(besseljPrime(v, jpzeros)) < 1e-10), ...
-    "One or more zeros could not be found.");
-
-end
-

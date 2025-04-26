@@ -16,12 +16,14 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(a, b, 2);
             expected = sum(a.*b);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
-            
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
+
             % Test mean mode
             result = innerProduct(a, b, 2, SummationMode="mean");
             expected = mean(a.*b);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         function test_basicVectorInput2(testCase)
@@ -31,12 +33,14 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(a, b, 2);
             expected = sum(a.*b, 2);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
-            
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
+
             % Test mean mode
             result = innerProduct(a, b, 2, SummationMode="mean");
             expected = mean(a.*b, 2);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         function test_basicVectorInput3(testCase)
@@ -46,12 +50,14 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(a, b, 1);
             expected = sum(a.*b, 1);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
-            
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
+
             % Test mean mode
             result = innerProduct(a, b, 1, SummationMode="mean");
             expected = mean(a.*b, 1);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         function test_basicMatrixInput(testCase)
@@ -61,12 +67,14 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(A, B, 2);
             expected = sum(A.*B, 2);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
-            
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
+
             % Test mean mode
             result = innerProduct(A, B, 2, SummationMode="mean");
             expected = mean(A.*B, 2);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         function test_multipleDimensions(testCase)
@@ -76,12 +84,14 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(A, B, [1, 3]);
             expected = sum(A.*B, [1, 3]);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
-            
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
+
             % Test mean mode
             result = innerProduct(A, B, [1, 3], SummationMode="mean");
             expected = mean(A.*B, [1, 3]);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         function test_allDimensions(testCase)
@@ -91,12 +101,14 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(A, B, "all");
             expected = sum(A.*B, "all");
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
-            
+            testCase.verifyEqual(result, expected,...
+                AbsTol=testCase.tolVal);
+
             % Test mean mode
             result = innerProduct(A, B, "all", SummationMode="mean");
             expected = mean(A.*B, "all");
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         %% Broadcasting Tests
@@ -107,12 +119,14 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(A, B, 3);
             expected = sum(A.*B, 3);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
-            
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
+
             % Test mean mode
             result = innerProduct(A, B, 3, SummationMode="mean");
             expected = mean(A.*B, 3);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         %% Data Type Tests
@@ -123,12 +137,14 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(A, B, 4);
             expected = sum(double(A).*double(B), 4);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
-            
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
+
             % Test mean mode
             result = innerProduct(A, B, 4, SummationMode="mean");
             expected = mean(double(A).*double(B), 4);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         function test_intDataTypes2(testCase)
@@ -138,12 +154,14 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(A, B, [1, 4]);
             expected = sum(double(A).*double(B), [1, 4]);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
-            
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
+
             % Test mean mode
             result = innerProduct(A, B, [1, 4], SummationMode="mean");
             expected = mean(double(A).*double(B), [1, 4]);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         function test_singlePrecType(testCase)
@@ -153,12 +171,14 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(A, B, [1, 4]);
             expected = sum(A.*B, [1, 4]);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
-            
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
+
             % Test mean mode
             result = innerProduct(A, B, [1, 4], SummationMode="mean");
             expected = mean(A.*B, [1, 4]);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         %% Edge Case Tests
@@ -169,11 +189,13 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(A, B, 3);
             expected = A.*B;
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
-            
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
+
             % Test mean mode (should be same as sum since no summation occurs)
             result = innerProduct(A, B, 3, SummationMode="mean");
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         function testEdge_emptyInputDimToSum(testCase)
@@ -184,7 +206,7 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             result = innerProduct(A, B, 2);
             testCase.verifySize(result, [3, 1, 2]);
             testCase.verifyEqual(result, zeros(3, 1, 2));
-            
+
             % Test mean mode (should be nan)
             result = innerProduct(A, B, 2, SummationMode="mean");
             testCase.verifySize(result, [3, 1, 2]);
@@ -198,7 +220,7 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(A, B, 3);
             testCase.verifySize(result, [3, 0, 1, 4]);
-            
+
             % Test mean mode
             result = innerProduct(A, B, 3, SummationMode="mean");
             testCase.verifySize(result, [3, 0, 1, 4]);
@@ -212,7 +234,7 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             result = innerProduct(A, B, []);
             expected = A.*B;
             testCase.verifyEqual(result, expected);
-            
+
             % Test mean mode (should be same as sum)
             result = innerProduct(A, B, [], SummationMode="mean");
             testCase.verifyEqual(result, expected);
@@ -225,12 +247,14 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             % Test sum mode
             result = innerProduct(A, B, 4);
             expected = sum(A.*B, 4);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
-            
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
+
             % Test mean mode
             result = innerProduct(A, B, 4, SummationMode="mean");
             expected = mean(A.*B, 4);
-            testCase.verifyEqual(result, expected, AbsTol=testCase.tolVal);
+            testCase.verifyEqual(result, expected, ...
+                AbsTol=testCase.tolVal);
         end
 
         function testEdge_complexInputs(testCase)
@@ -241,7 +265,7 @@ classdef tester_innerProduct < matlab.unittest.TestCase
             result = innerProduct(A, B, 2);
             expected = sum(A.*B, 2);
             testCase.verifyEqual(result, expected);
-            
+
             % Test mean mode
             result = innerProduct(A, B, 2, SummationMode="mean");
             expected = mean(A.*B, 2);

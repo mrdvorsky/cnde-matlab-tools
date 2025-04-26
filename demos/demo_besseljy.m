@@ -5,9 +5,9 @@ close all;
 %% Inputs
 r12 = [1, 4];
 
-rPlot(:, 1) = linspace(0, 5, 10000);
+rPlot(:, 1) = linspace(0, 5, 1000);
 
-besselOrder = 40;
+besselOrder = 1;
 numZeros = 3;
 
 %% Plot
@@ -27,14 +27,14 @@ interactiveDots(r12, 0*r12, ...
 function [x, y] = updateFunction(x, y, ind, linePlot, axes, besselOrder, numZeros)
     y = 0*y;
 
-    [kc, t] = besseljyCrossZeros(besselOrder, numZeros, min(x), max(x));
+    [k, t] = besselCrossZeros(besselOrder, max(x)./min(x), 1:numZeros);
 
     for ii = 1:numel(linePlot)
-        linePlot(ii).YData = besseljy(...
-            t(ii), besselOrder, kc(ii).*linePlot(ii).XData);
+        linePlot(ii).YData = besselCylinder(...
+            besselOrder, t(ii), k(ii).*linePlot(ii).XData ./ min(x));
     end
 
-    legend(axes, compose("kc = %.2f", kc));
+    legend(axes, compose("kc = %.2f", k));
 end
 
 

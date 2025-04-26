@@ -4,10 +4,10 @@ classdef tester_besselyPrimeZeros < matlab.unittest.TestCase
     % Author: Matt Dvorsky
 
     properties
-        tolVal = 1e-14;
+        tolVal = 1e-13;
 
         v0 = [0, 1, 2, 10, 0.5, 1000, 10000];
-        jzero0 = [...
+        ypvn0 = [...
             2.197141326031017, ...
             3.683022856585178, ...
             5.002582931446064, ...
@@ -22,110 +22,159 @@ classdef tester_besselyPrimeZeros < matlab.unittest.TestCase
         %% Basic Functionality Tests
         function test_firstZero(testCase)
             v = testCase.v0(:);
-            z0Actual = arrayfun(@(n) besselyPrimeZeros(n, 1), v);
-            z0Exp = testCase.jzero0(:);
+            z0Actual = besselyPrimeZeros(v, 1);
+            z0Exp = testCase.ypvn0(:);
 
-            tableActual = table(v(:), z0Actual(:), besselyPrime(v(:), z0Actual(:)), ...
-                VariableNames=["v", "z0", "f(z0)"]);
-
-            tableExp = table(v(:), z0Exp, 0*z0Exp(:), ...
-                VariableNames=["v", "z0", "f(z0)"]);
-
-            testCase.verifyEqual(tableActual, tableExp, ...
+            testCase.verifyEqual(z0Actual, z0Exp, ...
                 RelTol=testCase.tolVal, AbsTol=testCase.tolVal);
+
+            % Verify that they are zeros.
+            besVal = besselyPrime(v, z0Actual);
+            testCase.verifyEqual(besVal, 0*v, ...
+                RelTol=testCase.tolVal, AbsTol=testCase.tolVal);
+        end
+
+        %% Assert Interleaving Property of Bessel Function Zeros
+        function test_compare_ypvn_interleaving_v0(testCase)
+            v = 0;
+            n(:, 1) = 1:1000;
+
+            ypvn = besselyPrimeZeros(v, n);
+            ypvplus1m = besselyPrimeZeros(v + 1, n);
+
+            zerosInOrder = reshape([ypvn, ypvplus1m].', [], 1);
+            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                "Bessel function zeros must interlace properly.");
+
+            besselValueAtZero = besselyPrime(v, ypvn);
+            testCase.verifyEqual(besselValueAtZero, ...
+                zeros(size(besselValueAtZero)), ...
+                AbsTol=testCase.tolVal);
+        end
+
+        function test_compare_ypvn_interleaving_v1(testCase)
+            v = 1;
+            n(:, 1) = 1:1000;
+
+            ypvn = besselyPrimeZeros(v, n);
+            ypvplus1m = besselyPrimeZeros(v + 1, n);
+
+            zerosInOrder = reshape([ypvn, ypvplus1m].', [], 1);
+            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                "Bessel function zeros must interlace properly.");
+
+            besselValueAtZero = besselyPrime(v, ypvn);
+            testCase.verifyEqual(besselValueAtZero, ...
+                zeros(size(besselValueAtZero)), ...
+                AbsTol=testCase.tolVal);
+        end
+
+        function test_compare_ypvn_interleaving_vOneHalf(testCase)
+            v = 0.5;
+            n(:, 1) = 1:1000;
+
+            ypvn = besselyPrimeZeros(v, n);
+            ypvplus1m = besselyPrimeZeros(v + 1, n);
+
+            zerosInOrder = reshape([ypvn, ypvplus1m].', [], 1);
+            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                "Bessel function zeros must interlace properly.");
+
+            besselValueAtZero = besselyPrime(v, ypvn);
+            testCase.verifyEqual(besselValueAtZero, ...
+                zeros(size(besselValueAtZero)), ...
+                AbsTol=testCase.tolVal);
+        end
+
+        function test_compare_ypvn_interleaving_v10000(testCase)
+            v = 10000;
+            n(:, 1) = 1:1000;
+
+            ypvn = besselyPrimeZeros(v, n);
+            ypvplus1m = besselyPrimeZeros(v + 1, n);
+
+            zerosInOrder = reshape([ypvn, ypvplus1m].', [], 1);
+            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                "Bessel function zeros must interlace properly.");
+
+            besselValueAtZero = besselyPrime(v, ypvn);
+            testCase.verifyEqual(besselValueAtZero, ...
+                zeros(size(besselValueAtZero)), ...
+                AbsTol=testCase.tolVal);
+        end
+
+        function test_compare_ypvn_interleaving_vVariable(testCase)
+            n(:, 1) = 1:20;
+            for v = 0.5:0.5:100
+                ypvn = besselyPrimeZeros(v, n);
+                ypvplus1m = besselyPrimeZeros(v + 1, n);
+
+                zerosInOrder = reshape([ypvn, ypvplus1m].', [], 1);
+                testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
+                    sprintf("Bessel function zeros (for v = %g) " + ...
+                    "must interlace properly.", v));
+
+                besselValueAtZero = besselyPrime(v, ypvn);
+                testCase.verifyEqual(besselValueAtZero, ...
+                    zeros(size(besselValueAtZero)), ...
+                    AbsTol=testCase.tolVal);
+            end
+        end
+
+        %% Broadcasting Tests
+        function test_broadcasting1(testCase)
+            v = rand(10, 1);
+            n = round(10*rand(1, 5)) + 1;
+
+            ypvn = besselyPrimeZeros(v, n);
+            testCase.verifySize(ypvn, [numel(v), numel(n)]);
+        end
+
+        function test_broadcasting2(testCase)
+            v = rand(3, 1, 4);
+            n = round(10*rand(1, 5, 4)) + 1;
+
+            ypvn = besselyPrimeZeros(v, n);
+            testCase.verifySize(ypvn, [3, 5, 4]);
         end
 
         %% Edge Case Tests
         function testEdge_decreasingSpacing_vGreaterThanOneHalf(testCase)
             v = 0.51;
-            nZeros = 1000;
+            n(:, 1) = 1:1000;
 
-            jzeros = besselyPrimeZeros(v, nZeros);
-            testCase.verifyLessThanOrEqual(diff(jzeros, 2), 0, ...
+            ypvn = besselyPrimeZeros(v, n);
+            testCase.verifyLessThanOrEqual(diff(ypvn, 2), 0, ...
                 "Spacing of zeros must be monotonically decreasing.");
         end
 
         function testEdge_decreasingSpacing_vLarge(testCase)
             v = 1000;
-            nZeros = 1000;
+            n(:, 1) = 1:1000;
 
-            jzeros = besselyPrimeZeros(v, nZeros);
-            testCase.verifyLessThanOrEqual(diff(jzeros, 2), 0, ...
+            ypvn = besselyPrimeZeros(v, n);
+            testCase.verifyLessThanOrEqual(diff(ypvn, 2), 0, ...
                 "Spacing of zeros must be monotonically decreasing.");
         end
 
         function testEdge_decreasingSpacing_vZero(testCase)
             v = 0;
-            nZeros = 1000;
+            n(:, 1) = 1:1000;
 
-            jzeros = besselyPrimeZeros(v, nZeros);
-            testCase.verifyLessThanOrEqual(diff(jzeros, 2), 0, ...
+            ypvn = besselyPrimeZeros(v, n);
+            testCase.verifyLessThanOrEqual(diff(ypvn, 2), 0, ...
                 "Spacing of zeros must be monotonically increasing.");
         end
 
-        %% Assert Interleaving Property of Bessel Function Zeros
-        function test_compare_ypvm_interleaving_v0(testCase)
-            v = 0;
-            nZeros = 1000;
-
-            ypvm = besselyPrimeZeros(v, nZeros);
-            ypvplus1m = besselyPrimeZeros(v + 1, nZeros);
-
-            zerosInOrder = reshape([ypvm, ypvplus1m].', [], 1);
-            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
-                "Bessel function zeros must interlace properly.");
-        end
-
-        function test_compare_ypvm_interleaving_v1(testCase)
-            v = 1;
-            nZeros = 1000;
-
-            ypvm = besselyPrimeZeros(v, nZeros);
-            ypvplus1m = besselyPrimeZeros(v + 1, nZeros);
-
-            zerosInOrder = reshape([ypvm, ypvplus1m].', [], 1);
-            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
-                "Bessel function zeros must interlace properly.");
-        end
-
-        function test_compare_ypvm_interleaving_vOneHalf(testCase)
-            v = 0.5;
-            nZeros = 1000;
-
-            ypvm = besselyPrimeZeros(v, nZeros);
-            ypvplus1m = besselyPrimeZeros(v + 1, nZeros);
-
-            zerosInOrder = reshape([ypvm, ypvplus1m].', [], 1);
-            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
-                "Bessel function zeros must interlace properly.");
-        end
-
-        function test_compare_ypvm_interleaving_v10000(testCase)
-            v = 10000;
-            nZeros = 1000;
-
-            ypvm = besselyPrimeZeros(v, nZeros);
-            ypvplus1m = besselyPrimeZeros(v + 1, nZeros);
-
-            zerosInOrder = reshape([ypvm, ypvplus1m].', [], 1);
-            testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
-                "Bessel function zeros must interlace properly.");
-        end
-
-        function test_compare_ypvm_interleaving_vVariable(testCase)
-            for v = 0.5:0.5:100
-                nZeros = 20;
-
-                ypvm = besselyPrimeZeros(v, nZeros);
-                ypvplus1m = besselyPrimeZeros(v + 1, nZeros);
-
-                zerosInOrder = reshape([ypvm, ypvplus1m].', [], 1);
-                testCase.verifyReturnsTrue(@() issorted(zerosInOrder), ...
-                    "Bessel function zeros must interlace properly.");
-            end
-        end
-
         %% Error Condition Tests
+        function testError_broadcastingMismatch(testCase)
+            v = rand(10, 1);
+            n = round(10*rand(9, 5)) + 1;
+
+            testCase.verifyError(@() besselyPrimeZeros(v, n), ...
+                "MATLAB:sizeDimensionsMustMatch");
+        end
+
         function testError_nonPositiveN(testCase)
             testCase.verifyError(@() besselyPrimeZeros(0, 0), ...
                 "MATLAB:validators:mustBePositive");

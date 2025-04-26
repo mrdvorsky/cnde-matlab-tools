@@ -1,60 +1,41 @@
-function [ypzeros] = besselyPrimeZeros(v, n)
-%Gives the first "n" zeros of the "besselyPrime" function.
-% Returns a column vector with the first n zeros (y'vn) of the
-% "besselyPrime" function.
+function [ypvm] = besselyPrimeZeros(v, n)
+%Calculates the "n"th zero(s) of the "besselyPrime" function.
+% Returns the nth (1-indexed) zero of the "besselyPrime" function.
 %
 % Example Usage:
-%   ypzeros = besselyPrimeZeros(v, n);
-%   assert(all(besselyPrime(v, ypzeros) == 0));     % Almost passes.
+%   ypvm = besselyPrimeZeros(v, n);
+%   assert(all(besselyPrime(v, ypvm) == 0));      % Almost passes.
 %
 %
 % Inputs:
-%   v - Bessel function order. See "bessely" documentation.
-%   n - Number of zeros to find.
+%   v - Bessel function order(s).
+%   n - Which zeros to find, indexed starting at 1.
 %
 % Outputs:
-%   ypzeros - First "n" zeros of besselyPrime of order "v".
+%   ypvn - The "n"th zeros of besselyPrime of order "v".
 %
 % Author: Matt Dvorsky
 
 arguments
-    v(1, 1) {mustBeNonnegative, mustBeFinite};
-    n(1, 1) {mustBePositive, mustBeInteger};
+    v {mustBeNonnegative, mustBeFinite};
+    n {mustBePositive, mustBeInteger, ...
+        mustBeBroadcastable(v, n)};
 end
+
+%% Broadcast "v" and "n"
+% This is only necessary because MATLAB's bessel function implementation
+% does not support broadcasting properly.
+[v, n] = broadcastArrays(v, n);
 
 %% Calculate Zeros
-fun = @(y) besselyPrime(v, y);
+ypvm_desiredUnwrappedPhase = pi*n;
+ypvm = ypvm_desiredUnwrappedPhase ...
+    + max(v - 1, v + 1.8210980*v.^(1/3) - pi);
+for nn = 1:5
+    [ph, ph_der] = besselhPrimePhaseUnwrapped(v, ypvm);
 
-ypzeros = zeros(n, 1);
-ypzero0_guess = v + 1.8210980*v.^(1/3) + max(0, 2.19*(1 - v));
-
-for ii = 1:5
-    ypzero0_guess = ypzero0_guess ...
-        - 2 * besselyPrime(v, ypzero0_guess) ...
-        ./ (besselyPrime(v - 1, ypzero0_guess) - besselyPrime(v + 1, ypzero0_guess));
+    % Update using Newton's method
+    ypvm = ypvm - (ph - ypvm_desiredUnwrappedPhase)./ph_der;
 end
 
-assert(abs(besselyPrime(v, ypzero0_guess)) < 1e-10, ...
-    "Could not find initial zero.");
-
-ypzeros(1) = ypzero0_guess;
-for ii = 2:n
-    yp_guess = ypzeros(ii - 1) + pi*[0.9, 1.1];
-    while sum(sign(fun(yp_guess))) ~= 0
-        yp_guess(2) = 1.1*yp_guess(2) - 0.1*ypzeros(ii - 1);
-    end
-    ypzeros(ii) = fzero(fun, yp_guess);
 end
-
-%% Refine Using Newtons Method
-for ii = 1:5
-    ypzeros = ypzeros ...
-        - 2 * besselyPrime(v, ypzeros) ...
-        ./ (besselyPrime(v - 1, ypzeros) - besselyPrime(v + 1, ypzeros));
-end
-
-assert(all(abs(besselyPrime(v, ypzeros)) < 1e-10), ...
-    "One or more zeros could not be found.");
-
-end
-
