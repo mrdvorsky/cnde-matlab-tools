@@ -1,0 +1,21 @@
+Test functions
+
+- nearestIndex
+- onesLike
+- zerosLike
+- getDataTipCoordinates
+- db
+
+- exportScan
+- importScan
+- importSdt
+- importSnp
+
+- showImage
+
+Not to be tested
+- renameMatFileFields
+- plot_squeeze
+- loglog_squeeze
+- semilogx_squeeze
+- semilogy_squeeze
