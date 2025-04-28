@@ -67,7 +67,7 @@ function mustBePositiveOddInteger(num)
     mustBeInteger(num);
     mustBePositive(num);
     if mod(num, 2) ~= 1
-        throwAsCaller(MException("CNDE:mustBePositiveOddInteger", ...
+        throwAsCaller(MException("exampleFunction:mustBePositiveOddInteger", ...
             "Value must be a positive odd integer."));
     end
 end

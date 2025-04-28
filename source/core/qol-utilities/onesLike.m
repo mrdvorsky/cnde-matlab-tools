@@ -5,11 +5,14 @@ function [onesArray] = onesLike(arrayIn, options)
 % "broadcasted" size will be used instead.
 %
 % Example Usage:
-%   % The output "onesArray" has the same size as "existingArray".
+%   % The output "onesArray" has the same size and type as "existingArray".
 %   [onesArray] = onesLike(existingArray);
 %
 %   % The output "onesArray" has the "broadcasted" size of all inputs.
 %   [onesArray] = onesLike(arr1, arr2, arr3, ...);
+%   
+%   Force a specific type.
+%   [onesArray] = onesLike(arr1, arr2, arr3, ..., Type="uint8");
 %
 %
 % Author: Matt Dvorsky
@@ -19,8 +22,8 @@ arguments (Repeating)
 end
 arguments
     options.Type(1, 1) string {mustBeMember(options.Type, [ ...
-        "double", "single", "logical", "int8", "uint8", "int16", ...
-        "uint16", "int32", "uint32", "int64", "uint64"])} = "double";
+        "infer", "double", "single", "logical", "int8", "uint8", "int16", ...
+        "uint16", "int32", "uint32", "int64", "uint64"])} = "infer";
 end
 
 %% Create Output Array

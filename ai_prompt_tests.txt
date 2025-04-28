@@ -1,0 +1,7 @@
+Here are some example unit tests that I have written for a MATLAB library. Please write unit tests for the provided functions.
+
+Use the following coding standards:
+- When defining arrays, use commas.
+- Use camelCase for variable names that are scalars or 1d vectors and functions, otherwise use PascalCase for multidimensional arrays.
+- Prefer double quotes for strings.
+- Always use the Arg=Val syntax for named input arguments to functions.

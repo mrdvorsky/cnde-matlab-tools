@@ -5,9 +5,9 @@ close all;
 %% Inputs
 r12 = [1, 4];
 
-rPlot(:, 1) = linspace(0, 5, 10000);
+rPlot(:, 1) = linspace(0, 5, 1000);
 
-besselOrder = 0.0;
+besselOrder = 10;
 numZeros = 3;
 
 %% Plot
@@ -29,7 +29,7 @@ function [x, y] = updateFunction(x, y, ind, linePlot, axes, besselOrder, numZero
     [k, t] = besselCrossPrimeZeros(besselOrder, max(x)./min(x), 1:numZeros);
 
     for ii = 1:numel(linePlot)
-        linePlot(ii).YData = besselCylinderPrime(...
+        linePlot(ii).YData = besselCylinder(...
             besselOrder, t(ii), k(ii).*linePlot(ii).XData ./ min(x));
     end
 

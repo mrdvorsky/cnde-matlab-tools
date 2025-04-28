@@ -1,6 +1,6 @@
 classdef tester_exampleFunction < matlab.unittest.TestCase
     % Unit tests for the exampleFunction function.
-    % 
+    %
     % This class should serve as an example for how to format unit tests
     % for your custom functions.
     %
@@ -22,7 +22,7 @@ classdef tester_exampleFunction < matlab.unittest.TestCase
     properties
         % If needed, the class can store any objects required for the unit
         % tests.
-        % 
+        %
         % Make sure to use the teardown and setup methods if needed.
         % https://www.mathworks.com/help/matlab/matlab_prog/write-setup-and-teardown-code-using-classes.html
     end
@@ -52,7 +52,7 @@ classdef tester_exampleFunction < matlab.unittest.TestCase
 
         function testDefault_stringArray(testCase)
             [~, out2] = exampleFunction("b", false);
-            
+
             testCase.verifyEqual(out2, "");
         end
 
@@ -66,7 +66,7 @@ classdef tester_exampleFunction < matlab.unittest.TestCase
         function testError_evenPositiveOddInt(testCase)
             testCase.verifyError(...
                 @() exampleFunction("x", true, PositiveOddInt=4), ...
-                "CNDE:mustBePositiveOddInteger");
+                "exampleFunction:mustBePositiveOddInteger");
         end
 
         %% Edge Case Tests

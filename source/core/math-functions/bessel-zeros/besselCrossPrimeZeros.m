@@ -64,7 +64,7 @@ for nn = 1:8
 end
 
 %% Calculate BesselCylinder Phase Shift Coefficients
-tpvn = 1j*besselhPrime(v, 1, kpvn);
+tpvn = -1j*besselhPrime(v, 1, kpvn);
 tpvn = tpvn ./ abs(tpvn);
 tpvn(isnan(tpvn)) = 1;
 

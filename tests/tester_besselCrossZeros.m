@@ -89,10 +89,23 @@ classdef tester_besselCrossZeros < matlab.unittest.TestCase
             kvn2 = besselCylinder(v, t0Actual, lam.*k0Actual);
             testCase.verifyEqual(kvn2, 0*v, ...
                 AbsTol=testCase.tolVal);
+        end
 
-            % % Verify that besselCylinderPrime is positive at k0Actual.
-            % kpvn1 = besselCylinderPrime(v, t0Actual, k0Actual);
-            % testCase.verifyGreaterThan(kpvn1, 0);
+        function test_besselCylinderSign(testCase)
+            v = testCase.v0(:);
+            lam = testCase.lam0(:);
+            n(1, :) = 1:5;
+
+            [k, t] = besselCrossZeros(v, lam, n);
+
+            % We want to test whether the derivative of besselCylinder is
+            % positive at "k", but for high orders, we can't test
+            % directly. Instead, we can check at "k.*lam" to see whether
+            % the derivative at "k" is positive.
+            besVal = besselCylinderPrime(v, t, k.*lam) .* (-1).^n;
+
+            testCase.verifyGreaterThan(besVal, 0, ...
+                "Derivative should be positive at first zero.");
         end
 
         %% Assert Interleaving Property of Bessel Function Zeros
