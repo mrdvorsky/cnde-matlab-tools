@@ -23,29 +23,82 @@ end
 updaterTitle = sprintf("'%s' Updater", libName);
 
 %% Look for Git Repo
-repo = gitrepo(libPath);
+try
+    repo = gitrepo(libPath);
+catch ex
+    warning("Failed to open git repository. Git may not be installed.");
+    rethrow(ex);
+end
 fetch(repo);
 
-isThereAnUpdate = false;
+%% Check Alternate Branch
+if ~strcmp(repo.CurrentBranch.Name, "main")
+    if options.AlwaysShowPopupWindow
+        msgbox(sprintf("The '%s' libary is currently switched to " + ...
+            "a different branch (%s). Update will not be performed. " + ...
+            "Make sure to run the update function once you have " + ...
+            "switched back.", ...
+            libName, repo.CurrentBranch.Name), ...
+            updaterTitle);
+    end
+    return;
+end
+
+%% Check for Remote Updates
+updateLog = repo.log(Revisions="origin/main");
+
+isThereAnUpdate = ~strcmp(updateLog.ID(1), ...
+    repo.CurrentBranch.LastCommit.ID);
+
 if ~isThereAnUpdate
     if options.AlwaysShowPopupWindow
-        msgbox(sprintf("'%s' libary is up to date (%s).", ...
+        msgbox(sprintf("The '%s' libary is up to date (%s).", ...
             libName, cndeMatlabTools_getVersion()), ...
             updaterTitle);
     end
     return;
 end
 
-%% Popup Window
+%% Ask to Update
 resp = questdlg(sprintf(...
-    "'%s' library has updates. Do you want to update?", ...
+    "The '%s' library has updates. Do you want to update?", ...
     libName), ...
     updaterTitle, ...
     "Update", "Cancel", "Update");
 
-if strcmp(resp, "Update")
-    fprintf("Test\r\n");
+if strcmp(resp, "Cancel")
+    return;
 end
 
+%% Check for Local Changes to Library
+changesTable = repo.status(IncludeIgnoredFiles=false, ...
+    IncludeUntrackedFiles=false);
+
+if height(changesTable) > 0
+    resp = questdlg(sprintf(...
+        "The '%s' library has been modified, and thus updating " + ...
+        "will result in any changes being lost. Do you want to proceed?", ...
+        libName), ...
+        updaterTitle, ...
+        "?? Revert all Changes ??", "Cancel", "Cancel");
+    if strcmp(resp, "Cancel")
+        return;
+    end
+
+    for ii = 1:height(changesTable)
+        repo.discardChanges(changesTable.File{ii});
+    end
 end
+
+%% Perform Update
+pull(repo);
+msgbox(sprintf("The '%s' libary was successfully updated to %s.", ...
+    libName, cndeMatlabTools_getVersion()), ...
+    updaterTitle);
+
+%% Setup Paths by Reinstalling
+cndeMatlabTools_install();
+
+end
+
 

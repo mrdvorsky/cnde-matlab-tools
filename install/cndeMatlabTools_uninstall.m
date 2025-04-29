@@ -35,9 +35,10 @@ if ~isempty(dir(startupFilePath))
     end
 end
 
-%% Remove Folders from Path
-rmpath(genpath(fullfile(libPath, "source")));
-rmpath(fullfile(libPath, "install"));
+%% Clean Path
+pathAll = split(path(), pathsep());
+pathAllLib = pathAll(startsWith(pathAll, libPath));
+rmpath(pathAllLib{:});
 
 %% Delete the Functions in UserPath Folder
 delete(fullfile(startupFileLocation, strcat(libStartupFileName, "*")));
