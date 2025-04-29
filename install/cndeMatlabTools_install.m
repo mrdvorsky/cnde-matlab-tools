@@ -1,4 +1,4 @@
-function [] = cndeMatlabTools_install()
+function [] = cndeMatlabTools_install(options)
 %This function "installs" the cnde-matlab-tools library.
 % Essentially, this function does the following:
 %   - Creates the "startup.m" file in the userpath directory, if it does
@@ -10,6 +10,10 @@ function [] = cndeMatlabTools_install()
 %   - Runs the "cndeMatlabTools_startup" function.
 %
 % Author: Matt Dvorsky
+
+arguments
+    options.ShowFinishedPopup(1, 1) logical = true;
+end
 
 %% Inputs and Paths
 startupLineSearch = "cndeMatlabTools_startup(";
@@ -64,11 +68,13 @@ pathAllLib = pathAll(startsWith(pathAll, libPath));
 rmpath(pathAllLib{:});
 
 %% Run Startup
-cndeMatlabTools_startup(CheckForUpdates=true);
+cndeMatlabTools_startup(CheckForUpdates=false);
 
 %% Finished Dialogue
-msgbox(sprintf("Library '%s' was successfully installed.", libName), ...
-    sprintf("'%s Installer'", libName));
+if options.ShowFinishedPopup
+    msgbox(sprintf("Library '%s' was successfully installed.", libName), ...
+        sprintf("'%s Installer'", libName));
+end
 
 end
 

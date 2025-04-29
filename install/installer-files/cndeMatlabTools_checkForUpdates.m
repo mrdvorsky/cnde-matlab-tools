@@ -4,7 +4,10 @@ function [] = cndeMatlabTools_checkForUpdates(options)
 %   - Fetch latest from remote git repo.
 %   - Check if there is an update.
 %   - If there is an update, ask the user if they want to update.
-%       - If user has modified libary, ask if they want to revert.
+%       - If user has modified libary, ask if they want to revert all
+%           changes, and then do so.
+%       - Perform the update.
+%       - Re-install (fix paths, and then copy update and startup files).
 %
 % Author: Matt Dvorsky
 
@@ -97,7 +100,7 @@ msgbox(sprintf("The '%s' libary was successfully updated to %s.", ...
     updaterTitle);
 
 %% Setup Paths by Reinstalling
-cndeMatlabTools_install();
+cndeMatlabTools_install(ShowFinishedPopup=false);
 
 end
 
