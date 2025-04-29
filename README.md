@@ -24,7 +24,7 @@ Open MATLAB and run the following commands (note that this requires git to be in
 cd(userpath());
 gitclone("https://github.com/mrdvorsky/cnde-matlab-tools.git");
 cd(fullfile("cnde-matlab-tools", "install"));
-cndeMatlabUtils_install();
+cndeMatlabTools_install();
 ```
 
 This will clone this git repository in the "userpath()" folder.
