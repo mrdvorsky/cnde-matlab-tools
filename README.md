@@ -22,8 +22,8 @@ A curated collection of MATLAB tools for accelerating research workflows in the 
 Open MATLAB and run the following commands (note that this requires git to be installed):
 ```matlab
 cd(userpath());
-gitclone("https://git.ece.iastate.edu/amntl/cnde-matlab-utils");
-cd(fullfile("cnde-matlab-utils", "install"));
+gitclone("https://github.com/mrdvorsky/cnde-matlab-tools.git");
+cd(fullfile("cnde-matlab-tools", "install"));
 cndeMatlabUtils_install();
 ```
 
