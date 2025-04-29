@@ -35,14 +35,15 @@ rmpath(genpath(fullfile(userpath(), "cnde-matlab-utils", "source")));
 rmpath(fullfile(userpath(), "cnde-matlab-utils", "install"));
 
 %% Popup Window
-% resp = questdlg("Library 'cnde-matlab-utils' was successfully uninstalled. " + ...
-%     "The git repository", ...
-%     "Uninstall 'cnde-matlab-utils'", ...
-%     "Yes", "No", "No");
-% 
-% if strcmp(resp, "Yes")
-%     rmdir(fullfile(userpath());
-% end
+resp = questdlg("Library 'cnde-matlab-utils' was successfully uninstalled. " + ...
+    "The git repository is still present on your computer. " + ...
+    "Do you want to open the folder so that you can delete it?", ...
+    "Uninstall 'cnde-matlab-utils'", ...
+    "Yes", "No", "Yes");
+
+if strcmp(resp, "Yes")
+    rmdir(fullfile(userpath());
+end
 
 end
 

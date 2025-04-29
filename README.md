@@ -19,27 +19,15 @@ A curated collection of MATLAB tools for accelerating research workflows in the 
 ---
 
 ## Installation
-
-### 1. Clone the Repository
-```bash
-git clone https://gitlab.com/your-lab-name/matlab-utilities.git
-```
-
-### 2. Add to MATLAB Path
-In MATLAB:
+Open MATLAB and run the following commands (note that this requires git to be installed):
 ```matlab
-addpath(genpath('/path/to/matlab-utilities'));
-savepath; % Optional: Save path for future sessions
+cd(userpath());
+gitclone("https://git.ece.iastate.edu/amntl/cnde-matlab-utils");
+cd(fullfile("cnde-matlab-utils", "install"));
+cndeMatlabUtils_install();
 ```
 
-### 3. Verify Dependencies
-Ensure required toolboxes are installed:
-```matlab
-ver  % Check for:
-%   - Signal Processing Toolbox
-%   - Instrument Control Toolbox
-%   - Statistics and Machine Learning Toolbox
-```
+This will clone this git repository in the "userpath()" folder.
 
 ---
 
