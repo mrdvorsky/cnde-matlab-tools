@@ -18,5 +18,10 @@ end
 addpath(fullfile(libPath, "install"));
 addpath(genpath(fullfile(libPath, "source")));
 
+%% Check for Updates
+if options.CheckForUpdates
+    cndeMatlabTools_checkForUpdates(AlwaysShowPopupWindow=false);
+end
+
 end
 
