@@ -1,6 +1,5 @@
-# MATLAB CNDE Research Tools
+# CNDE MATLAB Research Tools
 
-![GitLab](https://img.shields.io/badge/GitLab-%23181717.svg?style=flat&logo=gitlab&logoColor=white)
 ![MATLAB](https://img.shields.io/badge/MATLAB-R2023b%2B-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
