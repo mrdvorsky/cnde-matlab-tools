@@ -19,7 +19,7 @@ A curated collection of MATLAB tools for accelerating research workflows in the 
 ---
 
 ## Installation
-Open MATLAB and run the following commands (note that this requires git to be installed):
+Open MATLAB and run the following commands in the command window (note that this requires git to be installed on your system):
 ```matlab
 cd(userpath());
 gitclone("https://github.com/mrdvorsky/cnde-matlab-tools.git");
