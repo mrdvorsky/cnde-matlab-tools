@@ -1,5 +1,5 @@
 function [varargout] = nearestIndex(xSearchSpace, x)
-%Finds index of value closest to "xSearchSpace" in "x".
+%Finds index of "xSearchSpace" with the closest value to "x".
 % Returns the "subscripts" of the values of the search space that are
 % closest to the value that are being searched for.
 %
@@ -24,12 +24,12 @@ function [varargout] = nearestIndex(xSearchSpace, x)
 % Author: Matt Dvorsky
 
 arguments
-    xSearchSpace;
+    xSearchSpace {mustBeNonempty};
     x;
 end
 
 %% Calculate
-xInd = zerosLike(x);
+xInd = zerosLike(x, Type="double");
 for ii = 1:length(x(:))
     [~, xInd(ii)] = min(abs(xSearchSpace(:) - x(ii)));
 end

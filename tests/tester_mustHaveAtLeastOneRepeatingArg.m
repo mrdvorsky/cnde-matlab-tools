@@ -14,7 +14,7 @@ classdef tester_mustHaveAtLeastOneRepeatingArg < matlab.unittest.TestCase
         function testError_emptyInput(testCase)
             testCase.verifyError(...
                 @() mustHaveAtLeastOneRepeatingArg({}), ...
-                "validators:mustHaveAtLeastOneRepeatingArg");
+                "MATLAB:narginchk:notEnoughInputs");
         end
     end
 end

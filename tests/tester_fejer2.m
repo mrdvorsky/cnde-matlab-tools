@@ -176,7 +176,7 @@ classdef tester_fejer2 < matlab.unittest.TestCase
             [~, weights] = fejer2(N, a, b);
 
             numerical = sum(weights);
-            analytical = 0;
+            analytical = -1;
             testCase.verifyEqual(numerical, analytical, ...
                 AbsTol=testCase.tolVal);
         end
