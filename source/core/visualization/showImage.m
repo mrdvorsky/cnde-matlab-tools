@@ -1,5 +1,5 @@
 function [varargout] = showImage(x, y, ImgIn, options)
-%SHOWIMAGE Shows an 2D (potentially complex-valued) image.
+%Shows an 2D (potentially complex-valued) image.
 % This function shows a 2D image, and it optionally formats a complex
 % image for display. It also sets the axis aspect ratio properly.
 %
