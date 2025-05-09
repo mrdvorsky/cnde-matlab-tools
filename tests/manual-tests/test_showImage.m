@@ -3,8 +3,8 @@ clear;
 close all;
 
 %% Inputs
-x(:, 1) = 15 * linspace(-1, 1, 700);
-y(1, :) = 10 * linspace(-1, 1, 500);
+x(:, 1) = 15 * linspace(-1, 1, 350);
+y(1, :) = 10 * linspace(-1, 1, 250);
 
 %% Calculate Image
 r = hypot(x, y);
@@ -14,6 +14,7 @@ Img = besselh(1, 2, r) .* cos(phi - pi/4) .* (r > 1);
 
 %% Plotting
 figure;
-showImage(x, y, Img, DisplayFormat="Magnitude");
+[~, updateFun] = showImage(x, y, Img, DisplayFormat="Magnitude");
 
-
+pause(5);
+updateFun(conj(Img));
