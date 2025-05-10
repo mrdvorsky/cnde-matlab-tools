@@ -30,7 +30,7 @@ function [plotHandle, fillHandle] = plotWithErrorBounds(x, y, lineSpec, options,
 
 arguments
     x(:, 1);
-    y(:, :) {mustHaveEqualSizes(y, x, Dimension=1)};
+    y(:, :) {mustHaveEqualSizes(y, x, Dimensions=1)};
 
     lineSpec(1, 1) string = "";
 
