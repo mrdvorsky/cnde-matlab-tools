@@ -109,7 +109,7 @@ lineHandles = plot(options.Axis, xp, yp, lineSpec, plotOptions);
 
 for ii = 1:size(val, 2)
     lineHandles(ii).UserData.f = f;
-    lineHandles(ii).UserData.val = val;
+    lineHandles(ii).UserData.val = val(:, ii);
 end
 
 %% Add Custom Data Tips
@@ -125,6 +125,11 @@ if options.AddCustomDataTips
         
         lineHandles(ii).DataTipTemplate.DataTipRows = dataTipsCustom;
     end
+end
+
+%% Create "updateFun" Return Argument
+if nargout >= 2
+    updateFun = @(newVal) updateFunHandler(options.Axis, lineHandles, newVal);
 end
 
 %% Draw Unit Circle and Axes
@@ -161,12 +166,43 @@ end
 
 
 
+%% UpdateFun Handler
+function updateFunHandler(axis, lineHandles, newVal)
+    newVal = squeeze(newVal);
+    if isvector(newVal)
+        newVal = newVal(:);
+    end
+
+    options = axis.UserData.options;
+
+    for ii = 1:numel(lineHandles)
+        [xp, yp] = convertData(options, ...
+            lineHandles(ii).UserData.f, newVal(:, ii));
+
+        lineHandles(ii).XData = xp;
+        lineHandles(ii).YData = yp;
+
+        lineHandles(ii).UserData.val = newVal(:, ii);
+    end
+
+    if options.AddCustomDataTips
+        for ii = 1:numel(lineHandles)
+            lineHandles(ii).DataTipTemplate.DataTipRows(2).Value ...
+                = real(newVal(:, ii));
+            lineHandles(ii).DataTipTemplate.DataTipRows(3).Value ...
+                = imag(newVal(:, ii));
+            lineHandles(ii).DataTipTemplate.DataTipRows(4).Value ...
+                = abs(newVal(:, ii));
+            lineHandles(ii).DataTipTemplate.DataTipRows(5).Value ...
+                = rad2deg(angle(newVal(:, ii)));
+        end
+    end
+end
 
 %% Display Format Update Function
 function displayFormatUpdateFun(itemLabel, axisHandle)
+    axisHandle.UserData.options.DisplayFormat = itemLabel;
     options = axisHandle.UserData.options;
-    
-    options.DisplayFormat = itemLabel;
 
     for ii = 1:numel(axisHandle.Children)
         f = axisHandle.Children(ii).UserData.f;
