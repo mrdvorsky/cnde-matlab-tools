@@ -85,7 +85,8 @@ end
 
 if isfield(options, "WeightingMoments")
     if numel(options.WeightingMoments) ~= N
-        error("'WeightingMoments' argument must be a vector " + ...
+        error("fejer2:incorrectWeightingMomentsSize", ...
+            "'WeightingMoments' argument must be a vector " + ...
             "with size N (%d).", N);
     end
 end

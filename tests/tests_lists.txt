@@ -1,10 +1,6 @@
 Test functions
 
-- nearestIndex
-- onesLike
-- zerosLike
 - getDataTipCoordinates
-- db
 
 - exportScan
 - importScan

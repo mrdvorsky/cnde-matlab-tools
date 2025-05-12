@@ -20,7 +20,7 @@ end
 if ~isempty(Arrays)
     return;
 end
-throwAsCaller(MException("validators:mustHaveAtLeastOneRepeatingArg", ...
+throwAsCaller(MException("MATLAB:narginchk:notEnoughInputs", ...
     "Must have at least one argument."));
 
 end

@@ -52,12 +52,12 @@ classdef tester_broadcastSize < matlab.unittest.TestCase
 
         function testError_noArgs(testCase)
             testCase.verifyError(@() broadcastSize(), ...
-                "validators:mustHaveAtLeastOneRepeatingArg");
+                "MATLAB:narginchk:notEnoughInputs");
         end
 
         function testError_noArgsWithDimensionSpec(testCase)
             testCase.verifyError(@() broadcastSize(Dimensions=1), ...
-                "validators:mustHaveAtLeastOneRepeatingArg");
+                "MATLAB:narginchk:notEnoughInputs");
         end
 
         %% Edge Case Tests

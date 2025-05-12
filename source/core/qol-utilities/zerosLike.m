@@ -4,12 +4,20 @@ function [zerosArray] = zerosLike(arrayIn, options)
 % single input is passed in. If multiple arrays are passed, the
 % "broadcasted" size will be used instead.
 %
+% The type of the output array can be specified using the "Type" named
+% argument, otherwise it will be inferred such that the type of
+% "zerosLike(A, B, C, ...)" will be the same type as 
+% "0*(A + B + C + ...)" if possible, or it will be "double";
+%
 % Example Usage:
-%   % The output "zerosArray" has the same size as "existingArray".
+%   % The output "zerosArray" has the same size and type as "existingArray".
 %   [zerosArray] = zerosLike(existingArray);
 %
 %   % The output "zerosArray" has the "broadcasted" size of all inputs.
 %   [zerosArray] = zerosLike(arr1, arr2, arr3, ...);
+%
+%   % The type of the output "zerosArray" will be "single".
+%   [zerosArray] = zerosLike(arr1, arr2, arr3, ..., Type="single");
 %
 %
 % Author: Matt Dvorsky
@@ -18,12 +26,29 @@ arguments (Repeating)
     arrayIn;
 end
 arguments
-    options.Type(1, 1) string {mustBeMember(options.Type, [ ...
+    options.Type(1, 1) string {mustBeMember(options.Type, ["infer", ...
         "double", "single", "logical", "int8", "uint8", "int16", ...
-        "uint16", "int32", "uint32", "int64", "uint64"])} = "double";
+        "uint16", "int32", "uint32", "int64", "uint64"])} = "infer";
 end
+mustHaveAtLeastOneRepeatingArg(arrayIn);
 
 %% Create Output Array
+if strcmp(options.Type, "infer")
+    try
+        A = zeros(1, like=arrayIn{1});
+        for ii = 2:numel(arrayIn)
+            A = A + zeros(1, like=arrayIn{ii});
+        end
+        options.Type = class(A);
+    catch ex
+        if ~any(strcmp(ex.identifier, ...
+                ["MATLAB:zeros:invalidInputClass", ...
+                "MATLAB:mixedClasses"]))
+            rethrow(ex);
+        end
+        options.Type = "double";
+    end
+end
 zerosArray = zeros(broadcastSize(arrayIn{:}), options.Type);
 
 end

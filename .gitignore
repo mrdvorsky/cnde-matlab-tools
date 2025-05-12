@@ -1,2 +1,5 @@
 # Matlab Backup Files
 *.asv
+
+# Concatenated Files
+allFiles.txt

@@ -173,7 +173,7 @@ classdef tester_hypotn < matlab.unittest.TestCase
         %% Error Condition Tests
         function testError_noInputs(testCase)
             testCase.verifyError(@() hypotn(), ...
-                "validators:mustHaveAtLeastOneRepeatingArg");
+                "MATLAB:narginchk:notEnoughInputs");
         end
 
         function testError_incompatibleInputs(testCase)

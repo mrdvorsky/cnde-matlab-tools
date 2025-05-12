@@ -3,7 +3,7 @@ function [versionString] = cndeMatlabTools_getVersion()
 %
 % Author: Matt Dvorsky
 
-versionString = "v0.1.1-beta";
+versionString = "v1.0.0";
 
 end
 

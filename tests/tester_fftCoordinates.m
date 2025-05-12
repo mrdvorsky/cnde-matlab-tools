@@ -99,7 +99,7 @@ classdef tester_fftCoordinates < matlab.unittest.TestCase
         function testError_noArgs(testCase)
             [~, ~, ~] = testCase.verifyError(...
                 @() fftCoordinates(), ...
-                "validators:mustHaveAtLeastOneRepeatingArg");
+                "MATLAB:narginchk:notEnoughInputs");
         end
 
         function testError_moreOutputsThanInputs(testCase)

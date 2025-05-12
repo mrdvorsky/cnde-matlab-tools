@@ -48,8 +48,8 @@ function [nodes, weights] = gaussLegendre(N, a, b)
 
 arguments
     N(1, 1) {mustBeInteger, mustBePositive} = 10;
-    a(1, 1) {mustBeReal, mustBeFinite} = -1;
-    b(1, 1) {mustBeReal, mustBeFinite} = 1;
+    a(1, 1) {mustBeFinite} = -1;
+    b(1, 1) {mustBeFinite} = 1;
 end
 
 %% Calculate Nodes
