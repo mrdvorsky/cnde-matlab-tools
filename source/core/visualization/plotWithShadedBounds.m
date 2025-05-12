@@ -1,30 +1,45 @@
 function [plotHandle, fillHandle] = plotWithShadedBounds(x, y, yMin, yMax, lineSpec, options, plotOptions)
-%Plots a line, along with a shaded region surrounding the line.
-% This function plots a single line, and then plots a transparent shaded
-% region specified by the input min/max bounds.
+%Plot a line with shaded bounds showing min/max or confidence intervals.
+% This function creates a line plot with a semi-transparent shaded region
+% between specified minimum and maximum bounds, useful for visualizing
+% uncertainty ranges or confidence intervals.
 %
-% Example Usage:
+% ===== Basic Usage =====
+%   plotWithShadedBounds(x, y, yMin, yMax);
+%   h = plotWithShadedBounds(x, y, yMin, yMax, "r-", LineWidth=1.5);
+%
+% ===== Multiple Plots =====
 %   figure;
-%   plotWithShadedBounds(x, y, yMin, yMax, LineWidth=1.5);
+%   plotWithShadedBounds(x, y1, yMin1, yMax1);
 %   hold on;
-%   plotWithShadedBounds(x, y2, yMin2, yMax2, ":", LineWidth=1.5);
+%   plotWithShadedBounds(x, y2, yMin2, yMax2, '--');
 %
 %
 % Inputs:
-%   x - Input x-coordinates for plot.
-%   y - Input y-coordinates for plot.
-%   yMin - Input y-coordinates for bottom of shaded region.
-%   yMax - Input y-coordinates for top of shaded region.
-%   lineSpec - Linespec argument, passed to "plot" function.
+%   x      - Vector of x-coordinates.
+%   y      - Vector of y-coordinates (central line).
+%   yMin   - Vector of lower bound values.
+%   yMax   - Vector of upper bound values.
+%   lineSpec ("") - Line style specification (same as "plot" function).
 %
 % Outputs:
-%   plotHandle - Output of the "plot" function.
-%   fillHandle - Output of the "fill" function.
+%   plotHandle - Handle to the line plot object.
+%   fillHandle - Handle to the shaded region patch object.
 %
-% Named Arguments:
-%   ShadedRegionAlpha (0.25) - Alpha value for shaded region.
-%   ShadedRegionLineWidth (0.5) - Linewidth for shaded region edge.
-%   Axis (gca()) - Axis on which to plot.
+% Options (name-value pairs):
+%   ShadedRegionAlpha (0.25) - Transparency of shaded region (0-1).
+%   ShadedRegionLineWidth (0.5) - Edge line width of shaded region
+%                                 (set to 0 for no edge).
+%   Axis (gca) - Target axes for plotting.
+%
+%   plotOptions - Additional line properties (name-value pairs):
+%                 Any valid Line property (e.g., 'LineWidth', 'Color').
+%                 See the "plot" function for more details.
+%
+% Notes:
+%   - Shaded region automatically matches the line color.
+%   - Maintains hold state of the target axes.
+%   - For statistical bounds, see plotWithErrorBounds.
 %
 % Author: Matt Dvorsky
 

@@ -1,47 +1,69 @@
 function [lineHandles, updateFun] = plotComplex(f, val, lineSpec, options, plotOptions)
-%Plot a complex-valued function in polar or other formats.
-% This function plots complex-valued data in various formats including polar,
-% magnitude, dB, phase, real, and imaginary components. It provides interactive
-% controls to switch between display formats.
+%Plot complex-valued data with interactive format control and dynamic updates.
+% This function visualizes complex-valued data in various formats (polar,
+% magnitude, phase, etc.) with interactive controls. It supports dynamic
+% updates through the returned update function handle.
 %
-% Example Usage:
+% ===== Basic Usage =====
 %   plotComplex(f, val);
-%   h = plotComplex(f, val);
+%   h = plotComplex(f, val);        % Return handles to lines.
+%
+% ===== Complex Data Visualization =====
 %   plotComplex(f, val, DisplayFormat="Polar");
 %   plotComplex(f, val, DisplayFormat="dB", AxisRangeDB=40);
-%   plotComplex(f, val, "-o", LineWidth=2);
 %
+% ===== Multiple Plots =====
+%   % In the example below, the DisplayFormat will be overwritten on the
+%   % second call, as if the first call was also "dB".
+%   figure;
+%   plotComplex(f, val1, DisplayFormat="Polar");
+%   hold on;
+%   plotComplex(f, val2, DisplayFormat="dB", AxisRangeDB=40);
 %
-% If the "DisplayFormat" option is set to "Polar", the complex values will be
-% plotted on a polar plot with a unit circle reference. Other formats plot
-% the selected component against the frequency (or x-axis) values.
+% ===== Advanced Features =====
+%   % Update plot data after creation.
+%   [~, updateFun] = plotComplex(f, val);
+%   updateFun(newVal);      % Update with new data
+%   drawnow;
+%
+%   % Customize appearance
+%   plotComplex(f, val, "-o", LineWidth=2, MarkerSize=8, ...
+%               DisplayFormat="Phase", SetAxisLimits=false);
+%
 %
 % Inputs:
-%   f - vector of x-axis values (typically frequency).
-%   val - Array containing complex values to plot. Can be a vector or matrix.
-%       If a matrix, each column will be plotted as a separate line.
-%   lineSpec - (Optional) Line specification string (e.g., '-r' for red solid line).
+%   f      - Vector of x-coordinates (typically frequency).
+%   val    - Complex-valued vector to plot, with same length as "f". Can
+%            be a 2D input, where each column generates a separate line.
+%   lineSpec ("") - Line style specification (same as "plot" function).
 %
 % Outputs:
-%   lineHandles - Array of line handles for each plotted line.
+%   lineHandles - Array of line object handles for each plotted trace.
+%   updateFun   - Function handle to update plot data: updateFun(newVal).
 %
-% Named Arguments:
-%   DisplayFormat ("Polar") - Which complex component to show:
-%       "Polar" - Complex plane plot with unit circle
-%       "Magnitude" - Magnitude vs frequency
-%       "dB" - Magnitude in dB vs frequency
-%       "Phase" - Phase in degrees vs frequency
-%       "Real" - Real component vs frequency
-%       "Imag" - Imaginary component vs frequency
-%   AxisRangeDB (60) - Range in dB for dB scale plots.
-%   Axis (gca()) - Axis on which to plot.
-%   AddCustomDataTips (true) - If true, adds detailed data tips showing
-%       real/imag/magnitude/phase values.
-%   SetAxisLimits (true) - If true, sets appropriate axis limits for each display format.
-%   ShowMenu (true) - If true, adds a context menu to change display format.
+% Options (name-value pairs):
+%   DisplayFormat ("Polar") - Visualization format:
+%       "Polar"    - Complex plane with unit circle
+%       "Magnitude"- Magnitude vs frequency
+%       "dB"       - Magnitude (20*log10) vs frequency
+%       "Phase"    - Phase (degrees) vs frequency
+%       "Real"     - Real component vs frequency
+%       "Imag"     - Imaginary component vs frequency
 %
-%   plotOptions - Additional line properties can be specified as name-value pairs
-%       (e.g., 'LineWidth', 2, 'Marker', 'o').
+%   AxisRangeDB (60)      - Dynamic range for dB-scale plots (positive value)
+%   Axis (gca)            - Target axes for plotting
+%   AddCustomDataTips (true) - Enable detailed data tips showing complex values
+%   SetAxisLimits (true)  - Auto-set appropriate axis limits for each format
+%   ShowMenu (true)       - Add context menu for interactive format control
+%
+%   plotOptions - Additional line properties (name-value pairs):
+%       Any valid Line property (e.g., 'LineWidth', 'Marker', 'Color')
+%
+% Notes:
+%   - New menu-bar allows changing display format interactively.
+%   - Data tips show: Frequency, [Real, Imag], Magnitude, and Phase.
+%   - For polar plots, unit circle and axes are shown as reference.
+%   - updateFun preserves all formatting when updating data.
 %
 % Author: Matt Dvorsky
 

@@ -1,55 +1,79 @@
 function [imageHandle, updateFun] = showImage(x, y, ImgIn, options)
-%Shows an 2D (potentially complex-valued) image.
-% This function shows a 2D image, and it optionally formats a complex
-% image for display. It also sets the axis aspect ratio properly.
+%Display a 2D image with support for complex-valued data and visualization options.
+% This function displays 2D images with proper aspect ratio and provides
+% specialized handling for complex-valued images through various display
+% formats. It includes features like normalization, different scaling
+% options, and interactive controls.
 %
-% Example Usage:
+% ===== Basic Usage =====
 %   showImage(x, y, Img);
-%   h = showImage(x, y, Img);
-%   showImage(x, y, Img, DisplayFormat="Magnitude");
-%   showImage(x, y, Img, DisplayFormat="Magnitude", Normalize=true);
+%   h = showImage([], [], Img);     % Uses indices as coordinates
 %
-%   % Updating image after creating.
-%   [~, updateFun] = showImage(x, y, Img);
-%   updateFun(ImgNew);
+% ===== Complex Data Visualization =====
+%   showImage(x, y, complexImg, DisplayFormat="Magnitude");
+%   showImage(x, y, complexImg, DisplayFormat="MagPhase");
+%   showImage(x, y, complexImg, DisplayFormat="Animated");
+%
+% ===== Advanced Features =====
+%   % Update image data after creation
+%   [~, updateFun] = showImage(x, y, ImgComplex);
+%   updateFun(newImgCompelx);   % Update with new complex-valued data.
 %   drawnow;
 %
+%   % Customize display
+%   showImage(x, y, Img, DisplayFormat="Phase", Normalize=true, ...
+%             ColorScaleRangeDB=40, Interpolation="Bilinear");
 %
-% If the "DisplayFormat" option is set to "MagPhase", the image will be
-% shown using color to represent phase, and intesity to represent
-% magnitude.
-%
-% If the "DisplayFormat" option is set to "Animated", a time changing
-% image will be shown. This will be similar to the "Real" or "Imag"
-% options, but the current phase will change using the e^-jwt convention.
-% This is useful to show electric or magnetic field plots with radiation.
 %
 % Inputs:
-%   x - vector of coordinates of ImgIn (first dimension).
-%   y - vector of coordinates of ImgIn (second dimension).
-%   ImgIn - Array containing image. Should have at most 2 non-singleton
-%       dimensions. Can be complex.
+%   x - Vector of x-coordinates (first dimension of ImgIn).
+%   y - Vector of y-coordinates (second dimension of ImgIn).
+%   ImgIn - 2D array containing image data. Can be real or complex-valued.
+%           Must satisfy size(squeeze(ImgIn)) = [length(x), length(y)].
 %
 % Outputs:
-%   imageHandle - Value returned from "imagesc".
-%   updateFun - Function handle that takes a new "ImgIn" argument, and
-%       updates the image shown.
+%   imageHandle - Handle to the image object created by imagesc.
+%   updateFun   - Function handle to update the displayed image with new
+%                 complex-valued data. This function will properly handle
+%                 the complex-valued display format.
 %
-% Named Arguments:
-%   DisplayFormat ("Magnitude") - Which complex component to show.
-%   DisplayScale ("Abs") - Scaling to apply (abs, db, linear).
-%   Normalize (false) - If true, normalize image before showing.
-%   NormalizeFactor (1) - If Normalize=true or DisplayFormat="MagPhase",
-%       this scaling factor is applied post-normalization.
-%   ColorScaleRangeDB (60) - Range, in dB to plot when in any 'dB' mode.
-%   ShowColorbar (true) - Whether or not to display colorbar.
-%   ColorbarLabel - If specified, use as the colorbar label string.
-%   Interpolation ("Nearest") - Type of image scaling interpolation to
-%       use. Essentially, should the image be pixelated or smooth.
-%   Axis (gca()) - Axis on which to plot.
-%   ShowMenu (true) - If true, add a context menu with display options.
-%   AnimationFPS (30) - Animation update rate, if animation mode is on.
-%   AnimationPeriodSeconds (2) - Animation periodicity.
+% Options (name-value pairs):
+%   DisplayFormat ("Magnitude") - How to display complex data:
+%       "Magnitude" - Show absolute value
+%       "Real"      - Show real component
+%       "Imag"      - Show imaginary component
+%       "Phase"     - Show phase (degrees)
+%       "MagPhase"  - Magnitude (alpha) + Phase (color)
+%       "Animated"  - Animated phase with magnitude alpha
+%
+%   DisplayScale ("Abs") - Scaling for magnitude/real/imag displays:
+%       "Linear"    - Linear scale
+%       "Abs"       - Absolute value
+%       "dB"        - 20*log10(abs())
+%
+%   Normalize (false)      - Normalize image by its maximum value.
+%   NormalizeFactor (1)    - Scaling factor applied after normalization.
+%   ColorScaleRangeDB (60) - Dynamic range in dB for dB-scale displays.
+%
+%   Interpolation ("Nearest") - Image interpolation method:
+%       "Nearest"   - Pixelated (no interpolation)
+%       "Bilinear"  - Smooth interpolation
+%
+%   ShowColorbar (true)   - Whether to show colorbar.
+%   ColorbarLabel         - Custom label for colorbar.
+%   Axis (gca)            - Target axes for plotting.
+%
+%   AddCustomDataTips (true) - Enable detailed data tips showing complex
+%                              values.
+%   ShowMenu (true)          - Add context menu for interactive controls.
+%
+%   AnimationFPS (30)      - Frame rate for animated display (1-30 fps).
+%   AnimationPeriodSeconds (2) - Period for phase animation (0.5-10 sec).
+%
+% Notes:
+%   - For "MagPhase" and "Animated" formats, magnitude controls transparency
+%   - Data tips show complex values as [Real, Imag], Magnitude, and Phase
+%   - Right-click menu allows changing display parameters interactively
 %
 % Author: Matt Dvorsky
 

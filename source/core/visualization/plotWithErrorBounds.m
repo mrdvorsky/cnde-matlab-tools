@@ -1,30 +1,49 @@
 function [plotHandle, fillHandle] = plotWithErrorBounds(x, y, lineSpec, options, plotOptions)
-%Plots a line, along with a shaded region surrounding the line.
-% This function plots a single line, and then plots a transparent shaded
-% region specified by the input min/max bounds.
+%Plot data with automatically calculated error bounds.
+% This function plots the mean of input data with shaded regions
+% representing different statistical bounds (min/max, ±1σ, ±2σ, or ±3σ).
 %
-% Example Usage:
+% ===== Basic Usage =====
+%   plotWithErrorBounds(x, yData);
+%   h = plotWithErrorBounds(x, yData, "b-", ErrorBoundType="Std*2");
+%
+% ===== Multiple Plots =====
 %   figure;
-%   plotWithShadedBounds(x, y, ErrorBoundType="Std*1");
+%   plotWithErrorBounds(x, yData1, ErrorBoundType="Std*1");
 %   hold on;
-%   plotWithShadedBounds(x, y2, ":", LineWidth=1.5);
+%   plotWithErrorBounds(x, yData2, ":", ErrorBoundType="MinMax");
 %
 %
 % Inputs:
-%   x - Input x-coordinates for plot.
-%   y - 2D array, where each column has the y-coordinates for the plot.
-%   lineSpec - Linespec argument, passed to "plot" function.
+%   x      - Vector of x-coordinates
+%   y      - Matrix where each column represents a different
+%            measurement/sample and rows correspond to x-values.
+%   lineSpec ("") - Line style specification (same as "plot" function).
 %
 % Outputs:
-%   plotHandle - Output of the "plot" function.
-%   fillHandle - Output of the "fill" function.
+%   plotHandle - Handle to the mean line plot object.
+%   fillHandle - Handle to the error bound patch object.
 %
-% Named Arguments:
-%   ShadedRegionAlpha (0.25) - Alpha value for shaded region.
-%   ShadedRegionLineWidth (0.5) - Linewidth for shaded region edge.
-%   Axis (gca()) - Axis on which to plot.
-%   ErrorBoundType ("MinMax") - What method to use to calculate error
-%       bounds. Can be "MinMax", "Std*1", "Std*2", "Std*3".
+% Options (name-value pairs):
+%   ErrorBoundType ("MinMax") - Statistical bound calculation method:
+%       "MinMax" - Minimum and maximum bounds.
+%       "Std*1"  - Mean ±1 standard deviation.
+%       "Std*2"  - Mean ±2 standard deviations.
+%       "Std*3"  - Mean ±3 standard deviations.
+%
+%   ShadedRegionAlpha (0.25) - Transparency of shaded region (0-1).
+%   ShadedRegionLineWidth (0.5) - Edge line width of shaded region
+%                                 (set to 0 for no edge).
+%   Axis (gca) - Target axes for plotting.
+%
+%   plotOptions - Additional line properties (name-value pairs):
+%                 Any valid Line property (e.g., 'LineWidth', 'Color').
+%                 See the "plot" function for more details.
+%
+% Notes:
+%   - Automatically calculates mean and specified bounds.
+%   - Shaded region matches line color automatically.
+%   - For pre-calculated bounds, use plotWithShadedBounds.
 %
 % Author: Matt Dvorsky
 
