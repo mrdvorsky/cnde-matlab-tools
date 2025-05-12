@@ -74,6 +74,7 @@ arguments
     options.ColorbarLabel(1, 1) string;
     options.Axis(1, 1) matlab.graphics.axis.Axes;
 
+    options.AddCustomDataTips(1, 1) logical = true;
     options.ShowMenu(1, 1) logical = true;
 
     options.AnimationFPS(1, 1) ...
@@ -106,12 +107,12 @@ displayFormatItems = [...
 displayScaleItems = [...
     "Linear", ...
     "Abs", ...
-    "dB"
+    "dB", ...
     ];
 
 interpItems = [...
     "Nearest", ...
-    "Bilinear"
+    "Bilinear", ...
     ];
 
 %% Show Image
@@ -132,6 +133,28 @@ options.Axis.UserData.options = options;
 options.Axis.UserData.maxImgAbs = maxImgAbs;
 options.Axis.UserData.Img = ImgIn;
 options.Axis.UserData.PlotHandle = imageHandle;
+
+%% Add Custom Data Tips
+if options.AddCustomDataTips
+    tmpTip = datatip(imageHandle, x(1), y(1), Visible="off");
+
+    imageHandle.DataTipTemplate.DataTipRows(2) = dataTipTextRow(...
+        "[R, I]", ...
+        @(x) dataTipHandler_realImag(options.Axis, imageHandle, x), ...
+        "auto");
+
+    imageHandle.DataTipTemplate.DataTipRows(3) = dataTipTextRow(...
+        "Mag", ...
+        @(x) dataTipHandler_mag(options.Axis, imageHandle, x), ...
+        "%.6g");
+
+    imageHandle.DataTipTemplate.DataTipRows(4) = dataTipTextRow(...
+        "Phase", ...
+        @(x) dataTipHandler_phase(options.Axis, imageHandle, x), ...
+        "%.6g deg");
+
+    delete(tmpTip);
+end
 
 %% Set Colormap
 setColormap(options.Axis);
@@ -211,6 +234,37 @@ function updateFunHandler(axis, ImgIn)
     axis.UserData.PlotHandle.AlphaData = ImgA.';
 end
 
+%% Data Tip Handler
+function [realImag] = dataTipHandler_realImag(axis, imgHandle, xyCoords)
+    xPick = xyCoords(1);
+    yPick = xyCoords(2);
+
+    xInd = nearestIndex(imgHandle.XData, xPick);
+    yInd = nearestIndex(imgHandle.YData, yPick);
+
+    realImag = axis.UserData.Img(xInd, yInd);
+    realImag = [real(realImag), imag(realImag)];
+end
+
+function [mag] = dataTipHandler_mag(axis, imgHandle, xyCoords)
+    xPick = xyCoords(1);
+    yPick = xyCoords(2);
+
+    xInd = nearestIndex(imgHandle.XData, xPick);
+    yInd = nearestIndex(imgHandle.YData, yPick);
+
+    mag = abs(axis.UserData.Img(xInd, yInd));
+end
+
+function [ph] = dataTipHandler_phase(axis, imgHandle, xyCoords)
+    xPick = xyCoords(1);
+    yPick = xyCoords(2);
+
+    xInd = nearestIndex(imgHandle.XData, xPick);
+    yInd = nearestIndex(imgHandle.YData, yPick);
+
+    ph = rad2deg(angle(axis.UserData.Img(xInd, yInd)));
+end
 
 %% Display Format Update Functions
 function displayFormatUpdateFun(itemText, axis)

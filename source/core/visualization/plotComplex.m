@@ -1,6 +1,48 @@
-function [lineHandles] = plotComplex(f, val, lineSpec, options, plotOptions)
+function [lineHandles, updateFun] = plotComplex(f, val, lineSpec, options, plotOptions)
 %Plot a complex-valued function in polar or other formats.
-% 
+% This function plots complex-valued data in various formats including polar,
+% magnitude, dB, phase, real, and imaginary components. It provides interactive
+% controls to switch between display formats.
+%
+% Example Usage:
+%   plotComplex(f, val);
+%   h = plotComplex(f, val);
+%   plotComplex(f, val, DisplayFormat="Polar");
+%   plotComplex(f, val, DisplayFormat="dB", AxisRangeDB=40);
+%   plotComplex(f, val, "-o", LineWidth=2);
+%
+%
+% If the "DisplayFormat" option is set to "Polar", the complex values will be
+% plotted on a polar plot with a unit circle reference. Other formats plot
+% the selected component against the frequency (or x-axis) values.
+%
+% Inputs:
+%   f - vector of x-axis values (typically frequency).
+%   val - Array containing complex values to plot. Can be a vector or matrix.
+%       If a matrix, each column will be plotted as a separate line.
+%   lineSpec - (Optional) Line specification string (e.g., '-r' for red solid line).
+%
+% Outputs:
+%   lineHandles - Array of line handles for each plotted line.
+%
+% Named Arguments:
+%   DisplayFormat ("Polar") - Which complex component to show:
+%       "Polar" - Complex plane plot with unit circle
+%       "Magnitude" - Magnitude vs frequency
+%       "dB" - Magnitude in dB vs frequency
+%       "Phase" - Phase in degrees vs frequency
+%       "Real" - Real component vs frequency
+%       "Imag" - Imaginary component vs frequency
+%   AxisRangeDB (60) - Range in dB for dB scale plots.
+%   Axis (gca()) - Axis on which to plot.
+%   AddCustomDataTips (true) - If true, adds detailed data tips showing
+%       real/imag/magnitude/phase values.
+%   SetAxisLimits (true) - If true, sets appropriate axis limits for each display format.
+%   ShowMenu (true) - If true, adds a context menu to change display format.
+%
+%   plotOptions - Additional line properties can be specified as name-value pairs
+%       (e.g., 'LineWidth', 2, 'Marker', 'o').
+%
 % Author: Matt Dvorsky
 
 arguments
@@ -14,6 +56,7 @@ arguments
     options.AxisRangeDB(1, 1) {mustBePositive} = 60;
     options.Axis(1, 1) matlab.graphics.axis.Axes;
 
+    options.AddCustomDataTips(1, 1) logical = true;
     options.SetAxisLimits(1, 1) logical = true;
     options.ShowMenu(1, 1) logical = true;
 
@@ -35,7 +78,7 @@ displayFormatItems = [...
     "dB", ...
     "Phase", ...
     "Real", ...
-    "Imag" ...
+    "Imag", ...
     ];
 
 %% Draw Primary Plot
@@ -45,6 +88,21 @@ lineHandles = plot(options.Axis, xp, yp, lineSpec, plotOptions);
 for ii = 1:size(val, 2)
     lineHandles(ii).UserData.f = f;
     lineHandles(ii).UserData.val = val;
+end
+
+%% Add Custom Data Tips
+if options.AddCustomDataTips
+    for ii = 1:size(val, 2)
+        dataTipsCustom = [...
+            dataTipTextRow("Freq", f, "%.6g GHz"), ...
+            dataTipTextRow("Real", real(val(:, ii)), "%.6g"), ...
+            dataTipTextRow("Imag", imag(val(:, ii)), "%.6g"), ...
+            dataTipTextRow("Mag", abs(val(:, ii)), "%.6g"), ...
+            dataTipTextRow("Phase", rad2deg(angle(val(:, ii))), "%.6g deg"), ...
+            ];
+        
+        lineHandles(ii).DataTipTemplate.DataTipRows = dataTipsCustom;
+    end
 end
 
 %% Draw Unit Circle and Axes
