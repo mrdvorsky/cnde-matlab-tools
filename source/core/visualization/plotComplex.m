@@ -29,8 +29,6 @@ if isvector(val)
     val = val(:);
 end
 
-wasHoldOn = ishold(options.Axis);
-
 displayFormatItems = [...
     "Polar", ...
     "Magnitude", ...
@@ -42,7 +40,7 @@ displayFormatItems = [...
 
 %% Draw Primary Plot
 [xp, yp] = convertData(options, f, val);
-lineHandles = plot(xp, yp, lineSpec, plotOptions);
+lineHandles = plot(options.Axis, xp, yp, lineSpec, plotOptions);
 
 for ii = 1:size(val, 2)
     lineHandles(ii).UserData.f = f;
@@ -68,13 +66,12 @@ if ~isfield(options.Axis.UserData, "unitCircleHandle")
 end
 
 %% Add Menu Items
-if options.ShowMenu
-    if ~isfield(options.Axis.UserData, "options")
-        fig = ancestor(options.Axis, "matlab.ui.Figure");
-        menu = uimenu(fig, Text="Display Format");
-        createMenuList(menu, displayFormatItems, options.DisplayFormat, ...
-            {@displayFormatUpdateFun, options.Axis});
-    end
+% Checking for "options" field so that we only do this on the first run.
+if options.ShowMenu && ~isfield(options.Axis.UserData, "options")
+    fig = ancestor(options.Axis, "matlab.ui.Figure");
+    menu = uimenu(fig, Text="Display Format");
+    createMenuList(menu, displayFormatItems, options.DisplayFormat, ...
+        {@displayFormatUpdateFun, options.Axis});
 end
 
 options.Axis.UserData.options = options;
