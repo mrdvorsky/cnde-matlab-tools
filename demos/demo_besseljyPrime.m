@@ -3,12 +3,13 @@ clear;
 close all;
 
 %% Inputs
-r12 = [1, 4];
-
-rPlot(:, 1) = linspace(0, 5, 1000);
-
+% Try changing the order below.
 besselOrder = 5;
 numZeros = 3;
+
+
+r12 = [1, 4];
+rPlot(:, 1) = linspace(0, 5, 1000);
 
 %% Plot
 figure;

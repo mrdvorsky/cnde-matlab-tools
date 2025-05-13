@@ -1,6 +1,6 @@
 clc;
 clear;
-% close all;
+close all;
 
 %% Inputs
 S = [1, -1, exp(0.5j)];
@@ -22,10 +22,10 @@ figure;
 handle_r = showImage(xp, yp, calSens, DisplayFormat="Magnitude");
 clim([0, 2]);
 hold on;
-interactivePlot(real(S), imag(S), ...
+interactiveDots(real(S), imag(S), ...
     {@updatePlot, xp, yp, handle_r, offInds, dt}, ...
     MarkerSize=20, ...
-    DragClampFun=@(x, y) [x, y] + 0 ./ max(hypot(x, y), 1));
+    DragClampFun=@(x, y) [x, y] ./ max(hypot(x, y), 1));
 
 
 
@@ -62,10 +62,11 @@ function [calSens] = getCalSens(x, y, S, inds, dt)
     calSens = sqrt(calSens) .* (hypot(x, y) <= 1);
 end
 
-function updatePlot(sReal, sImag, xp, yp, plot_handle, offInds, dt)
+function [sReal, sImag] = updatePlot(sReal, sImag, ind, xp, yp, plot_handle, offInds, dt)
     arguments
         sReal(:, 1);
         sImag(:, 1);
+        ind(1, 1);
         xp(:, 1);
         yp(1, :);
         plot_handle;
