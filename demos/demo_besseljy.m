@@ -3,12 +3,13 @@ clear;
 close all;
 
 %% Inputs
-r12 = [1, 4];
-
-rPlot(:, 1) = linspace(0, 5, 1000);
-
-besselOrder = 1;
+% Try changing the order below.
+besselOrder = 5;
 numZeros = 3;
+
+
+r12 = [1, 4];
+rPlot(:, 1) = linspace(0, 5, 1000);
 
 %% Plot
 figure;
@@ -25,6 +26,7 @@ interactiveDots(r12, 0*r12, ...
 
 %% Update Function
 function [x, y] = updateFunction(x, y, ind, linePlot, axes, besselOrder, numZeros)
+    x = max(x, 0.0000001);
     y = 0*y;
 
     [k, t] = besselCrossZeros(besselOrder, max(x)./min(x), 1:numZeros);
@@ -34,7 +36,7 @@ function [x, y] = updateFunction(x, y, ind, linePlot, axes, besselOrder, numZero
             besselOrder, t(ii), k(ii).*linePlot(ii).XData ./ min(x));
     end
 
-    legend(axes, compose("kc = %.2f", k));
+    legend(axes, compose("kc = %.2f", k ./ min(x)));
 end
 
 
