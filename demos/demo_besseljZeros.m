@@ -3,7 +3,7 @@ clear;
 close all;
 
 %% Inputs
-v(1, :) = [0, 1, 5];
+v(1, :) = [0, 1, 5, 0.5];
 n(:, 1) = 1:10;
 
 xPlot(:, 1) = linspace(0, 25, 1000);
