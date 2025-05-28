@@ -508,10 +508,8 @@ end
 
 %% Custom Argument Validation Function
 function mustBeValidImageSize(Img, x, y)
-    if all(size(Img) == [numel(x), numel(y)])
-        return;
-    end
-    if (numel(Img) == numel(x)*numel(y)) && (isscalar(x) || isscalar(y))
+    if all((size(Img) == [numel(x), numel(y)]) ...
+            | ([isempty(x), isempty(y)]))
         return;
     end
     throwAsCaller(MException("showImage:mustBeValidImageSize", ...
