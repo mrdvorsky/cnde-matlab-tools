@@ -44,7 +44,8 @@ function [imageHandle, updateFun] = showImage(x, y, ImgIn, options)
 %       "Imag"      - Show imaginary component
 %       "Phase"     - Show phase (degrees)
 %       "MagPhase"  - Magnitude (alpha) + Phase (color)
-%       "Animated"  - Animated phase with magnitude alpha
+%       "Animated"  - Same as "Real", but the instantaneous phase changes
+%                     with time
 %
 %   DisplayScale ("Abs") - Scaling for magnitude/real/imag displays:
 %       "Linear"    - Linear scale
@@ -71,9 +72,9 @@ function [imageHandle, updateFun] = showImage(x, y, ImgIn, options)
 %   AnimationPeriodSeconds (2) - Period for phase animation (0.5-10 sec).
 %
 % Notes:
-%   - For "MagPhase" and "Animated" formats, magnitude controls transparency
+%   - For the "MagPhase" format, magnitude controls transparency
 %   - Data tips show complex values as [Real, Imag], Magnitude, and Phase
-%   - Right-click menu allows changing display parameters interactively
+%   - Menu-bar menu allows changing display parameters interactively
 %
 % Author: Matt Dvorsky
 
@@ -156,6 +157,7 @@ set(options.Axis, Color="k");
 options.Axis.UserData.options = options;
 options.Axis.UserData.maxImgAbs = maxImgAbs;
 options.Axis.UserData.Img = ImgIn;
+options.Axis.UserData.animationPhase = 1;
 options.Axis.UserData.PlotHandle = imageHandle;
 
 %% Add Custom Data Tips
@@ -344,9 +346,14 @@ function closeRequest(axis, ~)
 end
 
 function animationTimerFunction(~, ~, axis, phaseShiftPerUpdate)
-    currentColormap = colormap(axis);
-    colormap(axis, circshift(currentColormap, ...
-        round(size(currentColormap, 1) * phaseShiftPerUpdate/(-2*pi)), 1));
+    ph = axis.UserData.animationPhase;
+    axis.UserData.animationPhase = ph .* exp(1j * phaseShiftPerUpdate);
+
+    axis.UserData.PlotHandle.CData = convertImage(...
+        ph .* axis.UserData.Img.', ...
+        axis.UserData.options, ...
+        axis.UserData.maxImgAbs);
+
     drawnow;
 end
 
@@ -371,14 +378,14 @@ function [ImgC, ImgA] = convertImage(ImgIn, options, maxVal)
             ImgC = rad2deg(angle(ImgIn));
             ImgA = abs(ImgIn) * (options.NormalizeFactor ./ maxVal);
         case "Animated"
-            ImgC = rad2deg(angle(ImgIn));
-            ImgA = abs(ImgIn) * (options.NormalizeFactor ./ maxVal);
+            ImgC = real(ImgIn) * scaleFactor;
         otherwise
             error("'DisplayFormat' argument '%s' is not recognized", ...
                 options.DisplayFormat);
     end
 
-    if any(strcmp(options.DisplayFormat, ["Magnitude", "Real", "Imag"]))
+    if any(strcmp(options.DisplayFormat, ...
+            ["Magnitude", "Real", "Imag", "Animated"]))
         switch options.DisplayScale
             case "Linear"
             case "Abs"
@@ -405,13 +412,14 @@ function colorbarLabel = getColorbarLabel(options)
         case "MagPhase"
             colorbarLabel = "Phase (deg)";
         case "Animated"
-            colorbarLabel = "Phase (deg)";
+            colorbarLabel = "Instantaneous";
         otherwise
             error("'DisplayFormat' argument '%s' is not recognized", ...
                 options.DisplayFormat);
     end
 
-    if any(strcmp(options.DisplayFormat, ["Magnitude", "Real", "Imag"]))
+    if any(strcmp(options.DisplayFormat, ...
+            ["Magnitude", "Real", "Imag", "Animated"]))
         switch options.DisplayScale
             case "Linear"
                 colorbarLabel = strcat(colorbarLabel, " (Linear)");
@@ -460,22 +468,14 @@ function setColormap(axis)
             colormap(axis, "hsv");
             clim(axis, [-180, 180]);
         case "Animated"
-            ph = linspace(-180, 180, 512).';
             switch options.DisplayScale
                 case "Linear"
-                    cmap = interp1(ph/180, ...
-                        colormapplusminus(numel(ph)), cosd(ph));
-                    colormap(axis, cmap);
+                    colormap(axis, "colormapplusminus");
                 case "Abs"
-                    cmap = interp1((ph + 180)/360, ...
-                        gray(numel(ph)), abs(cosd(ph)));
-                    colormap(axis, cmap);
+                    colormap(axis, "jet");
                 case "dB"
-                    cmap = interp1((ph + 180)/360, ...
-                        gray(numel(ph)), abs(cosd(ph)));
-                    colormap(axis, cmap);
+                    colormap(axis, "jet");
             end
-            clim(axis, [-180, 180]);
     end
 end
 
