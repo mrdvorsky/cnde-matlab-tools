@@ -253,7 +253,12 @@ function updateFunHandler(axis, ImgIn)
     axis.UserData.maxImgAbs = max(abs(ImgIn(:)));
     axis.UserData.Img = ImgIn;
 
-    [ImgC, ImgA] = convertImage(ImgIn, ...
+    ph = 1;
+    if strcmp(axis.UserData.options.DisplayFormat, "Animated")
+        ph = axis.UserData.animationPhase;
+    end
+
+    [ImgC, ImgA] = convertImage(ph .* ImgIn, ...
         axis.UserData.options, axis.UserData.maxImgAbs);
 
     axis.UserData.PlotHandle.CData = ImgC.';
@@ -303,6 +308,12 @@ function displayFormatUpdateFun(itemText, axis)
     elseif ~strcmp(itemText, "Animated") ...
             && strcmp(axis.UserData.animationTimer.Running, "on")
         stop(axis.UserData.animationTimer);
+    end
+
+    if strcmp(itemText, "Real")
+        axis.UserData.animationPhase = 1;
+    elseif strcmp(itemText, "Imag")
+        axis.UserData.animationPhase = -1j;
     end
 end
 
