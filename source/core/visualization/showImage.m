@@ -465,7 +465,7 @@ function setColormap(axis)
             clim(axis, [0, maxVal]);
         case "dB"
             colormap(axis, "jet");
-            clim(axis, [-options.ColorScaleRangeDB, 0] + db(maxVal));
+            clim(axis, [-options.ColorScaleRangeDB, 0] + (20*log10(abs(maxVal))));
         otherwise
             error("'DisplayScale' argument '%s' is not recognized", ...
                 options.DisplayScale);
